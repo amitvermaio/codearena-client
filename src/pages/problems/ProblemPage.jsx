@@ -272,6 +272,4 @@ const ProblemsPage = () => {
 }
 
 export default ProblemsPage
-$env:GIT_AUTHOR_DATE="2024-08-20 17:00:00"
-$env:GIT_COMMITTER_DATE="2024-08-20 17:00:00"
-git commit -m "Refactor(ProblemPage): optimize state logic, clean up filters, and improve UI styling"
+
