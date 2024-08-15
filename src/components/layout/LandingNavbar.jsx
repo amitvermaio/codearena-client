@@ -21,26 +21,15 @@ const useTheme = () => {
     return 'light'; // Default for server-side rendering
   });
 
-  useEffect(() => {
-    // Ensure DOM is available (SSR-safe)
-    if (typeof window === 'undefined') return;
-
-    // Debug helper (commented out by default)
-    // console.log(`DEBUG: Attempting to set theme to: ${theme}`);
+useEffect(() => {
+    // Debug: Check if theme is correctly applied
+   console.log(`DEBUG: Attempting to set theme to: ${theme}`);
 
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
-
-  function setTheme(newTheme) {
-      setThemeState(newTheme);
-    }
-
-  return { theme, setTheme };
-};
-
 // --- Converted Components ---
 
 /**
