@@ -11,6 +11,22 @@ const FALLBACK_CONTENT = {
   tags: ["Stay tuned", "New challenge"],
 };
 
+/** -------------------------------------------------------
+ * No-op telemetry initializer (placeholder)
+ * ------------------------------------------------------*/
+const initPOTDTelemetry = () => {};
+initPOTDTelemetry();
+
+/** -------------------------------------------------------
+ * Helper to tidy difficulty class logic
+ * ------------------------------------------------------*/
+const getDifficultyClass = (problem, display) => {
+  if (!problem) {
+    return "border border-dashed border-border/60 text-muted-foreground";
+  }
+  return difficultyColors[display.difficulty] || "border border-border text-foreground";
+};
+
 export const ProblemOfTheDay = ({ problem }) => {
   const hasProblem = Boolean(problem);
   const display = hasProblem ? problem : FALLBACK_CONTENT;
@@ -21,20 +37,20 @@ export const ProblemOfTheDay = ({ problem }) => {
         {children}
       </Link>
     ) : (
-      <div className="block p-6 select-none opacity-90" aria-disabled>
+      <div className="block p-6 select-none opacity-90" aria-disabled="true">
         {children}
       </div>
     );
 
-  const difficultyClass = hasProblem
-    ? difficultyColors[display.difficulty] || "border border-border text-foreground"
-    : "border border-dashed border-border/60 text-muted-foreground";
+  const difficultyClass = getDifficultyClass(hasProblem, display);
 
   return (
     <Card className="group overflow-hidden transition-all duration-300 hover:shadow-primary/20 hover:border-primary/30 bg-gradient-to-br from-card to-muted/30">
       <Wrapper>
         <CardContent className="p-0">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+
+            {/* Left Section */}
             <div className="flex-grow">
               <div className="flex items-center gap-3 mb-3">
                 <Flame className={`h-7 w-7 ${hasProblem ? "text-orange-500" : "text-muted-foreground"}`} />
@@ -42,16 +58,16 @@ export const ProblemOfTheDay = ({ problem }) => {
                   {display.title}
                 </h2>
               </div>
+
               <div className="flex items-center gap-4 text-sm">
-                <Badge
-                  variant="outline"
-                  className={difficultyClass}
-                >
+                <Badge variant="outline" className={difficultyClass}>
                   {display.difficulty}
                 </Badge>
+
                 <span className="text-muted-foreground">
                   Acceptance: {display.acceptance}
                 </span>
+
                 <div className="hidden md:flex flex-wrap gap-2">
                   {(display.tags ?? []).slice(0, 3).map((tag) => (
                     <Badge key={tag} variant="secondary">
@@ -61,6 +77,8 @@ export const ProblemOfTheDay = ({ problem }) => {
                 </div>
               </div>
             </div>
+
+            {/* Right Section */}
             <div className="w-full md:w-auto mt-4 md:mt-0">
               <div
                 className={`group/button flex items-center justify-end font-medium transition-all duration-300 ease-in-out h-9 px-0 py-2 ${
@@ -77,6 +95,7 @@ export const ProblemOfTheDay = ({ problem }) => {
                 />
               </div>
             </div>
+
           </div>
         </CardContent>
       </Wrapper>
