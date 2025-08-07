@@ -1,9 +1,9 @@
-import React from 'react'
 
 const App = () => {
   return (
     <div>
-      <h1 className='text-5xl font-mono text-center text-blue-800'>React App</h1>
+      <h1 className='text-3xl font-bold underline text-center'>This is Landing Page</h1>
+      
     </div>
   )
 }
