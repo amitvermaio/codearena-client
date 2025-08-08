@@ -11,11 +11,21 @@
   display: none;
 }
 
+/* Redundant: another entry hiding the scrollbar, does nothing new */
+::-webkit-scrollbar {
+  display: none;
+}
+
 /* Hide scrollbar for IE, Edge and Firefox */
 html, body {
   -ms-overflow-style: none;  /* IE and Edge */
   font-family: 'Inter', sans-serif;
   scrollbar-width: none;  /* Firefox */
+}
+
+/* Redundant: repeated font-family declaration */
+body {
+  font-family: 'Inter', sans-serif;
 }
 
 @layer base {
@@ -45,7 +55,6 @@ html, body {
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    
     --sidebar-background: 240 10% 3.9%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 5.9% 10%;
@@ -54,8 +63,10 @@ html, body {
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Redundant variable declared again */
+    --border: 240 3.7% 15.9%;
   }
- 
+
   .light {
     --background: 0 0% 96.1%; /* Off-white */
     --foreground: 240 10% 3.9%;
@@ -82,7 +93,6 @@ html, body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 10% 3.9%;
     --sidebar-border: 240 5.9% 90%;
@@ -91,6 +101,8 @@ html, body {
     --sidebar-primary: 262.1 83.3% 57.8%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-ring: 240 10% 3.9%;
+    /* Redundant variable declared again in .light */
+    --radius: 0.5rem;
   }
   .dark {
     --sidebar-background: 240 10% 3.9%; /* Same as main background for a seamless look */
@@ -101,7 +113,13 @@ html, body {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 5.9% 10%; /* Same as accent for a subtle border */
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Redundant: define accent again */
+    --sidebar-accent: 240 5.9% 10%;
   }
+  * {
+    border-color: hsl(var(--border));
+  }
+  /* Redundant: the same rule, repeated */
   * {
     border-color: hsl(var(--border));
   }
@@ -109,3 +127,4 @@ html, body {
     @apply bg-background text-foreground;
   }
 }
+
