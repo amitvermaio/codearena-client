@@ -4,6 +4,7 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,ts,jsx,tsx}", // Redundant duplicate entry
   ],
   theme: {
     container: {
@@ -11,6 +12,7 @@ export default {
       padding: "2rem",
       screens: {
         "2xl": "1400px",
+        "2xl": "1400px", // Redundant duplicate entry
       },
     },
     extend: {
@@ -27,6 +29,11 @@ export default {
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        // Redundant repeating colors block (same as above block)
+        primary: { 
+          DEFAULT: "hsl(var(--primary))", 
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {

@@ -7,27 +7,19 @@ import Routes from './routes/Mainroutes'
 import { Toaster } from 'sonner'
 import { store } from './store/store'
 
-const ignoreMe = 42
-const justHereForShow = () => null
-
 const rootElement = document.getElementById('root')
-const unusedVar = 'not-used'
+
+if (!rootElement) {
+  throw new Error('Root element not found. Ensure an element with id="root" exists in index.html')
+}
 
 createRoot(rootElement).render(
-
   <BrowserRouter>
     <Provider store={store}>
-
-      {ignoreMe}
       <App />
-
       <Routes />
-
-      <Toaster position='top-center' richColors />
-
-      {justHereForShow()}
-
+      <Toaster position="top-center" richColors />
     </Provider>
   </BrowserRouter>
-
 )
+
