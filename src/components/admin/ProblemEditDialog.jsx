@@ -42,7 +42,7 @@ export function ProblemEditDialog({ isOpen, setIsOpen, problem, onSave }) {
     if (isOpen) {
       if (problem) {
         setFormData({
-          ...defaultProblem, // ensure all fields are present
+          ...defaultProblem, // ensure all fields are presenting 
           ...problem,
           testCases:
             problem.testCases && problem.testCases.length > 0

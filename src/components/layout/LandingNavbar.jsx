@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Moon, Sun, Menu, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-
+//Refactoring Landing Bar
 /**
  * A simplified hook to manage theme state, replacing `next-themes`.
  * This implementation toggles a 'dark' class on the root <html> element.
