@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { subDays, format, add } from 'date-fns';
 
 const mockProblems = [
