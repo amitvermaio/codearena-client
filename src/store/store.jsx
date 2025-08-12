@@ -1,28 +1,40 @@
+// src/store/store.js
 import { configureStore } from "@reduxjs/toolkit";
+
+// Feature slices
 import problemsReducer from "./features/problems/problemSlice";
-import userReducer from "./features/user/userSlice"; // <- common users
-import adminUserReducer from "./features/admin/userSlice"; // <- admin panel users
-import profileReducer from "./features/profile/profileSlice"; // <- profile
+import userReducer from "./features/user/userSlice";
+import adminUserReducer from "./features/admin/userSlice";
+import profileReducer from "./features/profile/profileSlice";
 import potdReducer from "./features/problems/potdSlice";
 
 export const store = configureStore({
   reducer: {
-    user: userReducer,          // for common user
-    adminUsers: adminUserReducer, // for admin panel
+    // Common user state
+    user: userReducer,
+
+    // Admin panel user management
+    adminUsers: adminUserReducer,
+
+    // Problem-related data (listing, filtering, etc.)
     problems: problemsReducer,
-    profile: profileReducer, // for profile
+
+    // User profile information
+    profile: profileReducer,
+
+    // POTD (Problem of the Day)
     potd: potdReducer,
-    // contests: contestsReducer,
+
+    // contests: contestsReducer, // future use
   },
 });
 
+// ----------------------
+// Example Selectors
+// ----------------------
 
-
-// // In your components
-// import { useSelector, useDispatch } from 'react-redux';
-// import { fetchProblems, setFilter } from './problemActions';
-// import { selectPaginatedProblems, selectProblemLoading } from './problemSlice';
-
-// const dispatch = useDispatch();
-// const problems = useSelector(selectPaginatedProblems);
-// const loading = useSelector(selectProblemLoading);
+export const selectUser = (state) => state.user;
+export const selectAdminUsers = (state) => state.adminUsers;
+export const selectProfile = (state) => state.profile;
+export const selectProblems = (state) => state.problems;
+export const selectPOTD = (state) => state.potd;
