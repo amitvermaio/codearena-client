@@ -16,9 +16,6 @@ import {
   Code, 
   Layers, 
   Video, 
-  IndianRupee, 
-  CheckCircle, 
-  Sparkles 
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getProblemOfTheDay } from '@/lib/api';
@@ -67,7 +64,7 @@ const faqs = [
   }
 ];
 
-export default function LandingPage() {
+const Home = () => {
   const [problemOfTheDay, setProblemOfTheDay] = useState(null);
 
   useEffect(() => {
@@ -128,12 +125,12 @@ export default function LandingPage() {
               className="mt-8 flex flex-col sm:flex-row justify-center gap-4"
             >
               <Button asChild size="lg" className="shadow-lg hover:shadow-primary/50 transition-shadow">
-                <Link href="/create-account">
-                  Start Your 10 Free Sessions <ArrowRight className="ml-2 h-5 w-5" />
+                <Link to="/create-account">
+                  Get Started <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href="#pricing">View Pricing</Link>
+                <a href="#features"> Features </a>
               </Button>
             </motion.div>
           </div>
@@ -244,53 +241,7 @@ export default function LandingPage() {
               ))}
             </motion.div>
           </div>
-        </section>
-
-        {/* Pricing Section */}
-        <section id="pricing" className="py-20 sm:py-24 bg-background/80 backdrop-blur-sm">
-          <div className="container mx-auto px-4">
-            <div className="mx-auto max-w-3xl text-center mb-12">
-              <h2 className="text-3xl font-bold font-headline sm:text-4xl">Unlock Your Full Potential</h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Choose a plan that fits your journey. Start for free, and upgrade for unlimited collaborative sessions.
-              </p>
-            </div>
-            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Card>
-                <CardHeader className="text-center p-8">
-                  <IndianRupee className="h-10 w-10 mx-auto mb-4 p-2 bg-primary/10 text-primary rounded-full" />
-                  <CardTitle className="font-headline text-2xl">Pro Monthly</CardTitle>
-                  <CardDescription className="text-4xl font-bold text-foreground">₹299 <span className="text-xl font-normal text-muted-foreground">/ month</span></CardDescription>
-                </CardHeader>
-                <CardContent className="p-8 pt-0">
-                  <ul className="space-y-3 text-muted-foreground">
-                    <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-green-500" /> Unlimited Pair Programming Sessions</li>
-                    <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-green-500" /> Create Private Contests</li>
-                    <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-green-500" /> In-depth Analytics</li>
-                    <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-green-500" /> All Free Features</li>
-                  </ul>
-                  <Button size="lg" className="w-full mt-8">Upgrade to Pro</Button>
-                </CardContent>
-              </Card>
-               <Card className="shadow-2xl shadow-primary/20 border-primary">
-                <CardHeader className="text-center p-8">
-                  <Sparkles className="h-10 w-10 mx-auto mb-4 p-2 bg-primary/10 text-primary rounded-full" />
-                  <CardTitle className="font-headline text-2xl">Pro Yearly</CardTitle>
-                  <CardDescription className="text-4xl font-bold text-foreground">₹2,899 <span className="text-xl font-normal text-muted-foreground">/ year</span></CardDescription>
-                </CardHeader>
-                <CardContent className="p-8 pt-0">
-                  <ul className="space-y-3 text-muted-foreground">
-                    <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-green-500" /> Save over 20%</li>
-                    <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-green-500" /> Unlimited Pair Programming Sessions</li>
-                    <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-green-500" /> Create Private Contests</li>
-                    <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-green-500" /> In-depth Analytics</li>
-                  </ul>
-                  <Button size="lg" className="w-full mt-8">Go Yearly & Save</Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
+        </section>        
 
         {/* FAQ Section */}
         <section className="py-20 sm:py-24 bg-background/80 backdrop-blur-sm">
@@ -319,3 +270,5 @@ export default function LandingPage() {
     </div>
   );
 }
+
+export default Home;

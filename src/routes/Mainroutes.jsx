@@ -4,7 +4,7 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import Dashboard from "../pages/dashboard/Dashboard";
 import AdminPanel from "../pages/admin/AdminPanel";
-import ProblemList from "../pages/problems/ProblemList";
+import ProblemList from "../pages/problems/ProblemPage";
 import ProblemDetails from "../pages/problems/ProblemDetails";
 import UserProfile from "../pages/profile/UserProfile";
 import ContestList from "../pages/contests/ContestList";
@@ -14,6 +14,7 @@ import IDE from "../pages/tools/IDE";
 import CodeConverter from "../pages/tools/CodeConverter";
 import NotFound from "../pages/NotFound";
 
+import MainLayout from "@/components/layout/MainLayout";
 import AdminRoute from "../components/AdminRoute";
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -22,15 +23,13 @@ const Mainroutes = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/signin" element={<Login />} />
+      <Route path="/create-account" element={<Register />} />
 
       {/* Problems */}
-      <Route path="/problems" element={<ProblemList />} />
       <Route path="/problems/:problemId" element={<ProblemDetails />} />
 
       {/* Contests */}
-      <Route path="/contests" element={<ContestList />} />
       <Route path="/contests/:contestId" element={<ContestProblems />} />
 
       {/* Tools */}
@@ -52,6 +51,11 @@ const Mainroutes = () => {
         <ProtectedRoute><AdminRoute><AdminPanel /></AdminRoute></ProtectedRoute>
       } />
 
+      <Route element={<MainLayout />}>
+        <Route path="/problems" element={<ProblemList />} />
+        <Route path="/contests" element={<ContestList />} />
+        <Route path="/tools" element={<></>} />
+      </Route>
 
       {/* 404 Page */}
       <Route path="*" element={<NotFound />} />
