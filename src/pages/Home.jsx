@@ -179,7 +179,7 @@ const Home = () => {
                         viewport={{ once: true, amount: 0.5 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <Badge variant="outline" className="mb-4">Core Feature</Badge>
+                        <Badge variant="default" className="mb-4">Core Feature</Badge>
                         <h2 className="text-3xl font-bold font-headline sm:text-4xl">Solve Problems Face-to-Face</h2>
                         <p className="mt-4 text-lg text-muted-foreground">
                             Experience the power of pair programming like never before. Connect with a random peer over video, share a real-time code editor, and tackle challenging problems together. It's the most effective way to learn, improve, and build connections.

@@ -217,13 +217,80 @@ export default function ProblemsPage() {
 
           {/* Tags filter */}
           <Select
-            isMulti
-            placeholder="Tags"
-            options={allTags.map((tag) => ({ value: tag, label: tag }))}
-            value={selectedTags.map((tag) => ({ value: tag, label: tag }))}
-            onChange={(selected) => setSelectedTags(selected.map((opt) => opt.value))}
-            className="w-full sm:w-[200px]"
-          />
+          isMulti
+          placeholder="Tags"
+          options={allTags.map((tag) => ({ value: tag, label: tag }))}
+          value={selectedTags.map((tag) => ({ value: tag, label: tag }))}
+          onChange={(selected) => setSelectedTags(selected.map((opt) => opt.value))}
+          className="w-full sm:w-[200px]"
+          styles={{
+            control: (base, state) => ({
+              ...base,
+              backgroundColor: "hsl(240 10% 3.9%)",
+              borderColor: state.isFocused
+                ? "hsl(240 3.7% 15.9%)"
+                : "hsl(240 3.7% 15.9%)",
+              boxShadow: "none",
+              "&:hover": {
+                borderColor: "hsl(240 3.7% 15.9%)",
+              },
+              minHeight: "38px",
+              color: "hsl(0 0% 98%)",
+              fontSize: "0.875rem",
+              lineHeight: "1.25rem",
+            }),
+            valueContainer: (base) => ({
+              ...base,
+              color: "hsl(0 0% 98%)",
+              fontSize: "0.875rem",
+              lineHeight: "1.25rem",
+            }),
+            input: (base) => ({
+              ...base,
+              color: "hsl(0 0% 98%)",
+              fontSize: "0.875rem",
+              lineHeight: "1.25rem",
+            }),
+            menu: (base) => ({
+              ...base,
+              backgroundColor: "hsl(240 10% 3.9%)",
+              color: "hsl(0 0% 98%)",
+              fontSize: "0.875rem",
+              lineHeight: "1.25rem",
+            }),
+            option: (base, state) => ({
+              ...base,
+              backgroundColor: state.isFocused
+                ? "hsl(240 3.7% 15.9%)"
+                : "hsl(240 10% 3.9%)",
+              color: "hsl(0 0% 98%)",
+              cursor: "pointer",
+              fontSize: "0.875rem",
+              lineHeight: "1.25rem",
+            }),
+            multiValue: (base) => ({
+              ...base,
+              backgroundColor: "hsl(240 3.7% 15.9%)",
+              color: "hsl(0 0% 98%)",
+              fontSize: "0.875rem",
+              lineHeight: "1.25rem",
+            }),
+            multiValueLabel: (base) => ({
+              ...base,
+              color: "hsl(0 0% 98%)",
+              fontSize: "0.875rem",
+              lineHeight: "1.25rem",
+            }),
+            placeholder: (base) => ({
+              ...base,
+              color: "hsl(0 0% 98%)", // pure white
+              fontSize: "0.82rem",
+              lineHeight: "1.25rem",
+            }),
+
+          }}
+        />
+
         </div>
 
         {/* Problems list */}
