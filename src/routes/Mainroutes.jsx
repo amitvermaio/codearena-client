@@ -13,11 +13,13 @@ import ProblemOfTheDay from "../pages/potd/ProblemOfTheDay";
 import IDE from "../pages/tools/IDE";
 import CodeConverter from "../pages/tools/CodeConverter";
 import NotFound from "../pages/NotFound";
+import VerifyEmail from "../pages/auth/VerifyEmail";
+import Summarizer from "../pages/tools/Summarizer";
+import Tools from "../pages/tools/Tools";
 
 import MainLayout from "@/components/layout/MainLayout";
 import AdminRoute from "../components/AdminRoute";
 import ProtectedRoute from "../components/ProtectedRoute";
-import VerifyEmail from "@/pages/auth/VerifyEmail";
 
 const Mainroutes = () => {
   return (
@@ -56,7 +58,8 @@ const Mainroutes = () => {
       <Route element={<MainLayout />}>
         <Route path="/problems" element={<ProblemList />} />
         <Route path="/contests" element={<ContestList />} />
-        <Route path="/tools" element={<></>} />
+        <Route path="/tools" element={<Tools />} />
+        <Route path="/tools/summarizer" element={<Summarizer/>} />
       </Route>
 
       {/* 404 Page */}
