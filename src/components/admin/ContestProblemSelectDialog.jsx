@@ -62,7 +62,7 @@ const ContestProblemSelectDialog = ({ isOpen, setIsOpen, onSave, initialSelected
   }, []);
 
   useEffect(() => {
-    // initialize selection whenever dialog opens or initialSelected changes
+    // initialize selection whenever dialog opens or initialSelected changing 
     if (isOpen) {
       setSelectedProblemIds(new Set((initialSelected || []).map((p) => String(p.id))));
     }
