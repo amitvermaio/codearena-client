@@ -141,7 +141,7 @@ export default function ProblemsPage() {
             <span className="text-primary">Problem Library</span>
           </h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            Sharpen your skills, solve challenges, and climb the leaderboard.
+            Sharpen your skills, solve challenges, and climb the leaderboard. Your coding journey starts now.
           </p>
         </div>
 

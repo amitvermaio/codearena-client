@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutGrid,
   Swords,
@@ -39,7 +40,6 @@ const getNotifications = () => {
 const navItems = [
   { href: "/problems", label: "Problems", icon: LayoutGrid },
   { href: "/contests", label: "Contests", icon: Swords },
-  { href: "/connections", label: "Connections", icon: Users },
   { href: "/tools", label: "Tools", icon: Wand2 },
 ];
 
@@ -71,13 +71,12 @@ const ThemeToggle = () => {
 };
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [notifications, setNotifications] = useState([]);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-
-  // Simulate pathname detection
-  const [pathname, setPathname] = useState(window.location.pathname);
 
   useEffect(() => {
     getNotifications().then(setNotifications);
@@ -100,23 +99,21 @@ const Navbar = () => {
   }, [lastScrollY]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
-
   const renderNavLinks = (isMobile = false) =>
     navItems.map((item) => {
-      const isActive = pathname.startsWith(item.href);
+      const isActive = location.pathname.startsWith(item.href);
       return (
         <Button
           key={item.href}
           variant={isActive ? "secondary" : "ghost"}
           size={isMobile ? "default" : "sm"}
           className={cn("justify-start gap-2", isMobile ? "w-full" : "rounded-full")}
-          onClick={() => {
-            if (isMobile) setIsSheetOpen(false);
-            window.location.href = item.href; // simulate navigation
-          }}
+          asChild
         >
-          <item.icon className="h-4 w-4" />
-          <span>{item.label}</span>
+          <Link to={item.href} onClick={() => isMobile && setIsSheetOpen(false)}>
+            <item.icon className="h-4 w-4" />
+            <span>{item.label}</span>
+          </Link>
         </Button>
       );
     });
@@ -141,16 +138,16 @@ const Navbar = () => {
               <SheetContent side="left" className="w-64 p-4">
                 <SheetTitle className="sr-only">Menu</SheetTitle>
                 <SheetDescription className="sr-only">Main navigation menu</SheetDescription>
-                <div className="mb-6 flex" onClick={() => setIsSheetOpen(false)}>
+                <Link to="/" className="mb-6 flex" onClick={() => setIsSheetOpen(false)}>
                   <Logo />
-                </div>
+                </Link>
                 <div className="flex flex-col gap-2">{renderNavLinks(true)}</div>
               </SheetContent>
             </Sheet>
           </div>
-          <div className="hidden md:flex">
+          <Link to="/" className="hidden md:flex">
             <Logo />
-          </div>
+          </Link>
         </div>
 
         <div className="hidden md:flex items-center justify-center">
@@ -159,15 +156,15 @@ const Navbar = () => {
 
         <div className="flex items-center justify-end gap-2 md:flex-1">
           <ThemeToggle />
-          <Button variant="ghost" size="icon" onClick={() => (window.location.href = "/notifications")}>
-            <div className="relative">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/notifications" className="relative">
               <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
                   {unreadCount}
                 </span>
               )}
-            </div>
+            </Link>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -187,17 +184,23 @@ const Navbar = () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => (window.location.href = "/profile/janedoe")}>
-                  <UserIcon className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile/janedoe" className="flex items-center w-full">
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => (window.location.href = "/settings")}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                <DropdownMenuItem asChild>
+                  <Link to="/settings" className="flex items-center w-full">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => (window.location.href = "/admin")}>
-                  <Shield className="mr-2 h-4 w-4" />
-                  <span>Admin Panel</span>
+                <DropdownMenuItem asChild>
+                  <Link to="/admin" className="flex items-center w-full">
+                    <Shield className="mr-2 h-4 w-4" />
+                    <span>Admin Panel</span>
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />

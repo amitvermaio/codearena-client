@@ -17,6 +17,7 @@ import NotFound from "../pages/NotFound";
 import MainLayout from "@/components/layout/MainLayout";
 import AdminRoute from "../components/AdminRoute";
 import ProtectedRoute from "../components/ProtectedRoute";
+import VerifyEmail from "@/pages/auth/VerifyEmail";
 
 const Mainroutes = () => {
   return (
@@ -25,6 +26,7 @@ const Mainroutes = () => {
       <Route path="/" element={<Home />} />
       <Route path="/signin" element={<Login />} />
       <Route path="/create-account" element={<Register />} />
+      <Route path="/verify-account" element={<VerifyEmail />} />
 
       {/* Problems */}
       <Route path="/problems/:problemId" element={<ProblemDetails />} />

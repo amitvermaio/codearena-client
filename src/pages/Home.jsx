@@ -130,7 +130,7 @@ const Home = () => {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <a href="#features"> Features </a>
+                <a href="#features">View Features </a>
               </Button>
             </motion.div>
           </div>
