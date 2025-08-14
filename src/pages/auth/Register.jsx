@@ -102,6 +102,7 @@ const CreateAccount = () => {
               <Input
                 id="password"
                 type="password"
+                placeholder="●●●●●●"
                 {...register('password', { required: 'Password is required' })}
               />
               {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
