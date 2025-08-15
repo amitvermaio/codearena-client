@@ -60,6 +60,7 @@ const Mainroutes = () => {
         <Route path="/contests" element={<ContestList />} />
         <Route path="/tools" element={<Tools />} />
         <Route path="/tools/summarizer" element={<Summarizer/>} />
+        <Route path="/profile/:username" element={<UserProfile />} />
       </Route>
 
       {/* 404 Page */}
