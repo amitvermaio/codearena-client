@@ -42,6 +42,7 @@ const ProfileHeader = ({ user, onUpdate }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isImageUpdateOpen, setIsImageUpdateOpen] = useState(false);
   const navigate = useNavigate();
+  user = user[0];
 
   // const dispatch = useDispatch(); // Redux placeholder
 
