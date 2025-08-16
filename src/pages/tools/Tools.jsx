@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; 
-import { ArrowRight, Wand2 } from "lucide-react";
-import { Link } from "react-router-dom"; // React Router link use karenge
+import { ArrowRight, Wand2, CodeXmlIcon } from "lucide-react";
+import { href, Link } from "react-router-dom"; // React Router link use karenge
 
 const tools = [
   {
@@ -10,6 +10,12 @@ const tools = [
     href: "/tools/summarizer",
     icon: <Wand2 className="h-8 w-8 text-primary" />,
   },
+  {
+    title: "Code Converter",
+    description: "Change your code to another Language, See how it can be in another Programming Language. Learn Grow.",
+    href: "/tools/code-converter",
+    icon: <CodeXmlIcon className="h-8 w-8 text-primary" />
+  }
   // Add more tools here
 ];
 

@@ -170,7 +170,7 @@ const Navbar = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar className="h-10 w-10 border-2 border-border">
-                  <AvatarImage src="" alt="User profile" />
+                  <AvatarImage src="https://github.com/shadcn.png" alt="User profile" />
                   <AvatarFallback>JD</AvatarFallback>
                 </Avatar>
               </Button>
@@ -185,13 +185,13 @@ const Navbar = () => {
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                  <Link to="/profile/janedoe" className="flex items-center w-full">
+                  <Link to="/u/janedoe" className="flex items-center w-full">
                     <UserIcon className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/settings" className="flex items-center w-full">
+                  <Link to={`/u/janedoe/settings`} className="flex items-center w-full">
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </Link>

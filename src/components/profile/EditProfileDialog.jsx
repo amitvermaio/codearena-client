@@ -84,11 +84,13 @@ const EditProfileDialog = ({ user, children, open, onOpenChange, onUpdate }) => 
 
   const onSubmit = async (data) => {
     try {
+      console.log(data);
       const updatedUser = { ...data, skills };
-      const res = await axios.put("/api/user/update", updatedUser); // API endpoint change if needed
-      onUpdate(res.data);
+      // const res = await axios.put("/api/user/update", updatedUser); // API endpoint change if needed
+      // onUpdate(res.data);
       toast.success("Profile Updated", {
         description: "Your changes have been saved successfully.",
+        ok: `${console.log("chala")}`
       });
       onOpenChange?.(false);
     } catch (err) {
@@ -144,13 +146,13 @@ const EditProfileDialog = ({ user, children, open, onOpenChange, onUpdate }) => 
                       type="button"
                       key={color.name}
                       className={cn(
-                        "h-8 w-8 rounded-full border-2",
+                        "h-8 w-8 rounded-full border-2 flex justify-center items-center",
                         color.class,
                         selectedColor === color.name ? "border-primary" : "border-transparent"
                       )}
                       onClick={() => handleColorSelect(color.name)}
                     >
-                      {selectedColor === color.name && <Check className="h-5 w-5 text-white" />}
+                      {selectedColor === color.name && <Check className="h-4 w-4 text-white" />}
                     </button>
                   ))}
                 </div>

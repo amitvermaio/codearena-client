@@ -42,7 +42,6 @@ const ProfileHeader = ({ user, onUpdate }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isImageUpdateOpen, setIsImageUpdateOpen] = useState(false);
   const navigate = useNavigate();
-  user = user[0];
 
   // const dispatch = useDispatch(); // Redux placeholder
 
@@ -100,22 +99,7 @@ const ProfileHeader = ({ user, onUpdate }) => {
               <Button variant="outline" onClick={() => navigate(-1)}>
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back
               </Button>
-              <Button>
-                <UserPlus className="mr-2 h-4 w-4" /> Connect
-              </Button>
-              <EditProfileDialog
-                user={user}
-                onUpdate={onUpdate}
-                open={isEditDialogOpen}
-                onOpenChange={setIsEditDialogOpen}
-              >
-                <Button
-                  variant="outline"
-                  onClick={() => setIsEditDialogOpen(true)}
-                >
-                  <Edit className="mr-2 h-4 w-4" /> Edit Profile
-                </Button>
-              </EditProfileDialog>
+              
             </div>
           </div>
 

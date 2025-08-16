@@ -9,8 +9,7 @@ import ProfilePageSkeleton from "../../components/profile/ProfilePageSkeleton";
 
 // Main Profile Page Component
 const UserProfile = ({ username }) => {
-  const [user, setUser] = useState([
-    {
+  const [user, setUser] = useState({
         id: 'user1',
         username: 'janedoe',
         fullname: 'Jane Doe',
@@ -38,7 +37,7 @@ const UserProfile = ({ username }) => {
         },
         recentSubmissions: "mockRecentSubmissions",
     },
-  ]);
+  );
 
   useEffect(() => {
     getUserByUsername(username).then((userData) => {
@@ -66,11 +65,7 @@ const UserProfile = ({ username }) => {
       <div className="max-w-5xl mx-auto space-y-6">
         <ProfileHeader user={user} onUpdate={handleProfileUpdate} />
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {/* Submissions */}
-          <div className="xl:col-span-2 space-y-6">
-            <SubmissionHistory submissions={user?.recentSubmissions} />
-          </div>
+        <div className="grid grid-cols-1 gap-6">
 
           {/* Stats and Solved Stats */}
           <div className="space-y-6">
@@ -88,7 +83,7 @@ const UserProfile = ({ username }) => {
               </CardContent>
             </Card>
 
-            <SolvedStats stats={user?.solvedStats} total={user?.totalProblems} />
+            <SolvedStats stats={user.solvedStats} total={user?.totalProblems} />
           </div>
         </div>
       </div>

@@ -16,10 +16,15 @@ import NotFound from "../pages/NotFound";
 import VerifyEmail from "../pages/auth/VerifyEmail";
 import Summarizer from "../pages/tools/Summarizer";
 import Tools from "../pages/tools/Tools";
+import UserSettings from "../pages/problems/UserSettings";
+import ProfileSettings from "../pages/settings/ProfileSettings";
+import SecuritySettings from "../pages/settings/SecuritySettings";
 
 import MainLayout from "@/components/layout/MainLayout";
 import AdminRoute from "../components/AdminRoute";
 import ProtectedRoute from "../components/ProtectedRoute";
+import SettingsLayout from "@/components/layout/SettingsLayout";
+import SettingsSidebar from "@/components/settings/SettingsSidebar";
 
 const Mainroutes = () => {
   return (
@@ -36,15 +41,8 @@ const Mainroutes = () => {
       {/* Contests */}
       <Route path="/contests/:contestId" element={<ContestProblems />} />
 
-      {/* Tools */}
-      <Route path="/tools/ide" element={<IDE />} />
-      <Route path="/tools/code-converter" element={<CodeConverter />} />
-
       {/* Problem of the Day */}
       <Route path="/potd" element={<ProblemOfTheDay />} />
-
-      {/* User Profile */}
-      <Route path="/profile/:userId" element={<UserProfile />} />
 
       {/* Protected Routes */}
       <Route path="/dashboard" element={
@@ -59,8 +57,21 @@ const Mainroutes = () => {
         <Route path="/problems" element={<ProblemList />} />
         <Route path="/contests" element={<ContestList />} />
         <Route path="/tools" element={<Tools />} />
+        {/* Tools */}
+        <Route path="/tools/ide" element={<IDE />} />
+        <Route path="/tools/code-converter" element={<CodeConverter />} />
         <Route path="/tools/summarizer" element={<Summarizer/>} />
-        <Route path="/profile/:username" element={<UserProfile />} />
+        
+        {/* profile */}
+        <Route path="/u/:username" element={<UserProfile />} />
+
+        {/* settings */}
+        <Route path="/u/:username/settings" element={<SettingsLayout />}>
+          <Route index element={<ProfileSettings />} />
+          <Route path="account" element={<UserSettings />} />
+          <Route path="security" element={<SecuritySettings />} />
+        </Route>
+
       </Route>
 
       {/* 404 Page */}
