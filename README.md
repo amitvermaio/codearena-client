@@ -1,12 +1,151 @@
-# React + Vite
+# CodeArena
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+CodeArena is a collaborative coding platform built using the **MERN stack** with modern frontend tools like TailwindCSS and ShadCN.  
+This document will help contributors and collaborators quickly set up the project locally.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ⚡ Quick Setup
 
-## Expanding the ESLint configuration
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/your-username/codearena.git
+cd codearena
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 2️⃣ INSTALL DEPENDENCIES
+- Backend
+``` bash
+cd backend
+npm install
+```
+
+- Frontend
+```bash
+cd ../frontend
+npm install
+```
+
+### 3️⃣ Environment Variables
+
+Create a `.env` file in both backend/ and frontend/ .
+Backend (`backend/.env`)
+
+```bash
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+ACCESS_TOKEN_SECRET=your_secret
+ACCESS_TOKEN_EXPIRY=1d
+REFRESH_TOKEN_SECRET=your_secret
+REFRESH_TOKEN_EXPIRY=7d
+```
+
+### Frontend (`frontend/.env`)
+``` bash
+VITE_BACKEND_URL=http://localhost:5000
+```
+
+### 4️⃣ Run the Project
+
+- Backend (Express + MongoDB)
+```bash
+cd backend
+npm run dev
+```
+
+- Frontend (React + Vite)
+``` bash
+cd ../frontend
+npm run dev
+```
+
+The app should now be running at:
+
+- Frontend → http://localhost:5173/
+
+- Backend → http://localhost:5000/
+
+---
+
+## 📂 Project Structure
+
+``` bash
+codearena/
+├── backend/       # Node.js + Express + MongoDB
+│   ├── src/
+│   ├── .env
+│   └── package.json
+│
+├── frontend/      # React + TailwindCSS + ShadCN
+│   ├── src/
+│   ├── .env
+│   └── package.json
+│
+├── README.md
+└── .gitignore
+```
+
+---
+
+# 🔧 Development Workflow
+
+1. Create a new branch for your feature/bugfix:
+``` bash
+git checkout -b feat/feature-name
+```
+
+2. Make your changes and commit them using Conventional Commits:
+
+``` bash
+git commit -m "feat(auth): add forgot password API integration"
+```
+
+3. Push your branch:
+``` bash 
+git push origin feat/feature-name
+```
+
+4. Open a Pull Request 🚀
+
+---
+
+# 📌 Tech Stack (Quick Overview)
+
+- Frontend: React, Vite, Redux, TailwindCSS, ShadCN
+
+- Backend: Node.js, Express.js, MongoDB, JWT, bcrypt
+
+- Tools: Axios, ESLint, Prettier
+
+--- 
+
+# 🤝 Contributing
+
+- Fork the repo
+
+- Create your feature branch (git checkout -b feat/your-feature)
+
+- Commit your changes (git commit -m 'feat: add some feature')
+
+- Push to the branch (git push origin feat/your-feature)
+
+- Open a Pull Request
+
+----
+
+# 📜 License
+
+This project is licensed under the MIT License.
+
+``` yaml
+---
+
+## ✅ Commit message for this README  
+```
+
+---
+
+# 📝 Commit Message for this README
+``` bash
+docs(readme): add professional README with setup guide and contribution workflow
+```
