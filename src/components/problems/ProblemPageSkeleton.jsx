@@ -1,3 +1,11 @@
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { Skeleton } from "@/components/ui/skeleton";
+import ProblemDescriptionPanelSkeleton from "./ProblemDescriptionPanelSkeleton";
+
 const ProblemPageSkeleton = () => {
   return (
     <ResizablePanelGroup

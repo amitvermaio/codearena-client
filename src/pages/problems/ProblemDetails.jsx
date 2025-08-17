@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
+import { useIsMobile } from "../../hooks/use-mobile"
 
 // ---------------- Redux Version Imports (Comment if not using) ----------------
 // import { useDispatch, useSelector } from "react-redux";
@@ -18,16 +19,13 @@ import {
 } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 
-import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 
 // Optional editor/client panel. Keep if you already have this component.
 import ProblemDescriptionPanel from "@/components/problems/ProblemDescriptionPanel";
-import PairProgrammingClient from "@/components/problems/PairProgrammingClient";
-import { useIsMobile } from "../../hooks/use-mobile"
-import ProblemDescriptionPanel from "@/components/problems/ProblemDescriptionPanel";
 import ProblemPageSkeleton from "@/components/problems/ProblemPageSkeleton";
+import PairProgrammingClient from "@/components/problems/PairProgrammingClient";
 // ---------------- Helpers ----------------
 const difficultyColors = {
   Easy:
@@ -66,7 +64,7 @@ function SubmissionNoteForm({ problemId }) {
       <div>
         <label className="text-sm font-medium">Language</label>
         <Input
-          placeholder="e.g. javascript, python, cpp"
+          placeholder="Java"
           {...register("language", { required: true })}
         />
         {errors.language && (
