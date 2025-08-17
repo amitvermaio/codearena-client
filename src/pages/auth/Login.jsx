@@ -103,7 +103,7 @@ const Login = () => {
             <div className="space-y-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
-                <Link to="/forgot-password" className="ml-auto inline-block text-sm underline">
+                <Link to="/auth/forgot-password" className="ml-auto inline-block text-sm underline">
                   Forgot your password?
                 </Link>
               </div>

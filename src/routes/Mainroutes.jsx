@@ -19,6 +19,7 @@ import Tools from "../pages/tools/Tools";
 import UserSettings from "../pages/problems/UserSettings";
 import ProfileSettings from "../pages/settings/ProfileSettings";
 import SecuritySettings from "../pages/settings/SecuritySettings";
+import ForgotPassword from "../pages/auth/ForgotPassword";
 
 import MainLayout from "@/components/layout/MainLayout";
 import AdminRoute from "../components/AdminRoute";
@@ -34,6 +35,9 @@ const Mainroutes = () => {
       <Route path="/signin" element={<Login />} />
       <Route path="/create-account" element={<Register />} />
       <Route path="/verify-account" element={<VerifyEmail />} />
+      <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+      {/* <Route path="/auth/reset-password/:token" element={<ResetPassword />} /> */}
+
 
       {/* Problems */}
       <Route path="/problems/:problemId" element={<ProblemDetails />} />
