@@ -4,13 +4,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail } from "lucide-react";
+import axios from "../../config/axios.config.jsx";
+import { toast } from "sonner";
 
 const ForgotPassword = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     // Backend API call: send reset link to email
-    console.log("Sending reset link to", data.email);
+    try {
+      const res = await axios.post('/auth/password-reset-otp', {
+        email: data.email,
+      });
+      
+      toast.info("OTP sent successfully!");
+
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   return (

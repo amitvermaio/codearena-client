@@ -94,7 +94,7 @@ const Home = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <div className="flex min-h-screen flex-col bg-background text-foreground select-none">
        <LandingNavbar />
        <main className="flex-1">
          <div className="absolute inset-x-0 top-0 -z-10 h-full w-full bg-background bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:16px_1px]">

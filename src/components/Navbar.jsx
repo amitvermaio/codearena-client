@@ -28,6 +28,8 @@ import {
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Logo } from "../components/shared/Logo";
+import axios from "../config/axios.config.jsx";
+import { toast } from "sonner";
 
 // Dummy data instead of API call
 const getNotifications = () => {
@@ -77,6 +79,19 @@ const Navbar = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  const LogoutHandler = async () => {
+    try {
+      const res = await axios.post('/auth/logout');
+      console.log("Logout response: ", res);
+      if (res.status === 200) {
+        toast.success('Logged out successfully');
+        navigate('/');
+      }
+    } catch (error) {
+      toast.error('Something went wrong');
+    }
+  }
 
   useEffect(() => {
     getNotifications().then(setNotifications);
@@ -204,7 +219,7 @@ const Navbar = () => {
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={LogoutHandler}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>

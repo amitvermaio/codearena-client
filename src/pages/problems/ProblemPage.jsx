@@ -18,7 +18,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 
 import { Search, Flame, Video } from "lucide-react";
 
-export default function ProblemsPage() {
+const  ProblemsPage = () => {
   // Data states
   const [problemOfTheDay, setProblemOfTheDay] = useState(null);
   const [allProblems, setAllProblems] = useState([]);
@@ -299,3 +299,6 @@ export default function ProblemsPage() {
     </>
   );
 }
+
+export default ProblemsPage;
+

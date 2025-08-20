@@ -33,17 +33,16 @@ const Login = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     setServerError(null);
-
+    const { email, password } = data;
     try {
-      // Send credentials to backend
       const response = await axios.post('/auth/login', {
-        email: data.email,
-        password: data.password
+        email,
+        password,
       });
 
       if (response.status === 200) {
-        toast.success('Successfully signed in!');
         navigate('/problems');
+        toast.success('Successfully signed in!');
       }
     } catch (err) {
       const msg = err.response?.data?.message || 'Invalid email or password.';

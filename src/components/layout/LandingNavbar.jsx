@@ -132,45 +132,53 @@ export function LandingNavbar() {
 
       {/* --- Mobile Menu (Sheet) --- */}
       {/* Replaced Sheet/SheetContent with a conditionally rendered div */}
-      {isSheetOpen && (
+      {/* --- Mobile Menu (Sheet) --- */}
+    {isSheetOpen && (
+      <div
+        className="fixed inset-0 z-50 bg-black/60 flex justify-end"
+        onClick={() => setIsSheetOpen(false)}
+      >
         <div
-          className="fixed inset-0 z-50 bg-black/60"
-          onClick={() => setIsSheetOpen(false)}
+          className="h-full w-4/5 max-w-sm bg-white dark:bg-black shadow-xl flex flex-col"
+          onClick={(e) => e.stopPropagation()} // Prevent close on inside click
         >
-          <div
-            className="fixed top-0 right-0 h-full w-full max-w-sm bg-white dark:bg-black p-0"
-            onClick={(e) => e.stopPropagation()} // Prevents closing when clicking inside the menu
-          >
-            {/* Replaced SheetHeader */}
-            <div className="p-4 border-b">
-              <h2 className="text-lg font-semibold">Menu</h2>
-              <p className="sr-only">Main navigation menu</p>
-            </div>
+          {/* Header */}
+          <div className="p-4 border-b flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Menu</h2>
+            <button
+              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+              onClick={() => setIsSheetOpen(false)}
+            >
+              ✕
+            </button>
+          </div>
 
-            <div className="p-4 space-y-4">
-              <div className="space-y-2">
-                <a
-                  href="/create-account"
-                  className={`${buttonPrimary} w-full justify-start gap-2`}
-                  onClick={() => setIsSheetOpen(false)}
-                >
-                  <ArrowRight /> Get Started
-                </a>
-                <a
-                  href="/signin"
-                  className={`${buttonBase} border border-input bg-background hover:bg-accent hover:text-accent-foreground w-full justify-start`}
-                  onClick={() => setIsSheetOpen(false)}
-                >
-                  Sign In
-                </a>
-              </div>
-              <div className="pt-4">
-                <ThemeToggle isMobile />
-              </div>
-            </div>
+          {/* Links */}
+          <div className="flex-1 p-4 space-y-3">
+            <a
+              href="/create-account"
+              className={`${buttonPrimary} w-full justify-start gap-2`}
+              onClick={() => setIsSheetOpen(false)}
+            >
+              <ArrowRight /> Get Started
+            </a>
+            <a
+              href="/signin"
+              className={`${buttonBase} border border-input bg-background hover:bg-accent hover:text-accent-foreground w-full justify-start`}
+              onClick={() => setIsSheetOpen(false)}
+            >
+              Sign In
+            </a>
+          </div>
+
+          {/* Footer (Theme toggle) */}
+          <div className="p-4 border-t">
+            <ThemeToggle isMobile />
           </div>
         </div>
-      )}
+      </div>
+    )}
+
     </header>
   );
 }
