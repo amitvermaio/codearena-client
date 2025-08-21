@@ -27,14 +27,37 @@ import ProblemDescriptionPanel from "@/components/problems/ProblemDescriptionPan
 import ProblemPageSkeleton from "@/components/problems/ProblemPageSkeleton";
 import PairProgrammingClient from "@/components/problems/PairProgrammingClient";
 // ---------------- Helpers ----------------
-const difficultyColors = {
-  Easy:
-    "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700",
-  Medium:
-    "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-700",
-  Hard:
-    "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700",
+
+const dummyProblem = {
+  id: 1,
+  title: "Two Sum",
+  description: `<p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return <em>indices of the two numbers such that they add up to <code>target</code></em>.</p><p>You may assume that each input would have <strong><em>exactly</em> one solution</strong>, and you may not use the <em>same</em> element twice.</p><p>You can return the answer in any order.</p><p>&nbsp;</p><p><strong>Example 1:</strong></p><pre><strong>Input:</strong> nums = [2,7,11,15], target = 9
+<strong>Output:</strong> [0,1]
+<strong>Explanation:</strong> Because nums[0] + nums[1] == 9, we return [0, 1].
+</pre><p><strong>Example 2:</strong></p><pre><strong>Input:</strong> nums = [3,2,4], target = 6
+<strong>Output:</strong> [1,2]
+</pre><p><strong>Example 3:</strong></p><pre><strong>Input:</strong> nums = [3,3], target = 6
+<strong>Output:</strong> [0,1]
+</pre><p>&nbsp;</p><p><strong>Constraints:</strong></p><ul><li><code>2 &lt;= nums.length &lt;= 10<sup>4</sup></code></li><li><code>-10<sup>9</sup> &lt;= nums[i] &lt;= 10<sup>9</sup></code></li><li><code>-10<sup>9</sup> &lt;= target &lt;= 10<sup>9</sup></code></li><li><strong>Only one valid answer exists.</strong></li></ul>`,
+  difficulty: "Easy",
+  tags: ["Array", "Hash Table"],
+  acceptance: "50.5%",
+  status: "Todo",
 };
+
+function ProblemNotFound() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full text-center">
+      <h2 className="text-2xl font-bold">404 - Problem Not Found</h2>
+      <p className="text-muted-foreground">
+        The problem you are looking for does not exist.
+      </p>
+      <Button asChild className="mt-4">
+        <Link to="/problems">Back to Problems</Link>
+      </Button>
+    </div>
+  );
+}
 
 
 function SubmissionNoteForm({ problemId }) {
@@ -114,29 +137,23 @@ export default function ProblemPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // To view the page with dummy data, the API call is commented out.
+    // You can uncomment this block to restore API fetching.
+    /*
     let active = true;
-    async function load() {
-      try {
-        setLoading(true);
-        const res = await axios.get(`/api/problems/${id}`); // Adjust base URL if needed
-        if (!active) return;
-        if (res?.data) {
-          setProblem(res.data);
-        } else {
-          navigate("/404", { replace: true });
-        }
-      } catch (err) {
-        console.error(err);
-        navigate("/404", { replace: true });
-      } finally {
-        active = false;
-        setLoading(false);
-      }
-    }
+    async function load() { ... } // Original async load function
     if (id) load();
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
+    */
+
+    // --- Dummy Data Implementation ---
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setProblem(dummyProblem);
+      setLoading(false);
+    }, 300);
+
+    return () => clearTimeout(timer); // Cleanup timeout on unmount
   }, [id, navigate]);
 
   if (loading) return <ProblemPageSkeleton />;
@@ -167,5 +184,3 @@ export default function ProblemPage() {
     </ResizablePanelGroup>
   );
 }
-
-
