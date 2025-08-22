@@ -13,6 +13,7 @@ import { difficultyColors } from "../../utils/constants.js";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Code, Lightbulb, History } from "lucide-react";
+import SubmissionNoteForm from "./SubmissionNoteForm";
 
 const ProblemDescriptionPanel = ({ problem }) => {
   const [revealedHints, setRevealedHints] = useState(0);
