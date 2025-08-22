@@ -20,11 +20,30 @@ import {
   setUserProgress,
 } from "@/store/features/problems/problemSlice";
 
+/**
+ * Small helpers extracted for clarity (typical tiny refactor)
+ */
 const statusIcons = {
   Solved: <CheckCircle className="h-5 w-5 text-green-500" />,
   Attempted: <AlertCircle className="h-5 w-5 text-yellow-500" />,
   Todo: <Circle className="h-5 w-5 text-muted-foreground" />,
 };
+
+const formatAcceptance = (value) => {
+  // keep it simple but consistent — this allows future formatting changes centrally
+  if (value == null) return "—";
+  return typeof value === "number" ? `${value}%` : String(value);
+};
+
+const tagKey = (problem, tag, tIdx) =>
+  `${problem.slug || problem._id || problem.id}-${tag}-${tIdx}`;
+
+/**
+ * Placeholder telemetry initializer (no-op for now).
+ * Kept intentionally to indicate future instrumentation.
+ */
+const initUiTelemetry = () => {};
+initUiTelemetry();
 
 const ProblemList = () => {
   const navigate = useNavigate();
@@ -99,13 +118,13 @@ const ProblemList = () => {
                         </Badge>
                       </TableCell>
 
-                      <TableCell>{problem.acceptance}</TableCell>
+                      <TableCell>{formatAcceptance(problem.acceptance)}</TableCell>
 
                       {!hasAnyProblems && (
                         <TableCell className="space-x-1">
                           {(problem.tags || []).slice(0, 3).map((tag, tIdx) => (
                             <Badge
-                              key={`${problem.slug || problem._id || idx}-${tag}-${tIdx}`}
+                              key={tagKey(problem, tag, tIdx)}
                               variant="secondary"
                             >
                               {tag}
