@@ -23,7 +23,6 @@ const problemSlice = createSlice({
   name: 'problems',
   initialState,
   reducers: {
-    // Loading states
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
@@ -33,7 +32,7 @@ const problemSlice = createSlice({
       state.loading = false;
     },
 
-    // Problem management
+    // Problem mgmt
     setProblems: (state, action) => {
       state.problems = action.payload;
       state.filteredProblems = action.payload;

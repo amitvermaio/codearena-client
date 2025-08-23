@@ -13,10 +13,7 @@ import {
 
 // ------------------- Async Thunks ------------------- //
 
-// Fetch all problems
-export const fetchProblems = createAsyncThunk(
-  'problems/fetchProblems',
-  async (_, { dispatch, rejectWithValue }) => {
+export const fetchProblems = createAsyncThunk('problems/fetchProblems', async (_, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
       const { data } = await axios.get('/problems');
@@ -31,9 +28,7 @@ export const fetchProblems = createAsyncThunk(
 );
 
 // Fetch single problem by slug
-export const fetchProblemBySlug = createAsyncThunk(
-  'problems/fetchProblemBySlug',
-  async (slug, { dispatch, rejectWithValue }) => {
+export const fetchProblemBySlug = createAsyncThunk('problems/fetchProblemBySlug', async (slug, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
       const { data } = await axios.get(`/problems/${slug}`);
@@ -48,9 +43,7 @@ export const fetchProblemBySlug = createAsyncThunk(
 );
 
 // Create problem
-export const createProblem = createAsyncThunk(
-  'problems/createProblem',
-  async (problemData, { dispatch, rejectWithValue }) => {
+export const createProblem = createAsyncThunk('problems/createProblem', async (problemData, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
       const { data } = await axios.post('/problems', problemData);
@@ -66,9 +59,7 @@ export const createProblem = createAsyncThunk(
 );
 
 // Update problem by slug
-export const updateProblemBySlug = createAsyncThunk(
-  'problems/updateProblemBySlug',
-  async ({ slug, updates }, { dispatch, rejectWithValue }) => {
+export const updateProblemBySlug = createAsyncThunk('problems/updateProblemBySlug', async ({ slug, updates }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
       const { data } = await axios.put(`/problems/${slug}`, updates);
@@ -84,9 +75,7 @@ export const updateProblemBySlug = createAsyncThunk(
 );
 
 // Delete problem by slug
-export const deleteProblemBySlug = createAsyncThunk(
-  'problems/deleteProblemBySlug',
-  async (slug, { dispatch, rejectWithValue }) => {
+export const deleteProblemBySlug = createAsyncThunk('problems/deleteProblemBySlug', async (slug, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
       await axios.delete(`/problems/${slug}`);
@@ -102,9 +91,7 @@ export const deleteProblemBySlug = createAsyncThunk(
 );
 
 // Submit solution
-export const submitSolution = createAsyncThunk(
-  'problems/submitSolution',
-  async ({ slug, solution, language }, { dispatch, rejectWithValue }) => {
+export const submitSolution = createAsyncThunk('problems/submitSolution', async ({ slug, solution, language }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
       const { data } = await axios.post(`/problems/${slug}/submit`, { solution, language });
@@ -133,9 +120,7 @@ export const submitSolution = createAsyncThunk(
 );
 
 // Search problems
-export const searchProblems = createAsyncThunk(
-  'problems/searchProblems',
-  async (searchParams, { dispatch, rejectWithValue }) => {
+export const searchProblems = createAsyncThunk('problems/searchProblems', async (searchParams, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
       const { data } = await axios.get(`/problems/search`, { params: searchParams });

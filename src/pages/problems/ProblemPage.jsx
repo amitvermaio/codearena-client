@@ -17,11 +17,19 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 import { Search, Flame, Video } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProblems } from "@/store/actions/problems/problemAction";
 
 const  ProblemsPage = () => {
   // Data states
   const [problemOfTheDay, setProblemOfTheDay] = useState(null);
-  const [allProblems, setAllProblems] = useState([]);
+  const [allProblems, setAllProblems] = useState([{
+      id: 101,
+      title: "Two Sum",
+      difficulty: "Easy",
+      status: "Todo",
+      tags: ["Array", "Hash Table"],
+    }]);
   // UI states
   const [isPairingDialogOpen, setIsPairingDialogOpen] = useState(false);
   // Filter states
@@ -29,21 +37,16 @@ const  ProblemsPage = () => {
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedTags, setSelectedTags] = useState([]);
-
+  
+  const dispatch = useDispatch();
+  const problems = useSelector((state) => state.problems.problems.data);
+  
   /**
    * Load dummy data instead of API calls
    */
   useEffect(() => {
-    // Commented API calls for now
-    // axios.get("/api/problems-of-the-day")
-    //   .then((res) => setProblemOfTheDay(res.data))
-    //   .catch((err) => console.error("Error fetching Problem of the Day:", err));
+    dispatch(fetchProblems());
 
-    // axios.get("/api/problems")
-    //   .then((res) => setAllProblems(res.data))
-    //   .catch((err) => console.error("Error fetching problems:", err));
-
-    // Dummy Problem of the Day
     setProblemOfTheDay({
       id: 101,
       title: "Two Sum",
@@ -51,46 +54,14 @@ const  ProblemsPage = () => {
       status: "Todo",
       tags: ["Array", "Hash Table"],
     });
+  }, [dispatch]);
 
-    // Dummy Problems List
-    setAllProblems([
-      {
-        id: 1,
-        title: "Two Sum",
-        difficulty: "Easy",
-        status: "Todo",
-        tags: ["Array", "Hash Table"],
-      },
-      {
-        id: 2,
-        title: "Add Two Numbers",
-        difficulty: "Medium",
-        status: "Attempted",
-        tags: ["Linked List", "Math"],
-      },
-      {
-        id: 3,
-        title: "Longest Substring Without Repeating Characters",
-        difficulty: "Medium",
-        status: "Todo",
-        tags: ["String", "Sliding Window"],
-      },
-      {
-        id: 4,
-        title: "Median of Two Sorted Arrays",
-        difficulty: "Hard",
-        status: "Todo",
-        tags: ["Array", "Binary Search", "Divide and Conquer"],
-      },
-      {
-        id: 5,
-        title: "Valid Parentheses",
-        difficulty: "Easy",
-        status: "Solved",
-        tags: ["String", "Stack"],
-      },
-    ]);
-  }, []);
+  useEffect(() => {
+    if (problems && Array.isArray(problems)) {
+      setAllProblems(problems);
+    }
+  }, [problems]);
+  console.log(problems);
 
   /**
    * Extract unique tags from problems list
