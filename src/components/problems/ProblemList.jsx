@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Circle, AlertCircle, Play } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link, useNavigate } from "react-router-dom";
 
 const difficultyColors = {
   Easy: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700',
@@ -24,9 +25,12 @@ const statusIcons = {
   Todo: <Circle className="h-5 w-5 text-muted-foreground" />,
 };
 
-export default function ProblemList({ problems = [] }) {
-  const handleProblemClick = (problemId) => {
-    window.location.href = `/problems/${problemId}`;
+export default function ProblemList({ problems }) {
+
+  const navigate = useNavigate();
+
+  const handleProblemClick = (slug) => {
+    navigate(`/problems/${slug}`, { state: { slug } });
   };
 
   const hasInitialProblems = problems.length > 0;
@@ -60,7 +64,7 @@ export default function ProblemList({ problems = [] }) {
                   <TableRow
                     key={problem.id}
                     className="hover:bg-muted/50 cursor-pointer"
-                    onClick={() => handleProblemClick(problem.id)}
+                    onClick={() => handleProblemClick(problem.slug)}
                   >
                     <TableCell>{statusIcons[problem.status]}</TableCell>
                     <TableCell className="font-medium hover:text-primary transition-colors">
