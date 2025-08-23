@@ -1,13 +1,21 @@
 // src/store/store.js
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../features/auth/authSlice";
-import problemsReducer from "../features/problems/problemsSlice";
-import contestsReducer from "../features/contests/contestsSlice";
+import problemsReducer from "./features/problems/problemSlice";
+// import contestsReducer from "./features/contests/contestsSlice.jsx";
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
     problems: problemsReducer,
-    contests: contestsReducer,
+    // contests: contestsReducer,
   },
 });
+
+
+// // In your components
+// import { useSelector, useDispatch } from 'react-redux';
+// import { fetchProblems, setFilter } from './problemActions';
+// import { selectPaginatedProblems, selectProblemLoading } from './problemSlice';
+
+// const dispatch = useDispatch();
+// const problems = useSelector(selectPaginatedProblems);
+// const loading = useSelector(selectProblemLoading);
