@@ -21,6 +21,7 @@ import { useEffect, useState } from 'react';
 import { getProblemOfTheDay } from '@/lib/api';
 import { LandingNavbar } from '@/components/layout/LandingNavbar';
 import { Badge } from '@/components/ui/badge';
+import { useSelector, useDispatch } from "react-redux";
 
 const features = [
   {
@@ -66,6 +67,10 @@ const faqs = [
 
 const Home = () => {
   const [problemOfTheDay, setProblemOfTheDay] = useState(null);
+
+  // useEffect(() => {
+  //   useDispatch(login());
+  // }, []);
 
   useEffect(() => {
     getProblemOfTheDay().then(setProblemOfTheDay);
@@ -125,7 +130,7 @@ const Home = () => {
               className="mt-8 flex flex-col sm:flex-row justify-center gap-4"
             >
               <Button asChild size="lg" className="shadow-lg hover:shadow-primary/50 transition-shadow">
-                <Link to="/create-account">
+                <Link to="/problems">
                   Get Started <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import axios from '@/lib/axios'; // Your axios instance
+import axios from '@/config/axios.config';
 import {
   loginStart,
   loginSuccess,
@@ -14,7 +14,6 @@ import {
   setError,
   updateStats,
   setAchievements,
-  setRecentActivity,
   initializeUser,
   addActivity,
 } from '../../features/user/userSlice';
@@ -27,6 +26,7 @@ export const loginUser = createAsyncThunk(
       dispatch(loginStart());
       
       const response = await axios.post('/auth/login', credentials);
+      console.log("before login Success: \n\n", response.data);
       const { user, stats, preferences, achievements } = response.data.data;
       
       dispatch(loginSuccess({ 
@@ -348,23 +348,3 @@ export const deleteAccount = createAsyncThunk(
     }
   }
 );
-
-// Export all actions
-export {
-  loginUser,
-  registerUser,
-  logoutUser,
-  updateUserProfile,
-  uploadUserAvatar,
-  fetchUserStats,
-  updateProblemStatus,
-  fetchUserAchievements,
-  checkForNewAchievements,
-  fetchRecentActivity,
-  followUser,
-  unfollowUser,
-  updateUserPreferences,
-  initializeUserFromStorage,
-  changePassword,
-  deleteAccount,
-};

@@ -78,7 +78,7 @@ export default function ProblemPage() {
       setProblem(dummyProblem);
       setLoading(false);
     }, 300);
-
+    
     return () => clearTimeout(timer); // Cleanup timeout on unmount
   }, [id, navigate]);
 

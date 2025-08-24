@@ -28,7 +28,6 @@ const initialState = {
       medium: 0,
       hard: 0,
     },
-    categoryStats: {},
     lastActiveDate: null,
   },
 };
@@ -49,16 +48,11 @@ const userSlice = createSlice({
       state.loginError = null;
       state.error = null;
       
-      // Update stats if provided
       if (action.payload.stats) {
         state.stats = { ...state.stats, ...action.payload.stats };
       }
-      
-      // Update preferences if provided
-      if (action.payload.preferences) {
-        state.preferences = { ...state.preferences, ...action.payload.preferences };
-      }
     },
+
     loginFailure: (state, action) => {
       state.isLoginLoading = false;
       state.loginError = action.payload;
@@ -89,7 +83,6 @@ const userSlice = createSlice({
       state.loginError = null;
       state.registerError = null;
       state.updateError = null;
-      // Reset some stats but keep preferences for when user logs back in
       state.recentActivity = [];
       state.following = [];
       state.followers = [];

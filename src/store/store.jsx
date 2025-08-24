@@ -2,9 +2,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import problemsReducer from "./features/problems/problemSlice";
 // import contestsReducer from "./features/contests/contestsSlice.jsx";
+import userReducer from "./features/user/userSlice";
 
 export const store = configureStore({
   reducer: {
+    user: userReducer,
     problems: problemsReducer,
     // contests: contestsReducer,
   },

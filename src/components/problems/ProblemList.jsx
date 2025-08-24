@@ -30,7 +30,7 @@ export default function ProblemList({ problems }) {
   const navigate = useNavigate();
 
   const handleProblemClick = (slug) => {
-    navigate(`/problems/${slug}`, { state: { slug } });
+    navigate(`/problems/${slug}`);
   };
 
   const hasInitialProblems = problems.length > 0;
@@ -62,11 +62,11 @@ export default function ProblemList({ problems }) {
               {hasInitialProblems ? (
                 problems.map((problem) => (
                   <TableRow
-                    key={problem.id}
+                    key={problem._id}
                     className="hover:bg-muted/50 cursor-pointer"
                     onClick={() => handleProblemClick(problem.slug)}
                   >
-                    <TableCell>{statusIcons[problem.status]}</TableCell>
+                    <TableCell>{statusIcons['Todo']}</TableCell>
                     <TableCell className="font-medium hover:text-primary transition-colors">
                       {problem.title}
                     </TableCell>
@@ -94,7 +94,7 @@ export default function ProblemList({ problems }) {
                         size="icon"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleProblemClick(problem.id);
+                          handleProblemClick(problem.slug);
                         }}
                       >
                         <Play className="h-5 w-5" />
