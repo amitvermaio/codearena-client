@@ -25,6 +25,19 @@ const initialState = {
   },
 };
 
+/**
+ * Small helper to normalize id extraction to a string.
+ * Extracted to reduce duplication and make future changes easier.
+ */
+const normalizeId = (p) => String(p._id ?? p.id ?? "");
+
+/**
+ * Placeholder telemetry initializer (no-op for now).
+ * Represents a plausible tiny change a dev might add.
+ */
+const initProblemTelemetry = () => {};
+initProblemTelemetry();
+
 const problemSlice = createSlice({
   name: "problems",
   initialState,
@@ -83,7 +96,7 @@ const problemSlice = createSlice({
       // status — derived from user progress
       if (status !== "all") {
         filtered = filtered.filter((p) => {
-          const id = String(p._id ?? p.id ?? "");
+          const id = normalizeId(p);
           const isSolved = solvedIds.includes(id);
           const isAttempted = attemptedIds.includes(id);
           if (status === "Solved") return isSolved;
@@ -148,7 +161,7 @@ export const selectProblemsWithStatus = createSelector(
   [selectFilteredProblems, selectUserProgress],
   (problems, { solvedIds, attemptedIds }) => {
     return problems.map((p) => {
-      const id = String(p._id ?? p.id ?? "");
+      const id = normalizeId(p);
       const isSolved = solvedIds.includes(id);
       const isAttempted = attemptedIds.includes(id);
       const _status = isSolved ? "Solved" : isAttempted ? "Attempted" : "Todo";
@@ -158,3 +171,4 @@ export const selectProblemsWithStatus = createSelector(
 );
 
 export default problemSlice.reducer;
+
