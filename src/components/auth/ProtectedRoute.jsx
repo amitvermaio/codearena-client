@@ -1,4 +1,5 @@
 // src/components/ProtectedRoute.jsx
+// Higher-order route component: renders children if user is authenticated, else redirects to /login
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
