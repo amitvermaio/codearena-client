@@ -75,8 +75,8 @@ const ProfileHeader = ({ user, onUpdate }) => {
             {/* Profile Avatar */}
             <div className="relative group">
               <Avatar className="h-28 w-28 border-4 border-card">
-                <AvatarImage src={user.profilePic} />
-                <AvatarFallback>{user.fullname?.charAt(0)}</AvatarFallback>
+                <AvatarImage src={user.avatar} />
+                <AvatarFallback className="text-3xl font-semibold">{user.fullname?.charAt(0)}</AvatarFallback>
               </Avatar>
               <button
                 className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full"

@@ -30,6 +30,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Logo } from "../components/shared/Logo";
 import axios from "../config/axios.config.jsx";
 import { toast } from "sonner";
+import { fetchUserProfile } from "@/store/actions/user/userAction";
+import { useDispatch, useSelector } from "react-redux";
 
 // Dummy data instead of API call
 const getNotifications = () => {
@@ -75,10 +77,14 @@ const ThemeToggle = () => {
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const [notifications, setNotifications] = useState([]);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  
+  const { username, fullname, avatar } = useSelector(state => state.user?.user?.data || "");
+
 
   const LogoutHandler = async () => {
     try {
@@ -95,6 +101,10 @@ const Navbar = () => {
 
   useEffect(() => {
     getNotifications().then(setNotifications);
+  }, []);
+
+  useEffect(() => {
+    dispatch(fetchUserProfile());
   }, []);
 
   useEffect(() => {
@@ -185,8 +195,8 @@ const Navbar = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar className="h-10 w-10 border-2 border-border">
-                  <AvatarImage src="https://github.com/shadcn.png" alt="User profile" />
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarImage src={`${avatar}`} alt="User profile" />
+                  <AvatarFallback>{fullname?.charAt(0)}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -200,7 +210,7 @@ const Navbar = () => {
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                  <Link to="/u/janedoe" className="flex items-center w-full">
+                  <Link to={`/u/${username}`} className="flex items-center w-full">
                     <UserIcon className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </Link>

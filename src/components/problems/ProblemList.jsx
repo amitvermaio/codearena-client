@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "react";
 import {
   Table,
   TableHeader,
@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, Circle, AlertCircle, Play } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserProfile } from "@/store/actions/user/userAction";
 
 const difficultyColors = {
   Easy: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700',
@@ -28,6 +30,14 @@ const statusIcons = {
 export default function ProblemList({ problems }) {
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user?.user?.data);
+  const solvedProblems = user?.solvedProblems || [];
+  const attemptedProblems = user?.attemptedProblems || [];
+  
+  useEffect(() => {
+    dispatch(fetchUserProfile());
+  }, [dispatch]);
 
   const handleProblemClick = (slug) => {
     navigate(`/problems/${slug}`);
@@ -66,7 +76,12 @@ export default function ProblemList({ problems }) {
                     className="hover:bg-muted/50 cursor-pointer"
                     onClick={() => handleProblemClick(problem.slug)}
                   >
-                    <TableCell>{statusIcons['Todo']}</TableCell>
+                    <TableCell>{statusIcons[solvedProblems?.includes(problem._id)
+                      ? "Solved"
+                      : attemptedProblems?.includes(problem._id)
+                      ? "Attempted"
+                      : "Todo"]}
+                      </TableCell>
                     <TableCell className="font-medium hover:text-primary transition-colors">
                       {problem.title}
                     </TableCell>

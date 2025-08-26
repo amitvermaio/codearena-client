@@ -21,7 +21,8 @@ import { useEffect, useState } from 'react';
 import { getProblemOfTheDay } from '@/lib/api';
 import { LandingNavbar } from '@/components/layout/LandingNavbar';
 import { Badge } from '@/components/ui/badge';
-import { useSelector, useDispatch } from "react-redux";
+// import { useSelector, useDispatch } from "react-redux";
+// import { loginUser, registerUser, logoutUser, fetchUserProfile } from "../store/actions/user/userAction";
 
 const features = [
   {
@@ -67,10 +68,14 @@ const faqs = [
 
 const Home = () => {
   const [problemOfTheDay, setProblemOfTheDay] = useState(null);
+  // const dispatch = useDispatch();
+  // const user = useSelector((state) => state.user?.user?.data);
 
   // useEffect(() => {
-  //   useDispatch(login());
-  // }, []);
+  //   dispatch(fetchUserProfile());
+  // }, [dispatch]);
+  // console.log(user)
+
 
   useEffect(() => {
     getProblemOfTheDay().then(setProblemOfTheDay);
@@ -155,7 +160,7 @@ const Home = () => {
                            <img 
                              src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop"
                              alt="Collaborative coding session with video call"
-                             fill
+                             fill="true"
                              className="object-cover"
                              data-ai-hint="video meeting screen"
                            />

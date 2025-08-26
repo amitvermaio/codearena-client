@@ -17,9 +17,10 @@ import {
 import { Separator } from "../../components/ui/separator";
 import { cn } from "../../lib/utils";
 import { toast } from "sonner";
-import { Skeleton } from "../../components/ui/skeleton";
+import { useDispatch, useSelector } from "react-redux";
+import ProfileSettingsSkeleton from "@/components/settings/ProfileSettingsSkeleton";
+import { useForm } from "react-hook-form";
 
-/* ---------------- Profile Colors ---------------- */
 const profileColors = [
   { name: "default", class: "bg-muted" },
   { name: "blue", class: "bg-blue-500" },
@@ -35,48 +36,29 @@ const profileColors = [
   { name: "cyan", class: "bg-cyan-800" }
 ];
 
-/* ---------------- Skeleton Loader ---------------- */
-const ProfileSettingsSkeleton = () => {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-4 w-64" />
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="flex items-center gap-4">
-            <Skeleton className="h-6 w-24" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        ))}
-      </CardContent>
-      <CardFooter>
-        <Skeleton className="h-10 w-24" />
-      </CardFooter>
-    </Card>
-  );
-}
-
 /* ---------------- Main Component ---------------- */
 const ProfileSettings = () => {
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
+  const user = useSelector(state => state.user?.user?.data)
+  
   const [skillInput, setSkillInput] = useState("");
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: {
+      fullname: user?.fullname,
+      username: user?.username,
+      bio: user?.bio,
+      profileColor: user?.profileColor,
+      location: user?.location,
+      website: user?.website,
+      skills: user?.skills,
+      socials: user?.socialLinks
+    }
+  });
 
-  // ---------------- FETCH USER ----------------
-  useEffect(() => {
-    getUserByUsername("janedoe").then(setUser);
 
-    /* -------- Redux Version (Later) --------
-    import { useDispatch, useSelector } from "react-redux";
-    const dispatch = useDispatch();
-    const user = useSelector((state) => state.user.data);
-
-    useEffect(() => {
-      dispatch(fetchUserByUsername("janedoe"));
-    }, [dispatch]);
-    ---------------------------------------- */
-  }, []);
+  console.log(user);
+  const dispatch = useDispatch();
+  
 
   // ---------------- LOADING STATE ----------------
   if (!user) {
@@ -141,7 +123,7 @@ const ProfileSettings = () => {
     // Redux: dispatch(removeUserSkill(skillToRemove));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmita = (e) => {
     e.preventDefault();
     console.log("Saving user:", user);
     toast.success("Profile Updated", {

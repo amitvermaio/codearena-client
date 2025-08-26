@@ -32,6 +32,7 @@ const CreateAccount = () => {
 
     try {
       const response = await axios.post('/auth/register', {
+        fullname: data.fullname,
         username: data.userName,
         email: data.email,
         password: data.password,
@@ -73,12 +74,23 @@ const CreateAccount = () => {
               </div>
             </div>
 
+            {/* Full Name */}
+            <div className="space-y-2">
+              <Label htmlFor="fullname">Full Name</Label>
+              <Input
+                id="fullname"
+                placeholder="John Doe"
+                {...register('fullname', { required: 'Full name is required' })}
+              />
+              {errors.fullname && <p className="text-sm text-destructive">{errors.fullname.message}</p>}
+            </div>
+
             {/* Username */}
             <div className="space-y-2">
               <Label htmlFor="userName">Username</Label>
               <Input
                 id="userName"
-                placeholder="Jane Doe"
+                placeholder="johndoe"
                 {...register('userName', { required: 'Username is required' })}
               />
               {errors.userName && <p className="text-sm text-destructive">{errors.userName.message}</p>}

@@ -61,7 +61,6 @@ const  ProblemsPage = () => {
       setAllProblems(problems);
     }
   }, [problems]);
-  console.log(problems);
 
   /**
    * Extract unique tags from problems list
