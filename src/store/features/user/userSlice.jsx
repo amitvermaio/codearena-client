@@ -22,6 +22,24 @@ const userSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    updateUserField: (state, action) => {
+      const { name, value } = action.payload;
+      if (state.user) {
+        state.user[name] = value;
+      }
+    },
+    addUserSkill: (state, action) => {
+      if (state.user && !state.user.skills.includes(action.payload)) {
+        state.user.skills.push(action.payload);
+      }
+    },
+    removeUserSkill: (state, action) => {
+      if (state.user) {
+        state.user.skills = state.user.skills.filter(
+          (skill) => skill !== action.payload
+        );
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(loginUser.pending, (state) => {
@@ -39,7 +57,6 @@ const userSlice = createSlice({
       state.error = action.payload;
     });
 
-    // REGISTER
     builder.addCase(registerUser.pending, (state) => {
       state.loading = true;
     });
@@ -55,7 +72,6 @@ const userSlice = createSlice({
       state.error = action.payload;
     });
 
-    // FETCH PROFILE
     builder.addCase(fetchUserProfile.pending, (state) => {
       state.loading = true;
     });
@@ -69,7 +85,6 @@ const userSlice = createSlice({
       state.error = action.payload;
     });
 
-    // UPDATE PROFILE
     builder.addCase(updateUserProfile.pending, (state) => {
       state.loading = true;
     });
@@ -83,7 +98,6 @@ const userSlice = createSlice({
       state.error = action.payload;
     });
 
-    // LOGOUT
     builder.addCase(logoutUser.fulfilled, (state) => {
       state.user = null;
       state.token = null;
@@ -93,5 +107,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { clearError } = userSlice.actions;
+export const { clearError, updateUserField, addUserSkill, removeUserSkill } = userSlice.actions;
 export default userSlice.reducer;

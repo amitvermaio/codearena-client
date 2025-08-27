@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { getUserByUsername } from "../../lib/api"; // adjust path
+import React, { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -18,8 +17,14 @@ import { Separator } from "../../components/ui/separator";
 import { cn } from "../../lib/utils";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
-import ProfileSettingsSkeleton from "@/components/settings/ProfileSettingsSkeleton";
 import { useForm } from "react-hook-form";
+import {
+  updateUserField,
+  addUserSkill,
+  removeUserSkill,
+} from "@/store/features/user/userSlice"; 
+import { updateUserProfile } from "@/store/actions/user/userAction";
+import ProfileSettingsSkeleton from "@/components/settings/ProfileSettingsSkeleton";
 
 const profileColors = [
   { name: "default", class: "bg-muted" },
@@ -36,31 +41,22 @@ const profileColors = [
   { name: "cyan", class: "bg-cyan-800" }
 ];
 
-/* ---------------- Main Component ---------------- */
 const ProfileSettings = () => {
-  // const [user, setUser] = useState(null);
-  const user = useSelector(state => state.user?.user?.data)
-  
+  const user = useSelector((state) => state.user?.user?.data);
+  const dispatch = useDispatch();
   const [skillInput, setSkillInput] = useState("");
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    defaultValues: {
-      fullname: user?.fullname,
-      username: user?.username,
-      bio: user?.bio,
-      profileColor: user?.profileColor,
-      location: user?.location,
-      website: user?.website,
-      skills: user?.skills,
-      socials: user?.socialLinks
-    }
+  const [bgColor, setBgColor] = useState(user.profileColor);
+
+  const { register, handleSubmit, reset } = useForm({
+    defaultValues: user
   });
 
+  useEffect(() => {
+    if (user) {
+      reset(user);
+    }
+  }, [user, reset]);
 
-  console.log(user);
-  const dispatch = useDispatch();
-  
-
-  // ---------------- LOADING STATE ----------------
   if (!user) {
     return (
       <div className="space-y-6">
@@ -70,77 +66,38 @@ const ProfileSettings = () => {
     );
   }
 
-  // ---------------- FORM HANDLERS ----------------
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name.includes(".")) {
-      const [parent, child] = name.split(".");
-      setUser((prev) => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value
-        }
-      }));
-
-      /* -------- Redux Version (Later) --------
-      dispatch(updateUserField({ parent, child, value }));
-      ---------------------------------------- */
-    } else {
-      setUser((prev) => ({ ...prev, [name]: value }));
-
-      /* -------- Redux Version (Later) --------
-      dispatch(updateUserField({ name, value }));
-      ---------------------------------------- */
-    }
+  const SubmitHandler = (data) => {
+    console.log(data);
+    dispatch(updateUserProfile(data));
+    toast.success("Profile Updated", {
+      description: "Your changes have been saved successfully."
+    });
   };
 
-  const handleColorSelect = (colorName) => {
-    setUser((prev) => ({ ...prev, profileColor: colorName }));
-    // Redux: dispatch(updateUserField({ name: "profileColor", value: colorName }));
+  const handleColorSelect = (color) => {
+    console.log(color);
+    dispatch(updateUserField({ name: "profileColor", value: color.name }));
   };
 
   const handleSkillKeyDown = (e) => {
     if (e.key === "Enter" && skillInput.trim() !== "") {
       e.preventDefault();
-      if (!user.skills.includes(skillInput.trim())) {
-        setUser((prev) => ({
-          ...prev,
-          skills: [...prev.skills, skillInput.trim()]
-        }));
-        // Redux: dispatch(addUserSkill(skillInput.trim()));
+      if (!user.skills || !user.skills.includes(skillInput.trim())) {
+        dispatch(addUserSkill(skillInput.trim()));
       }
-      setSkillInput("");
+      setSkillInput(""); 
     }
   };
 
-  const removeSkill = (skillToRemove) => {
-    setUser((prev) => ({
-      ...prev,
-      skills: prev.skills.filter((skill) => skill !== skillToRemove)
-    }));
-    // Redux: dispatch(removeUserSkill(skillToRemove));
+  const handleRemoveSkill = (skill) => {
+    dispatch(removeUserSkill(skill));
   };
 
-  const handleSubmita = (e) => {
-    e.preventDefault();
-    console.log("Saving user:", user);
-    toast.success("Profile Updated", {
-      description: "Your changes have been saved successfully."
-    });
-
-    /* -------- Redux Version (Later) --------
-    dispatch(saveUser(user));
-    ---------------------------------------- */
-  };
-
-  // ---------------- RENDER ----------------
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold font-headline">Profile</h1>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(SubmitHandler)}>
         <Card>
           <CardHeader>
             <CardTitle>Public Profile</CardTitle>
@@ -157,26 +114,22 @@ const ProfileSettings = () => {
               </Label>
               <Input
                 id="fullname"
-                name="fullname"
-                value={user.fullname}
-                onChange={handleChange}
+                {...register("fullname")}
                 className="md:col-span-3"
               />
             </div>
 
             {/* Username */}
-            <div className="grid md:grid-cols-4 items-center gap-4">
+            {/* <div className="grid md:grid-cols-4 items-center gap-4">
               <Label htmlFor="username" className="md:text-right">
                 Username
               </Label>
               <Input
                 id="username"
-                name="username"
-                value={user.username}
-                onChange={handleChange}
+                {...register("username")}
                 className="md:col-span-3"
               />
-            </div>
+            </div> */}
 
             {/* Bio */}
             <div className="grid md:grid-cols-4 items-start gap-4">
@@ -185,11 +138,9 @@ const ProfileSettings = () => {
               </Label>
               <Textarea
                 id="bio"
-                name="bio"
-                value={user.bio}
-                onChange={handleChange}
-                className="md:col-span-3"
                 rows={3}
+                {...register("bio")}
+                className="md:col-span-3"
               />
             </div>
 
@@ -208,7 +159,7 @@ const ProfileSettings = () => {
                         ? "border-ring"
                         : "border-transparent"
                     )}
-                    onClick={() => handleColorSelect(color.name)}
+                    onClick={() => handleColorSelect(color)}
                   >
                     {user.profileColor === color.name && (
                       <Check className="h-5 w-5 text-white" />
@@ -225,9 +176,7 @@ const ProfileSettings = () => {
               </Label>
               <Input
                 id="location"
-                name="location"
-                value={user.location}
-                onChange={handleChange}
+                {...register("location")}
                 className="md:col-span-3"
               />
             </div>
@@ -239,9 +188,7 @@ const ProfileSettings = () => {
               </Label>
               <Input
                 id="portfolio"
-                name="portfolio"
-                value={user.portfolio}
-                onChange={handleChange}
+                {...register("portfolio")}
                 className="md:col-span-3"
               />
             </div>
@@ -260,12 +207,12 @@ const ProfileSettings = () => {
                   placeholder="Type a skill and press Enter"
                 />
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {user.skills.map((skill) => (
+                  {user.skills?.map((skill) => (
                     <Badge key={skill} variant="secondary" className="pr-1">
                       {skill}
                       <button
                         type="button"
-                        onClick={() => removeSkill(skill)}
+                        onClick={() => handleRemoveSkill(skill)}
                         className="ml-1 rounded-full p-0.5 hover:bg-destructive/80"
                       >
                         <X className="h-3 w-3" />
@@ -275,6 +222,7 @@ const ProfileSettings = () => {
                 </div>
               </div>
             </div>
+
 
             <Separator />
 
@@ -296,9 +244,7 @@ const ProfileSettings = () => {
                 </Label>
                 <Input
                   id={`socials.${platform}`}
-                  name={`socials.${platform}`}
-                  value={user.socials?.[platform] || ""}
-                  onChange={handleChange}
+                  {...register(`socials.${platform}`)}
                   className="md:col-span-3"
                   placeholder={`${platform}-handle`}
                 />
@@ -313,6 +259,6 @@ const ProfileSettings = () => {
       </form>
     </div>
   );
-}
+};
 
 export default ProfileSettings;
