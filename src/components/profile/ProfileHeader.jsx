@@ -118,28 +118,28 @@ const ProfileHeader = ({ user, onUpdate }) => {
                 <Mail className="h-4 w-4" /> {user.email}
               </div>
             )}
-            {user.portfolio && (
+            {user.website && (
               <a
                 href={
-                  user.portfolio.startsWith("http")
-                    ? user.portfolio
-                    : `https://${user.portfolio}`
+                  user.website.startsWith("http")
+                    ? user.website
+                    : `https://${user.website}`
                 }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 text-primary hover:underline"
               >
-                <LinkIcon className="h-4 w-4" /> {user.portfolio}
+                <LinkIcon className="h-4 w-4" /> {user.website}
               </a>
             )}
           </div>
 
           {/* Social Links */}
           <div className="mt-4 flex items-center gap-2">
-            {user.socials?.github && (
+            {user.socialLinks?.github && (
               <Button variant="ghost" size="icon" asChild>
                 <a
-                  href={`https://github.com/${user.socials.github}`}
+                  href={`${user.socialLinks.github}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -147,10 +147,10 @@ const ProfileHeader = ({ user, onUpdate }) => {
                 </a>
               </Button>
             )}
-            {user.socials?.linkedin && (
+            {user.socialLinks?.linkedin && (
               <Button variant="ghost" size="icon" asChild>
                 <a
-                  href={user.socials.linkedin}
+                  href={user.socialLinks.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -158,10 +158,10 @@ const ProfileHeader = ({ user, onUpdate }) => {
                 </a>
               </Button>
             )}
-            {user.socials?.twitter && (
+            {user.socialLinks?.twitter && (
               <Button variant="ghost" size="icon" asChild>
                 <a
-                  href={`https://twitter.com/${user.socials.twitter}`}
+                  href={`${user.socialLinks.twitter}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

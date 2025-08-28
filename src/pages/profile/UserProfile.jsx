@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ProfileHeader  from "../../components/profile/ProfileHeader";
 import { Card, CardContent } from "../../components/ui/card";
-import { Star, Users, CheckCircle } from "lucide-react";
+import { Star, Target, Zap, Award } from "lucide-react";
 import SolvedStats from "../../components/profile/SolvedStats";
 import SubmissionHistory from "../../components/profile/SubmissionHistory";
 import ProfilePageSkeleton from "../../components/profile/ProfilePageSkeleton";
@@ -13,19 +13,6 @@ import { useDispatch, useSelector } from "react-redux";
 const UserProfile = () => {
   const user = useSelector(state => state.user?.user?.data);
   
-  const {
-    username,
-    email,
-    avatar,
-    problemSolved,
-    location,
-    website,
-    skills,
-    bio,
-    socialLinks,
-    profileColor,
-    recentSubmissions
-  } = user || {};
 
   // const [user, setUser] = useState({
   //       id: 'user1',
@@ -68,20 +55,18 @@ const UserProfile = () => {
   }
 
   const stats = [
-    { label: "Rank", value: `#1432`, icon: <Star className="h-4 w-4" /> },
-    { label: "Followers", value: "343", icon: <Users className="h-4 w-4" /> },
-    { label: "Following", value: "2323", icon: <Users className="h-4 w-4" /> },
-    { label: "Solutions", value: problemSolved.length, icon: <CheckCircle className="h-4 w-4" /> },
+    { label: "Rank", value: `#1432`, icon: <Star className="h-5 w-5" /> },
+    { label: "Contests", value: "2", icon: <Target className="h-5 w-5" /> },
+    { label: "Streak", value: "2323", icon: <Zap className="h-5 w-5" /> },
+    { label: "Badges", value: user?.problemSolved?.length, icon: <Award className="h-4 w-4" /> },
   ];
 
-  const handleProfileUpdate = (updatedUser) => {
-    setUser(updatedUser);
-  };
+  
 
   return (
     <div className="container mx-auto py-8 px-4 md:px-6">
       <div className="max-w-5xl mx-auto space-y-6">
-        <ProfileHeader user={user} onUpdate={handleProfileUpdate} />
+        <ProfileHeader user={user}/>
 
         <div className="grid grid-cols-1 gap-6">
 
@@ -101,7 +86,7 @@ const UserProfile = () => {
               </CardContent>
             </Card>
 
-            {/* <SolvedStats stats={user.solvedStats} total={user?.totalProblems} /> */}
+            <SolvedStats stats={user.solvedStats} total={user?.totalProblems} />
           </div>
         </div>
       </div>

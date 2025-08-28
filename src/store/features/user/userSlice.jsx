@@ -8,12 +8,27 @@ import {
 } from "../../actions/user/userAction";
 
 const initialState = {
-  user: null,          // logged in user info
-  token: null,         // JWT token or auth token
-  loading: false,      // loading state for any async action
-  error: null,         // error state
-  isAuthenticated: false, // auth check
+  user: {
+    data: {
+      skills: [],       
+      profileColor: "",
+      fullname: "",
+      bio: "",
+      location: "",
+      portfolio: "",
+      socials: {
+        github: "",
+        twitter: "",
+        linkedin: "",
+      },
+    }
+  },
+  token: null,
+  loading: false,
+  error: null,
+  isAuthenticated: false,
 };
+
 
 const userSlice = createSlice({
   name: "user",
@@ -25,20 +40,25 @@ const userSlice = createSlice({
     updateUserField: (state, action) => {
       const { name, value } = action.payload;
       if (state.user) {
+        console.log(name, value)
         state.user[name] = value;
       }
     },
     addUserSkill: (state, action) => {
-      if (state.user && !state.user.skills.includes(action.payload)) {
-        state.user.skills.push(action.payload);
+      if (!state.user) return;
+      if (!state.user.data) state.user.data = {};
+      if (!state.user.data.skills) state.user.data.skills = [];
+      
+      if (!state.user.data.skills.includes(action.payload)) {
+        state.user.data.skills.push(action.payload);
       }
     },
     removeUserSkill: (state, action) => {
-      if (state.user) {
-        state.user.skills = state.user.skills.filter(
-          (skill) => skill !== action.payload
-        );
-      }
+      if (!state.user?.data?.skills) return;
+      
+      state.user.data.skills = state.user.data.skills.filter(
+        (skill) => skill !== action.payload
+      );
     },
   },
   extraReducers: (builder) => {

@@ -18,13 +18,9 @@ import { cn } from "../../lib/utils";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-import {
-  updateUserField,
-  addUserSkill,
-  removeUserSkill,
-} from "@/store/features/user/userSlice"; 
 import { updateUserProfile } from "@/store/actions/user/userAction";
 import ProfileSettingsSkeleton from "@/components/settings/ProfileSettingsSkeleton";
+import { updateUserField, addUserSkill, removeUserSkill } from "@/store/features/user/userSlice"; 
 
 const profileColors = [
   { name: "default", class: "bg-muted" },
@@ -45,7 +41,7 @@ const ProfileSettings = () => {
   const user = useSelector((state) => state.user?.user?.data);
   const dispatch = useDispatch();
   const [skillInput, setSkillInput] = useState("");
-  const [bgColor, setBgColor] = useState(user.profileColor);
+  const [bgColor, setBgColor] = useState(user?.profileColor);
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: user
@@ -67,7 +63,8 @@ const ProfileSettings = () => {
   }
 
   const SubmitHandler = (data) => {
-    console.log(data);
+    const profileColor = bgColor;
+    data.profileColor = profileColor;
     dispatch(updateUserProfile(data));
     toast.success("Profile Updated", {
       description: "Your changes have been saved successfully."
@@ -75,8 +72,7 @@ const ProfileSettings = () => {
   };
 
   const handleColorSelect = (color) => {
-    console.log(color);
-    dispatch(updateUserField({ name: "profileColor", value: color.name }));
+    dispatch(updateUserField({ name: "profileColor", value: color }));
   };
 
   const handleSkillKeyDown = (e) => {
@@ -155,13 +151,16 @@ const ProfileSettings = () => {
                     className={cn(
                       "h-8 w-8 rounded-full border-2 flex items-center justify-center",
                       color.class,
-                      user.profileColor === color.name
+                      bgColor === color.name
                         ? "border-ring"
                         : "border-transparent"
                     )}
-                    onClick={() => handleColorSelect(color)}
+                    onClick={() => { 
+                      setBgColor(color.name); 
+                      handleColorSelect(color.name); 
+                    }}
                   >
-                    {user.profileColor === color.name && (
+                    {bgColor === color.name && (
                       <Check className="h-5 w-5 text-white" />
                     )}
                   </button>
@@ -183,12 +182,12 @@ const ProfileSettings = () => {
 
             {/* Portfolio */}
             <div className="grid md:grid-cols-4 items-center gap-4">
-              <Label htmlFor="portfolio" className="md:text-right">
+              <Label htmlFor="website" className="md:text-right">
                 Portfolio URL
               </Label>
               <Input
-                id="portfolio"
-                {...register("portfolio")}
+                id="website"
+                {...register("website")}
                 className="md:col-span-3"
               />
             </div>
@@ -237,14 +236,14 @@ const ProfileSettings = () => {
                 className="grid md:grid-cols-4 items-center gap-4"
               >
                 <Label
-                  htmlFor={`socials.${platform}`}
+                  htmlFor={`socialLinks.${platform}`}
                   className="md:text-right"
                 >
                   {platform.charAt(0).toUpperCase() + platform.slice(1)}
                 </Label>
                 <Input
-                  id={`socials.${platform}`}
-                  {...register(`socials.${platform}`)}
+                  id={`socialLinks.${platform}`}
+                  {...register(`socialLinks.${platform}`)}
                   className="md:col-span-3"
                   placeholder={`${platform}-handle`}
                 />

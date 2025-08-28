@@ -27,7 +27,7 @@ const statusIcons = {
   Todo: <Circle className="h-5 w-5 text-muted-foreground" />,
 };
 
-export default function ProblemList({ problems }) {
+const ProblemList = ({ problems }) => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -131,3 +131,5 @@ export default function ProblemList({ problems }) {
     </Card>
   );
 }
+
+export default ProblemList;

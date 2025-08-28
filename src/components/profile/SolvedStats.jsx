@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const SolvedStats = ({ stats, total, className }) => {
-  console.log("stats: ", stats, "total: ", total);
-  const totalSolved = stats.easy + stats.medium + stats.hard;
+  if (!stats) stats = { easy: 0, medium: 0, hard: 0 };
+  if (!total) total = 150;
+  const totalSolved = stats?.easy + stats?.medium + stats?.hard || 0;
 
   const easyPercentage =
     totalSolved > 0 ? (stats.easy / totalSolved) * 100 : 0;
@@ -50,7 +51,7 @@ const SolvedStats = ({ stats, total, className }) => {
               <span>Easy</span>
             </div>
             <p className="font-semibold">
-              {stats.easy}{" "}
+              {stats?.easy}{" "}
               <span className="text-muted-foreground">/{totalSolved}</span>
             </p>
           </div>
@@ -61,7 +62,7 @@ const SolvedStats = ({ stats, total, className }) => {
               <span>Medium</span>
             </div>
             <p className="font-semibold">
-              {stats.medium}{" "}
+              {stats?.medium}{" "}
               <span className="text-muted-foreground">/{totalSolved}</span>
             </p>
           </div>
@@ -72,7 +73,7 @@ const SolvedStats = ({ stats, total, className }) => {
               <span>Hard</span>
             </div>
             <p className="font-semibold">
-              {stats.hard}{" "}
+              {stats?.hard}{" "}
               <span className="text-muted-foreground">/{totalSolved}</span>
             </p>
           </div>

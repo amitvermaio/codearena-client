@@ -11,13 +11,9 @@ export const loginUser = createAsyncThunk("user/login", async ({ email, password
   }
 );
 
-export const registerUser = createAsyncThunk("user/register", async ({ name, email, password }, { rejectWithValue }) => {
+export const registerUser = createAsyncThunk("user/register", async (userDetails, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post("/api/auth/register", {
-        name,
-        email,
-        password,
-      });
+      const { data } = await axios.post("/auth/register", userDetails);
       return data; 
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Registration failed");
@@ -38,9 +34,26 @@ export const fetchUserProfile = createAsyncThunk("user/fetchProfile", async (_, 
 export const updateUserProfile = createAsyncThunk("user/updateProfile", async (updates, { rejectWithValue }) => {
     try {
       const { data } = await axios.patch("/users/me", updates);
+      console.log(data);
       return data; 
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Update failed");
+    }
+  }
+);
+
+export const uploadPhoto = createAsyncThunk("upload/uploadPhoto", async (file, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("photo", file);
+
+      const res = await axios.post("/users/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      return res.data.url; 
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Upload failed");
     }
   }
 );
