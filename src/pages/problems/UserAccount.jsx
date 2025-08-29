@@ -4,8 +4,16 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Switch } from "../../components/ui/switch";
+import { toast } from "sonner";
 
-export default function AccountSettingsPage() {
+const UserAccount = () => {
+
+  const UserNameEmailHandler = () => {
+    toast('Changes Saved !', {
+      description: 'Now, you can\'t change username or email for next 7 days'
+    });
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold font-headline">Account Settings</h1>
@@ -21,8 +29,8 @@ export default function AccountSettingsPage() {
 
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
-            <Input id="fullName" defaultValue="Jane Doe" />
+            <Label htmlFor="username">User Name</Label>
+            <Input id="username" defaultValue="janedoe" />
           </div>
 
           <div className="space-y-2">
@@ -32,7 +40,7 @@ export default function AccountSettingsPage() {
         </CardContent>
 
         <CardFooter className="border-t px-6 py-4">
-          <Button>Save Changes</Button>
+          <Button onClick={UserNameEmailHandler}>Save Changes</Button>
         </CardFooter>
       </Card>
 
@@ -76,3 +84,5 @@ export default function AccountSettingsPage() {
     </div>
   );
 }
+
+export default UserAccount;

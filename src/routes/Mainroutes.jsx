@@ -16,7 +16,7 @@ import NotFound from "../pages/NotFound";
 import VerifyEmail from "../pages/auth/VerifyEmail";
 import Summarizer from "../pages/tools/Summarizer";
 import Tools from "../pages/tools/Tools";
-import UserSettings from "../pages/problems/UserSettings";
+import UserSettings from "../pages/problems/UserAccount";
 import ProfileSettings from "../pages/settings/ProfileSettings";
 import SecuritySettings from "../pages/settings/SecuritySettings";
 import ForgotPassword from "../pages/auth/ForgotPassword";
@@ -25,7 +25,7 @@ import MainLayout from "@/components/layout/MainLayout";
 import AdminRoute from "../components/AdminRoute";
 import ProtectedRoute from "../components/ProtectedRoute";
 import SettingsLayout from "@/components/layout/SettingsLayout";
-import SettingsSidebar from "@/components/settings/SettingsSidebar";
+import AdminLayout from "@/components/layout/AdminLayout";
 
 const Mainroutes = () => {
   return (
@@ -53,9 +53,10 @@ const Mainroutes = () => {
         <ProtectedRoute><Dashboard /></ProtectedRoute>
       } />
 
-      <Route path="/admin" element={
-        <ProtectedRoute><AdminRoute><AdminPanel /></AdminRoute></ProtectedRoute>
-      } />
+{/* <ProtectedRoute><AdminRoute><AdminPanel /></AdminRoute></ProtectedRoute> */}
+      <Route path="/administration" element={<AdminLayout />}>
+        <Route index element={<AdminPanel />} />
+      </Route>
 
       <Route element={<MainLayout />}>
         <Route path="/problems" element={<ProblemList />} />

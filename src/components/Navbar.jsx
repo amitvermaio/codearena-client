@@ -222,7 +222,7 @@ const Navbar = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to={`/admin/${username}`} className="flex items-center w-full">
+                  <Link to={`/administration`} className="flex items-center w-full">
                     <Shield className="mr-2 h-4 w-4" />
                     <span>Admin Panel</span>
                   </Link>
