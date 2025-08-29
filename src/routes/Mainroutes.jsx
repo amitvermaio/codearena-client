@@ -26,6 +26,7 @@ import AdminRoute from "../components/AdminRoute";
 import ProtectedRoute from "../components/ProtectedRoute";
 import SettingsLayout from "@/components/layout/SettingsLayout";
 import AdminLayout from "@/components/layout/AdminLayout";
+import UserManagement from "@/pages/admin/UserManagement";
 
 const Mainroutes = () => {
   return (
@@ -56,6 +57,7 @@ const Mainroutes = () => {
 {/* <ProtectedRoute><AdminRoute><AdminPanel /></AdminRoute></ProtectedRoute> */}
       <Route path="/administration" element={<AdminLayout />}>
         <Route index element={<AdminPanel />} />
+        <Route path="user-management" element={<UserManagement />} />
       </Route>
 
       <Route element={<MainLayout />}>

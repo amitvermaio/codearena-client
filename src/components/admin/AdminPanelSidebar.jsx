@@ -30,14 +30,12 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const adminNavItems = [
-  { label: "Dashboard", icon: Home, href: "/admin" },
-  { label: "Users", icon: Users, href: "/admin/users" },
-  { label: "Problems", icon: FileCode, href: "/admin/problems" },
-  { label: "Contests", icon: Trophy, href: "/admin/contests" },
-  { label: "Subscriptions", icon: CreditCard, href: "/admin/subscriptions" },
-  { label: "Analytics", icon: BarChart, href: "/admin/analytics" },
-  { label: "Earnings", icon: IndianRupee, href: "/admin/earnings" },
-  { label: "Settings", icon: Settings, href: "/admin/settings" },
+  { label: "Dashboard", icon: Home, href: "/administration" },
+  { label: "Users", icon: Users, href: "/administration/users-management" },
+  { label: "Problems", icon: FileCode, href: "/administration/problems" },
+  { label: "Contests", icon: Trophy, href: "/administration/contests" },
+  { label: "Analytics", icon: BarChart, href: "/administration/analytics" },
+  { label: "Settings", icon: Settings, href: "/administration/settings" },
 ];
 
 function AdminBreadcrumb() {
