@@ -1,3 +1,4 @@
+// ContestCard: displays contest info (title, date, duration, participants, type) with dynamic action button
 import React, { useMemo } from "react";
 import { Button } from "../ui/button";
 import {
