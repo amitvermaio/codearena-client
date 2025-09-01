@@ -27,6 +27,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import SettingsLayout from "@/components/layout/SettingsLayout";
 import AdminLayout from "@/components/layout/AdminLayout";
 import UserManagement from "@/pages/admin/UserManagement";
+import ProblemManagement from "@/pages/admin/ProblemManagement";
 
 const Mainroutes = () => {
   return (
@@ -57,7 +58,8 @@ const Mainroutes = () => {
 {/* <ProtectedRoute><AdminRoute><AdminPanel /></AdminRoute></ProtectedRoute> */}
       <Route path="/administration" element={<AdminLayout />}>
         <Route index element={<AdminPanel />} />
-        <Route path="user-management" element={<UserManagement />} />
+        <Route path="users-management" element={<UserManagement />} />
+        <Route path="problems-management" element={<ProblemManagement />} />
       </Route>
 
       <Route element={<MainLayout />}>

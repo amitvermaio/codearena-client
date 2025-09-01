@@ -32,8 +32,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 const adminNavItems = [
   { label: "Dashboard", icon: Home, href: "/administration" },
   { label: "Users", icon: Users, href: "/administration/users-management" },
-  { label: "Problems", icon: FileCode, href: "/administration/problems" },
-  { label: "Contests", icon: Trophy, href: "/administration/contests" },
+  { label: "Problems", icon: FileCode, href: "/administration/problems-management" },
+  { label: "Contests", icon: Trophy, href: "/administration/contests-management" },
   { label: "Analytics", icon: BarChart, href: "/administration/analytics" },
   { label: "Settings", icon: Settings, href: "/administration/settings" },
 ];
