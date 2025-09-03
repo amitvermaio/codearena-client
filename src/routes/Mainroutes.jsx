@@ -28,6 +28,8 @@ import SettingsLayout from "@/components/layout/SettingsLayout";
 import AdminLayout from "@/components/layout/AdminLayout";
 import UserManagement from "@/pages/admin/UserManagement";
 import ProblemManagement from "@/pages/admin/ProblemManagement";
+import ContestManagement from "@/pages/admin/ContestManagement";
+import ContestCreate from "@/pages/admin/ContestCreate";
 
 const Mainroutes = () => {
   return (
@@ -60,6 +62,8 @@ const Mainroutes = () => {
         <Route index element={<AdminPanel />} />
         <Route path="users-management" element={<UserManagement />} />
         <Route path="problems-management" element={<ProblemManagement />} />
+        <Route path="contests-management" element={<ContestManagement />} />
+        <Route path="contests-management/create-contest" element={<ContestCreate />} />
       </Route>
 
       <Route element={<MainLayout />}>

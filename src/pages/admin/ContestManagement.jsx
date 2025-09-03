@@ -17,12 +17,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-export default function AdminContestsPage() {
+const ContestManagement = () => {
   const [contests, setContests] = useState([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedContest, setSelectedContest] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getContests().then(setContests);
@@ -33,28 +35,19 @@ export default function AdminContestsPage() {
     setIsEditDialogOpen(true);
   };
 
-  const handleCreate = () => {
-    setSelectedContest(null);
-    setIsEditDialogOpen(true);
-  };
-
   const handleDelete = (contestId) => {
     setContests((prev) => prev.filter((c) => c.id !== contestId));
+    toast.success("Contest Deleted", {
+      description: "The contest has been removed successfully.",
+    });
   };
 
   const handleSave = (contest) => {
-    if (selectedContest) {
-      setContests((prev) =>
-        prev.map((c) => (c.id === contest.id ? contest : c))
-      );
-    } else {
-      setContests((prev) => [
-        { ...contest, id: `contest-${Date.now()}` },
-        ...prev,
-      ]);
-    }
-    toast.success("Contest Saved", {
-      description: `"${contest.title}" has been saved successfully.`,
+    setContests((prev) =>
+      prev.map((c) => (c.id === contest.id ? contest : c))
+    );
+    toast.success("Contest Updated", {
+      description: `"${contest.title}" has been updated successfully.`,
     });
   };
 
@@ -62,7 +55,9 @@ export default function AdminContestsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <h1 className="text-3xl font-bold font-headline">Manage Contests</h1>
-        <Button onClick={handleCreate}>Create Contest</Button>
+        <Button onClick={() => navigate("/administration/contests-management/create-contest")}>
+          Create Contest
+        </Button>
       </div>
       <Card>
         <CardHeader>
@@ -160,4 +155,6 @@ export default function AdminContestsPage() {
       />
     </div>
   );
-}
+};
+
+export default ContestManagement;
