@@ -3,7 +3,7 @@ import { Logo } from "../shared/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Github, Linkedin, Twitter } from "lucide-react";
-
+// Footer
 const footerLinks = {
   platform: [
     { label: "Problems", href: "/problems" },
