@@ -21,7 +21,8 @@ import { useEffect, useState } from 'react';
 import { getProblemOfTheDay } from '@/lib/api';
 import { LandingNavbar } from '@/components/layout/LandingNavbar';
 import { Badge } from '@/components/ui/badge';
-// import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { verifyAuth } from "@/store/actions/user/userAction";
 // import { loginUser, registerUser, logoutUser, fetchUserProfile } from "../store/actions/user/userAction";
 
 const features = [
@@ -68,6 +69,8 @@ const faqs = [
 
 const Home = () => {
   const [problemOfTheDay, setProblemOfTheDay] = useState(null);
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.user);
   // const dispatch = useDispatch();
   // const user = useSelector((state) => state.user?.user?.data);
 
@@ -75,7 +78,10 @@ const Home = () => {
   //   dispatch(fetchUserProfile());
   // }, [dispatch]);
   // console.log(user)
-
+  useEffect(() => {
+    dispatch(verifyAuth());
+    console.log(isAuthenticated)
+  }, [dispatch]);
 
   useEffect(() => {
     getProblemOfTheDay().then(setProblemOfTheDay);
@@ -135,7 +141,7 @@ const Home = () => {
               className="mt-8 flex flex-col sm:flex-row justify-center gap-4"
             >
               <Button asChild size="lg" className="shadow-lg hover:shadow-primary/50 transition-shadow">
-                <Link to="/problems">
+                <Link to={isAuthenticated ? "problems" : "signin"}>
                   Get Started <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>

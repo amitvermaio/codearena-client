@@ -30,7 +30,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Logo } from "../components/shared/Logo";
 import axios from "../config/axios.config.jsx";
 import { toast } from "sonner";
-import { fetchUserProfile } from "@/store/actions/user/userAction";
+import { fetchUserProfile, verifyAuth } from "@/store/actions/user/userAction";
 import { useDispatch, useSelector } from "react-redux";
 
 // Dummy data instead of API call
@@ -91,6 +91,7 @@ const Navbar = () => {
       const res = await axios.post('/auth/logout');
       console.log("Logout response: ", res);
       if (res.status === 200) {
+        dispatch(verifyAuth());
         toast.success('Logged out successfully');
         navigate('/');
       }

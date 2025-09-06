@@ -35,6 +35,7 @@ const Login = () => {
     setServerError(null);
     const { email, password } = data;
     try {
+      console.log(email, password);
       const response = await axios.post('/auth/login', {
         email,
         password,

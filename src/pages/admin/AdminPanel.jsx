@@ -5,6 +5,7 @@ import { getProblemOfTheDay, getProblems } from "@/lib/api";
 import { Star, Edit, Trash2 } from "lucide-react";
 import { ProblemSelectDialog } from "@/components/admin/ProblemSelectDialog";
 import { toast } from "sonner";
+import { Link } from "react-router-dom"; // ✅ Import Link
 
 const AdminPanel = () => {
   const [potd, setPotd] = useState(null);
@@ -84,8 +85,8 @@ const AdminPanel = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button>
-              <a href="/admin/users">Go to Users</a>
+            <Button asChild>
+              <Link to="/administration/users-management">Go to Users</Link>
             </Button>
           </CardContent>
         </Card>
@@ -99,8 +100,8 @@ const AdminPanel = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button>
-              <a href="/admin/problems">Go to Problems</a>
+            <Button asChild>
+              <Link to="/administration/problems-management">Go to Problems</Link>
             </Button>
           </CardContent>
         </Card>
@@ -114,8 +115,8 @@ const AdminPanel = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button>
-              <a href="/admin/contests">Go to Contests</a>
+            <Button asChild>
+              <Link to="/administration/contests-management">Go to Contests</Link>
             </Button>
           </CardContent>
         </Card>
@@ -129,8 +130,8 @@ const AdminPanel = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button>
-              <a href="/admin/analytics">View Analytics</a>
+            <Button asChild>
+              <Link to="/administration/analytics">View Analytics</Link>
             </Button>
           </CardContent>
         </Card>
@@ -144,8 +145,8 @@ const AdminPanel = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button>
-              <a href="/admin/settings">Go to Settings</a>
+            <Button asChild>
+              <Link to="/administration/settings">Go to Settings</Link>
             </Button>
           </CardContent>
         </Card>
@@ -155,3 +156,34 @@ const AdminPanel = () => {
 }
 
 export default AdminPanel;
+
+
+/* -------------------- Redux Version (commented) --------------------
+
+import { useSelector, useDispatch } from "react-redux";
+import { fetchPotd, fetchProblems, updatePotd, removePotd } from "@/store/adminSlice";
+
+const administrationPanel = () => {
+  const dispatch = useDispatch();
+  const potd = useSelector((state) => state.admin.potd);
+  const allProblems = useSelector((state) => state.admin.allProblems);
+  const isDialogOpen = useSelector((state) => state.admin.isDialogOpen);
+
+  useEffect(() => {
+    dispatch(fetchPotd());
+    dispatch(fetchProblems());
+  }, [dispatch]);
+
+  const handleUpdatePotd = (problem) => {
+    dispatch(updatePotd(problem));
+  };
+
+  const handleRemovePotd = () => {
+    dispatch(removePotd());
+    toast.info("Problem of the Day has been removed.");
+  };
+
+  return ( ... same JSX code as above ... )
+}
+
+------------------------------------------------------------------ */

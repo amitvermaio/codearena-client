@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  verifyAuth,
   fetchUserProfile,
   updateUserProfile,
   loginUser,
@@ -62,6 +63,24 @@ const userSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(verifyAuth.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(verifyAuth.fulfilled, (state, action) => {
+      state.loading = false;
+      if (action.payload) {
+        state.user = action.payload.user;
+        state.isAuthenticated = true;
+      } else {
+        state.user = null;
+        state.isAuthenticated = false;
+      }
+    });
+    builder.addCase(verifyAuth.rejected, (state) => {
+      state.loading = false;
+      state.user = null;
+      state.isAuthenticated = false;
+    }),
     builder.addCase(loginUser.pending, (state) => {
       state.loading = true;
     });

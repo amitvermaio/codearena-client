@@ -1,5 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { checkAuth } from "@/services/auth";
 import axios from "@/config/axios.config";
+
+export const verifyAuth = createAsyncThunk("user/verifyAuth", async () => {
+  const userData = await checkAuth();
+  return userData; 
+});
+
 
 export const loginUser = createAsyncThunk("user/login", async ({ email, password }, { rejectWithValue }) => {
     try {
