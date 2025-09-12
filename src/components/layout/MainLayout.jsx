@@ -8,6 +8,7 @@ export default function MainLayout() {
   // Placeholder for future layout setup logic
   const prepareLayout = () => {
     // currently not doing much, but kept for structural setup for the latter
+    // 
     return true;
   };
 

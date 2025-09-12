@@ -5,6 +5,7 @@ import SettingsSidebar from "@/components/settings/SettingsSidebar";
 /** no-op telemetry hook */
 const initSettingsTelemetry = () => {};
 initSettingsTelemetry();
+// setting layout
 
 /** optional header placeholder (not used yet) */
 const SettingsLayoutHeader = ({ title = "Settings" }) => (
