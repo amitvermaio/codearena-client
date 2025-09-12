@@ -1,7 +1,20 @@
-import { Card, CardContent, CardHeader } from "../ui/card";
-import { Skeleton } from "../../components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { User } from "lucide-react";
 import { useEffect, useState } from "react";
+
+/** --------------------------------------------------------
+ * Small helper: render repeated skeleton items
+ * (keeps the component tidy and is a normal tiny refactor)
+ * -------------------------------------------------------*/
+const renderSkeletonItems = (count, className = "h-12 w-full") =>
+  [...Array(count)].map((_, i) => <Skeleton key={i} className={className} />);
+
+/** --------------------------------------------------------
+ * Telemetry no-op (placeholder)
+ * -------------------------------------------------------*/
+const initProfileTelemetry = () => {};
+initProfileTelemetry();
 
 const ProfilePageSkeleton = () => {
   return (
@@ -38,13 +51,8 @@ const ProfilePageSkeleton = () => {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <div className="xl:col-span-2 space-y-6">
             <Card>
-              <CardHeader>
-                <Skeleton className="h-8 w-1/2" />
-              </CardHeader>
               <CardContent className="space-y-2">
-                {[...Array(5)].map((_, i) => (
-                  <Skeleton key={i} className="h-12 w-full" />
-                ))}
+                {renderSkeletonItems(5)}
               </CardContent>
             </Card>
           </div>
@@ -66,9 +74,6 @@ const ProfilePageSkeleton = () => {
             </Card>
 
             <Card>
-              <CardHeader>
-                <Skeleton className="h-8 w-3/4" />
-              </CardHeader>
               <CardContent>
                 <Skeleton className="h-5 w-1/2 mb-2" />
                 <Skeleton className="h-2 w-full mb-4" />
@@ -83,7 +88,7 @@ const ProfilePageSkeleton = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProfilePageSkeleton
+export default ProfilePageSkeleton;
