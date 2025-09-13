@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import axios from "@/config/axios.config";
 import Home from "../pages/Home";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
@@ -30,8 +31,10 @@ import UserManagement from "@/pages/admin/UserManagement";
 import ProblemManagement from "@/pages/admin/ProblemManagement";
 import ContestManagement from "@/pages/admin/ContestManagement";
 import ContestCreate from "@/pages/admin/ContestCreate";
+import { useEffect } from "react";
 
 const Mainroutes = () => {
+
   return (
     <Routes>
       {/* Public Routes */}
