@@ -19,6 +19,15 @@ import ImageUpdateDialog from "./ImageUpdateDialog";
 import { cn } from "../../lib/utils";
 import { useNavigate } from "react-router-dom";
 
+/** --------------------------------------------------------
+ * Telemetry placeholder (harmless)
+ * -------------------------------------------------------*/
+const initProfileHeaderTelemetry = () => {};
+initProfileHeaderTelemetry();
+
+/** --------------------------------------------------------
+ * Small helpers
+ * -------------------------------------------------------*/
 const profileBgColors = {
   default: "bg-muted",
   blue: "bg-blue-500",
@@ -34,7 +43,51 @@ const profileBgColors = {
   cyan: "bg-cyan-800",
 };
 
-const ProfileHeader = ({ user, canEdit = false, onUpdate }) => {
+const safeUrl = (u = "") => (u.startsWith("http") ? u : `https://${u}`);
+
+/** Action buttons area — extracted for clarity */
+const ProfileActions = ({ canEdit, onBack, onEdit }) => (
+  <div className="mt-4 sm:mt-0 flex flex-wrap gap-2">
+    <Button variant="outline" onClick={onBack}>
+      <ArrowLeft className="mr-2 h-4 w-4" /> Back
+    </Button>
+
+    {canEdit && (
+      <Button variant="default" onClick={onEdit}>
+        <Edit className="mr-2 h-4 w-4" /> Edit Profile
+      </Button>
+    )}
+  </div>
+);
+
+/** Social buttons extractor */
+const SocialButtons = ({ links = {} }) => (
+  <div className="mt-4 flex items-center gap-2">
+    {links.github && (
+      <Button variant="ghost" size="icon" asChild>
+        <a href={links.github} target="_blank" rel="noopener noreferrer">
+          <Github className="h-5 w-5" />
+        </a>
+      </Button>
+    )}
+    {links.linkedin && (
+      <Button variant="ghost" size="icon" asChild>
+        <a href={links.linkedin} target="_blank" rel="noopener noreferrer">
+          <Linkedin className="h-5 w-5" />
+        </a>
+      </Button>
+    )}
+    {links.twitter && (
+      <Button variant="ghost" size="icon" asChild>
+        <a href={links.twitter} target="_blank" rel="noopener noreferrer">
+          <Twitter className="h-5 w-5" />
+        </a>
+      </Button>
+    )}
+  </div>
+);
+
+const ProfileHeader = ({ user = {}, canEdit = false, onUpdate = () => {} }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isImageUpdateOpen, setIsImageUpdateOpen] = useState(false);
   const navigate = useNavigate();
@@ -104,18 +157,11 @@ const ProfileHeader = ({ user, canEdit = false, onUpdate }) => {
             </div>
 
             {/* Action buttons */}
-            <div className="mt-4 sm:mt-0 flex flex-wrap gap-2">
-              <Button variant="outline" onClick={() => navigate(-1)}>
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back
-              </Button>
-
-              {/* Edit button only for auth user */}
-              {canEdit && (
-                <Button variant="default" onClick={() => navigate(`/settings`)}>
-                  <Edit className="mr-2 h-4 w-4" /> Edit Profile
-                </Button>
-              )}
-            </div>
+            <ProfileActions
+              canEdit={canEdit}
+              onBack={() => navigate(-1)}
+              onEdit={() => navigate(`/settings`)}
+            />
           </div>
 
           {/* Bio */}
@@ -135,11 +181,7 @@ const ProfileHeader = ({ user, canEdit = false, onUpdate }) => {
             )}
             {user.website && (
               <a
-                href={
-                  user.website.startsWith("http")
-                    ? user.website
-                    : `https://${user.website}`
-                }
+                href={safeUrl(user.website)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 text-primary hover:underline"
@@ -150,29 +192,7 @@ const ProfileHeader = ({ user, canEdit = false, onUpdate }) => {
           </div>
 
           {/* Social links */}
-          <div className="mt-4 flex items-center gap-2">
-            {user.socialLinks?.github && (
-              <Button variant="ghost" size="icon" asChild>
-                <a href={user.socialLinks.github} target="_blank" rel="noopener noreferrer">
-                  <Github className="h-5 w-5" />
-                </a>
-              </Button>
-            )}
-            {user.socialLinks?.linkedin && (
-              <Button variant="ghost" size="icon" asChild>
-                <a href={user.socialLinks.linkedin} target="_blank" rel="noopener noreferrer">
-                  <Linkedin className="h-5 w-5" />
-                </a>
-              </Button>
-            )}
-            {user.socialLinks?.twitter && (
-              <Button variant="ghost" size="icon" asChild>
-                <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer">
-                  <Twitter className="h-5 w-5" />
-                </a>
-              </Button>
-            )}
-          </div>
+          <SocialButtons links={user.socialLinks} />
 
           {/* Skills */}
           {user.skills?.length > 0 && (
