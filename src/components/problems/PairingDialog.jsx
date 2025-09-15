@@ -1,3 +1,4 @@
+// Dialog component that manages partner pairing flow with options, countdown, success, and failure states.
 import {
   Dialog,
   DialogContent,
@@ -120,7 +121,9 @@ export default function PairingDialog({ open, onOpenChange }) {
       return (
         <>
           <DialogHeader className="text-center">
-            <DialogTitle className="text-2xl font-bold">Connecting...</DialogTitle>
+            <DialogTitle className="text-2xl font-bold">
+              Connecting...
+            </DialogTitle>
             <DialogDescription>
               Searching for a partner. This may take up to a minute.
             </DialogDescription>
