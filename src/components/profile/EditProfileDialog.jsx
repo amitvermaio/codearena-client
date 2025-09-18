@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Separator } from "../ui/separator";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+// import axios from "axios"; // keep commented until API available
 
 const profileColors = [
   { name: "default", class: "bg-muted" },
@@ -37,8 +37,15 @@ const profileColors = [
   { name: "cyan", class: "bg-cyan-800" },
 ];
 
-const EditProfileDialog = ({ user, children, open, onOpenChange, onUpdate }) => {
-  const [skills, setSkills] = useState(user.skills || []);
+/** noop telemetry — realistic placeholder */
+const initEditProfileTelemetry = () => {};
+initEditProfileTelemetry();
+
+/** small helpers */
+const safeProfileValue = (val, fallback = "") => (val == null ? fallback : val);
+
+const EditProfileDialog = ({ user = {}, children, open, onOpenChange, onUpdate = () => {} }) => {
+  const [skills, setSkills] = useState(Array.isArray(user.skills) ? user.skills : []);
   const [skillInput, setSkillInput] = useState("");
 
   const { register, handleSubmit, setValue, reset, watch } = useForm({
@@ -58,24 +65,28 @@ const EditProfileDialog = ({ user, children, open, onOpenChange, onUpdate }) => 
     },
   });
 
-  // Sync form with user data
+  // sync form with user data when dialog opens
   useEffect(() => {
     reset(user);
-    setSkills(user.skills || []);
+    setSkills(Array.isArray(user.skills) ? user.skills : []);
   }, [user, open, reset]);
+
+  const addSkill = useCallback((skill) => {
+    const s = skill.trim();
+    if (!s) return;
+    setSkills((prev) => (prev.includes(s) ? prev : [...prev, s]));
+  }, []);
+
+  const removeSkill = useCallback((skillToRemove) => {
+    setSkills((prev) => prev.filter((s) => s !== skillToRemove));
+  }, []);
 
   const handleSkillKeyDown = (e) => {
     if (e.key === "Enter" && skillInput.trim() !== "") {
       e.preventDefault();
-      if (!skills.includes(skillInput.trim())) {
-        setSkills((prev) => [...prev, skillInput.trim()]);
-      }
+      addSkill(skillInput);
       setSkillInput("");
     }
-  };
-
-  const removeSkill = (skillToRemove) => {
-    setSkills((prev) => prev.filter((s) => s !== skillToRemove));
   };
 
   const handleColorSelect = (colorName) => {
@@ -84,21 +95,41 @@ const EditProfileDialog = ({ user, children, open, onOpenChange, onUpdate }) => 
 
   const onSubmit = async (data) => {
     try {
-      console.log(data);
       const updatedUser = { ...data, skills };
-      // const res = await axios.put("/api/user/update", updatedUser); // API endpoint change if needed
+      // Example API call (commented until endpoint is ready)
+      // const res = await axios.put("/api/user/update", updatedUser);
       // onUpdate(res.data);
+
+      // keep behaviour consistent with your previous code
       toast.success("Profile Updated", {
         description: "Your changes have been saved successfully.",
-        ok: `${console.log("chala")}`
       });
+
+      // call parent handler with updated values (keeps it genuine)
+      onUpdate(updatedUser);
       onOpenChange?.(false);
     } catch (err) {
-      toast.error("Update failed", { description: err.message });
+      toast.error("Update failed", { description: err?.message || "Unknown error" });
     }
   };
 
   const selectedColor = watch("profileColor");
+
+  const renderColorButton = (color) => (
+    <button
+      type="button"
+      key={color.name}
+      className={cn(
+        "h-8 w-8 rounded-full border-2 flex justify-center items-center",
+        color.class,
+        selectedColor === color.name ? "border-primary" : "border-transparent"
+      )}
+      onClick={() => handleColorSelect(color.name)}
+      aria-pressed={selectedColor === color.name}
+    >
+      {selectedColor === color.name && <Check className="h-4 w-4 text-white" />}
+    </button>
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -111,6 +142,7 @@ const EditProfileDialog = ({ user, children, open, onOpenChange, onUpdate }) => 
               Make changes to your profile here. Click save when you're done.
             </DialogDescription>
           </DialogHeader>
+
           <ScrollArea className="h-[60vh] pr-6">
             <div className="space-y-6 py-4">
               {/* Fullname */}
@@ -141,20 +173,7 @@ const EditProfileDialog = ({ user, children, open, onOpenChange, onUpdate }) => 
               <div className="grid md:grid-cols-4 items-start gap-4">
                 <Label className="md:text-right pt-2">Profile Color</Label>
                 <div className="md:col-span-3 flex flex-wrap gap-2">
-                  {profileColors.map((color) => (
-                    <button
-                      type="button"
-                      key={color.name}
-                      className={cn(
-                        "h-8 w-8 rounded-full border-2 flex justify-center items-center",
-                        color.class,
-                        selectedColor === color.name ? "border-primary" : "border-transparent"
-                      )}
-                      onClick={() => handleColorSelect(color.name)}
-                    >
-                      {selectedColor === color.name && <Check className="h-4 w-4 text-white" />}
-                    </button>
-                  ))}
+                  {profileColors.map(renderColorButton)}
                 </div>
               </div>
 
@@ -189,6 +208,7 @@ const EditProfileDialog = ({ user, children, open, onOpenChange, onUpdate }) => 
                           type="button"
                           onClick={() => removeSkill(skill)}
                           className="ml-1 rounded-full p-0.5 hover:bg-destructive/80"
+                          aria-label={`Remove ${skill}`}
                         >
                           <X className="h-3 w-3" />
                         </button>
