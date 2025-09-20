@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 
@@ -16,7 +16,22 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Link } from "lucide-react";
 
-const ImageUpdateDialog = ({ isOpen, onOpenChange, onSave, aspect }) => {
+/** noop telemetry placeholder */
+const initImageUploadTelemetry = () => {};
+initImageUploadTelemetry();
+
+/** small helpers */
+const isImageUrl = (url = "") => /\.(jpe?g|png|gif|bmp|webp)$/i.test(url);
+
+const readFileAsDataURL = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+const ImageUpdateDialog = ({ isOpen, onOpenChange, onSave, aspect = 1 }) => {
   const [imageSrc, setImageSrc] = useState(null);
   const [crop, setCrop] = useState();
   const [urlInput, setUrlInput] = useState("");
@@ -24,41 +39,45 @@ const ImageUpdateDialog = ({ isOpen, onOpenChange, onSave, aspect }) => {
   const imgRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  const handleClose = () => {
+  const resetState = useCallback(() => {
     setImageSrc(null);
     setUrlInput("");
     setCrop(undefined);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    resetState();
     onOpenChange(false);
-  };
+  }, [onOpenChange, resetState]);
 
   useEffect(() => {
-    if (!isOpen) {
-      setImageSrc(null);
-      setUrlInput("");
-      setCrop(undefined);
-    }
-  }, [isOpen]);
+    if (!isOpen) resetState();
+  }, [isOpen, resetState]);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = useCallback(async (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageSrc(reader.result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const data = await readFileAsDataURL(file);
+        setImageSrc(data);
+      } catch (err) {
+        // graceful fallback
+        // eslint-disable-next-line no-alert
+        alert("Failed to read file. Please try another image.");
+      }
     }
-  };
+  }, []);
 
-  const handleUrlLoad = () => {
-    if (urlInput.match(/\.(jpeg|jpg|gif|png)$/) != null) {
-      setImageSrc(urlInput);
+  const handleUrlLoad = useCallback(() => {
+    if (isImageUrl(urlInput.trim())) {
+      setImageSrc(urlInput.trim());
     } else {
-      alert("Please enter a valid image URL ending in .jpg, .jpeg, .png, or .gif");
+      // eslint-disable-next-line no-alert
+      alert("Please enter a valid image URL ending in .jpg, .jpeg, .png, .gif, .bmp, or .webp");
     }
-  };
+  }, [urlInput]);
 
-  const onImageLoad = (e) => {
+  const onImageLoad = useCallback((e) => {
     const { width, height } = e.currentTarget;
     const initialCrop = centerCrop(
       makeAspectCrop({ unit: "%", width: 90 }, aspect, width, height),
@@ -66,9 +85,9 @@ const ImageUpdateDialog = ({ isOpen, onOpenChange, onSave, aspect }) => {
       height
     );
     setCrop(initialCrop);
-  };
+  }, [aspect]);
 
-  const handleSaveCrop = () => {
+  const handleSaveCrop = useCallback(() => {
     if (!imgRef.current || !crop?.width || !crop?.height) return;
 
     const canvas = document.createElement("canvas");
@@ -96,7 +115,7 @@ const ImageUpdateDialog = ({ isOpen, onOpenChange, onSave, aspect }) => {
     const dataUrl = canvas.toDataURL("image/png");
     onSave(dataUrl);
     handleClose();
-  };
+  }, [crop, onSave, handleClose]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -192,6 +211,6 @@ const ImageUpdateDialog = ({ isOpen, onOpenChange, onSave, aspect }) => {
       </DialogContent>
     </Dialog>
   );
-}
+};
 
 export default ImageUpdateDialog;
