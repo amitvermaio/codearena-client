@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/resizable";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProblemDescriptionPanelSkeleton from "./ProblemDescriptionPanelSkeleton";
-
+// udating problem page
 const ProblemPageSkeleton = () => {
   return (
     <ResizablePanelGroup
