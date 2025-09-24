@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -26,9 +26,12 @@ import {
   removeuserskill
 } from "@/store/features/user/userSlice";
 
+/** noop telemetry placeholder (harmless) */
+const initProfileSettingsTelemetry = () => {};
+initProfileSettingsTelemetry();
 
-// ✅ FIX: "class" -> "className"
-const profileColors = [
+/** small defaults/helper */
+const defaultProfileColors = [
   { name: "default", className: "bg-muted" },
   { name: "blue", className: "bg-blue-500" },
   { name: "green", className: "bg-green-500" },
@@ -43,27 +46,40 @@ const profileColors = [
   { name: "cyan", className: "bg-cyan-800" }
 ];
 
+const safeUser = (u = {}) => ({
+  skills: Array.isArray(u.skills) ? u.skills : [],
+  profileColor: u?.profileColor || "default",
+  ...u
+});
+
+/** upsert helper to avoid duplicates (used locally before dispatch) */
+const upsertSkill = (skills, newSkill) => {
+  const s = newSkill.trim();
+  if (!s) return skills;
+  return skills.includes(s) ? skills : [...skills, s];
+};
+
 const ProfileSettings = () => {
-  const user = useSelector((state) => state.user?.user);
+  const rawUser = useSelector((state) => state.user?.user);
+  const user = safeUser(rawUser);
   const dispatch = useDispatch();
 
-  // FIX: state undefined issues handled
+  // local form helpers
   const [skillInput, setSkillInput] = useState("");
-  const [bgColor, setBgColor] = useState(user?.profileColor || "default");
+  const [bgColor, setBgColor] = useState(user.profileColor || "default");
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: user
   });
 
   useEffect(() => {
-    if (user) {
-      reset(user);
-      setBgColor(user.profileColor || "default");
+    if (rawUser) {
+      reset(rawUser);
+      setBgColor(rawUser.profileColor || "default");
     }
-  }, [user]);
+  }, [rawUser, reset]);
 
-
-  if (!user) {
+  if (!rawUser) {
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold font-headline">Profile</h1>
@@ -91,8 +107,9 @@ const ProfileSettings = () => {
     if (e.key === "Enter" && skillInput.trim() !== "") {
       e.preventDefault();
 
-      // FIX: no duplicates
-      if (!user.skills?.includes(skillInput.trim())) {
+      // use a local dedupe first, then dispatch add action
+      const nextSkills = upsertSkill(user.skills, skillInput);
+      if (nextSkills.length !== user.skills.length) {
         dispatch(adduserskill(skillInput.trim()));
       }
 
@@ -100,9 +117,9 @@ const ProfileSettings = () => {
     }
   };
 
-  const handleRemoveSkill = (skill) => {
+  const handleRemoveSkill = useCallback((skill) => {
     dispatch(removeuserskill(skill));
-  };
+  }, [dispatch]);
 
   return (
     <div className="space-y-6">
@@ -118,7 +135,6 @@ const ProfileSettings = () => {
           </CardHeader>
 
           <CardContent className="space-y-6">
-
             {/* Full Name */}
             <div className="grid md:grid-cols-4 items-center gap-4">
               <Label htmlFor="fullname" className="md:text-right">
@@ -140,7 +156,7 @@ const ProfileSettings = () => {
               <Label className="md:text-right pt-2">Profile Color</Label>
 
               <div className="md:col-span-3 flex flex-wrap gap-2">
-                {profileColors.map((color) => (
+                {defaultProfileColors.map((color) => (
                   <button
                     type="button"
                     key={color.name}
@@ -150,6 +166,7 @@ const ProfileSettings = () => {
                       bgColor === color.name ? "border-ring" : "border-transparent"
                     )}
                     onClick={() => handleColorSelect(color.name)}
+                    aria-pressed={bgColor === color.name}
                   >
                     {bgColor === color.name && <Check className="h-5 w-5 text-white" />}
                   </button>
@@ -197,6 +214,7 @@ const ProfileSettings = () => {
                         type="button"
                         onClick={() => handleRemoveSkill(skill)}
                         className="ml-1 rounded-full p-0.5 hover:bg-destructive/80"
+                        aria-label={`Remove ${skill}`}
                       >
                         <X className="h-3 w-3" />
                       </button>
