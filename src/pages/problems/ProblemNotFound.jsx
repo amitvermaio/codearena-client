@@ -50,11 +50,9 @@ const ProblemNotFound = () => {
             </Link>
           </Button>
           
-          <Button variant="outline" asChild className="w-full sm:w-auto">
-            <Link to={navigate(-1)} className="flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Previous
-            </Link>
+          <Button variant="outline" className="w-full sm:w-auto flex items-center gap-2" onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-4 h-4" />
+            Back to Previous
           </Button>
         </div>
       </div>
