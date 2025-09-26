@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,18 +11,24 @@ import { useDispatch } from "react-redux";
 import { logoutuser } from "@/store/features/user/userSlice";
 import DeleteAccountPopup from "@/components/settings/DeleteAccountPopup";
 
-// ---------------- Redux Version Imports (Comment if not using) ----------------
-// import { useSelector, useDispatch } from "react-redux";
-// import { updatePassword, deleteAccount } from "@/redux/securitySlice";
+/** noop telemetry placeholder (harmless) */
+const initSecurityTelemetry = () => {};
+initSecurityTelemetry();
+
+/** small helper to build auth header */
+const authHeader = () => {
+  const token = localStorage.getItem(import.meta.env.VITE_TOKEN_NAME);
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 const SecuritySettings = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [openDeleteAccountPopup, setOpenDeleteAccountPopup] = React.useState(false);
+  const [openDeleteAccountPopup, setOpenDeleteAccountPopup] = useState(false);
 
-  const closeDeleteAccountPopup = () => {
+  const closeDeleteAccountPopup = useCallback(() => {
     setOpenDeleteAccountPopup(false);
-  };
+  }, []);
 
   // ---------------- React Hook Form ----------------
   const {
@@ -32,13 +38,21 @@ const SecuritySettings = () => {
     reset
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log("Password updated:", data);
+  // Keep client-side submit lightweight; server call can be added later.
+  const onSubmit = useCallback((data) => {
+    // basic client-side sanity: ensure new and confirm match (react-hook-form already validates)
+    if (data.newPassword && data.confirmPassword && data.newPassword !== data.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    // placeholder behaviour — replace with real API when available
+    console.log("Password updated (client):", { ...data, mask: "****" });
     toast.success("Password updated successfully!");
     reset();
-  };
+  }, [reset]);
 
-  const handleDeleteAccount = async () => {
+  const handleDeleteAccount = useCallback(async () => {
     try {
       const token = localStorage.getItem(import.meta.env.VITE_TOKEN_NAME);
       if (!token) {
@@ -46,26 +60,36 @@ const SecuritySettings = () => {
         return;
       }
 
-      const { data } = await axios.post("/auth/delete-account", {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (data.statusCode === 200) {
+      const { data } = await axios.post(
+        "/auth/delete-account",
+        {},
+        { headers: authHeader() }
+      );
+
+      if (data?.statusCode === 200) {
         toast.success("Account deleted successfully!");
         localStorage.removeItem(import.meta.env.VITE_TOKEN_NAME);
         dispatch(logoutuser());
         navigate("/problems");
+      } else {
+        // graceful handling for non-200 replies
+        toast.error(data?.message || "Failed to delete account");
       }
     } catch (error) {
-      console.log(error);
+      console.error("Delete account failed:", error);
       toast.error("Failed to delete account");
+    } finally {
+      setOpenDeleteAccountPopup(false);
     }
-  };
+  }, [dispatch, navigate]);
 
   return (
     <div className="space-y-6">
-      <DeleteAccountPopup open={openDeleteAccountPopup} onClose={closeDeleteAccountPopup} onConfirm={handleDeleteAccount} />
+      <DeleteAccountPopup
+        open={openDeleteAccountPopup}
+        onClose={closeDeleteAccountPopup}
+        onConfirm={handleDeleteAccount}
+      />
       <h1 className="text-3xl font-bold font-headline">Security</h1>
 
       {/* Change Password Section */}
