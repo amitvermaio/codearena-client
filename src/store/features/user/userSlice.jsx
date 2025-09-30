@@ -1,4 +1,4 @@
-// src/store/userSlice.js
+// src/store/features/user/userSlice.jsx
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -20,20 +20,26 @@ const initialState = {
   error: null
 };
 
+const safeAssign = (target = {}, data) => {
+  if (data && typeof data === "object") {
+    return { ...target, ...data };
+  }
+  return target;
+};
+
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    // Replace user object (e.g. after fetching profile)
     loadUser: (state, action) => {
-      if (action.payload && typeof action.payload === "object") {
-        state.user = { ...state.user, ...action.payload };
-      }
+      // merge incoming payload with existing user to avoid overwriting accidental fields
+      state.user = safeAssign(state.user, action.payload);
     },
 
     setLoading: (state, action) => {
       state.loading = !!action.payload;
     },
+
     setError: (state, action) => {
       state.error = action.payload ?? null;
     },
@@ -48,6 +54,7 @@ const userSlice = createSlice({
     updateUserField: (state, action) => {
       const { name, value } = action.payload ?? {};
       if (!name) return;
+
       if (name.includes(".")) {
         const parts = name.split(".");
         let cur = state.user;
@@ -84,12 +91,7 @@ const userSlice = createSlice({
       state.isAdmin = !!action.payload;
     },
 
-    // ---------- REDUNDANT / NO-OP (intentional) ----------
-    // This reducer does nothing (keeps state unchanged).
-    // It's safe but redundant — useful if you need a placeholder.
-    noop: (state) => {
-      return state;
-    }
+    noop: (state) => state
   }
 });
 
