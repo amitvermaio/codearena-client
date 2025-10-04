@@ -5,21 +5,23 @@ import { getProblemOfTheDay, getProblems } from "@/lib/api";
 import { Star, Edit, Trash2 } from "lucide-react";
 import { ProblemSelectDialog } from "@/components/admin/ProblemSelectDialog";
 import { toast } from "sonner";
-import { Link } from "react-router-dom"; // ✅ Import Link
+import { Link } from "react-router-dom";
 
 const AdminPanel = () => {
   const [potd, setPotd] = useState(null);
   const [allProblems, setAllProblems] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProblemOfTheDay().then(setPotd);
-    getProblems().then(setAllProblems);
+    Promise.all([getProblemOfTheDay(), getProblems()]).then(([potdResp, problemsResp]) => {
+      setPotd(potdResp);
+      setAllProblems(problemsResp);
+      setLoading(false);
+    });
   }, []);
 
-  const handleUpdatePotd = (problem) => {
-    setPotd(problem);
-  };
+  const handleUpdatePotd = (problem) => setPotd(problem);
 
   const handleRemovePotd = () => {
     setPotd(null);
@@ -29,6 +31,7 @@ const AdminPanel = () => {
   return (
     <div>
       <h1 className="text-3xl font-bold font-headline mb-6">Admin Dashboard</h1>
+
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         
         {/* Problem of the Day */}
@@ -42,8 +45,11 @@ const AdminPanel = () => {
               Manage the current daily problem.
             </CardDescription>
           </CardHeader>
+
           <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            {potd ? (
+            {loading ? (
+              <p className="text-muted-foreground">Loading...</p>
+            ) : potd ? (
               <>
                 <div>
                   <p className="font-semibold">{potd.title}</p>
@@ -153,37 +159,6 @@ const AdminPanel = () => {
       </div>
     </div>
   );
-}
+};
 
 export default AdminPanel;
-
-
-/* -------------------- Redux Version (commented) --------------------
-
-import { useSelector, useDispatch } from "react-redux";
-import { fetchPotd, fetchProblems, updatePotd, removePotd } from "@/store/adminSlice";
-
-const administrationPanel = () => {
-  const dispatch = useDispatch();
-  const potd = useSelector((state) => state.admin.potd);
-  const allProblems = useSelector((state) => state.admin.allProblems);
-  const isDialogOpen = useSelector((state) => state.admin.isDialogOpen);
-
-  useEffect(() => {
-    dispatch(fetchPotd());
-    dispatch(fetchProblems());
-  }, [dispatch]);
-
-  const handleUpdatePotd = (problem) => {
-    dispatch(updatePotd(problem));
-  };
-
-  const handleRemovePotd = () => {
-    dispatch(removePotd());
-    toast.info("Problem of the Day has been removed.");
-  };
-
-  return ( ... same JSX code as above ... )
-}
-
------------------------------------------------------------------- */
