@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import axios from "@/config/axios.config";
 import Home from "../pages/Home";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";

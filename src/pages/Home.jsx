@@ -78,10 +78,10 @@ const Home = () => {
   //   dispatch(fetchUserProfile());
   // }, [dispatch]);
   // console.log(user)
-  useEffect(() => {
-    dispatch(verifyAuth());
-    console.log(isAuthenticated)
-  }, [dispatch]);
+  
+  // useEffect(() => {
+  //   dispatch(verifyAuth());
+  // }, [dispatch]);
 
   useEffect(() => {
     getProblemOfTheDay().then(setProblemOfTheDay);

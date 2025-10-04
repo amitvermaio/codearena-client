@@ -11,6 +11,8 @@ export const verifyAuth = createAsyncThunk("user/verifyAuth", async () => {
 export const loginUser = createAsyncThunk("user/login", async ({ email, password }, { rejectWithValue }) => {
     try {
       const { data } = await axios.post("/auth/login", { email, password });
+      console.log(data)
+      localStorage.setItem("token", data.accessToken);
       return data; // { user, token }
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Login failed");
@@ -20,7 +22,8 @@ export const loginUser = createAsyncThunk("user/login", async ({ email, password
 
 export const registerUser = createAsyncThunk("user/register", async (userDetails, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post("/auth/register", userDetails);
+      const { fullname, username, email, password } = userDetails;
+      const { data } = await axios.post("/auth/register", { fullname, username, email, password });
       return data; 
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Registration failed");
@@ -30,7 +33,11 @@ export const registerUser = createAsyncThunk("user/register", async (userDetails
 
 export const fetchUserProfile = createAsyncThunk("user/fetchProfile", async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get("/auth/me");
+      const { data } = await axios.get('auth/me', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
       return data; 
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch profile");

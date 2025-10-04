@@ -24,7 +24,6 @@ const initialState = {
       },
     }
   },
-  token: null,
   loading: false,
   error: null,
   isAuthenticated: false,
