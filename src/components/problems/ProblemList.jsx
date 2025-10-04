@@ -70,9 +70,9 @@ const ProblemList = ({ problems }) => {
             </TableHeader>
             <TableBody>
               {hasInitialProblems ? (
-                problems.map((problem) => (
+                problems.map((problem, idx) => (
                   <TableRow
-                    key={problem._id}
+                    key={problem._id || problem.slug || problem.id || idx}
                     className="hover:bg-muted/50 cursor-pointer"
                     onClick={() => handleProblemClick(problem.slug)}
                   >
@@ -96,8 +96,8 @@ const ProblemList = ({ problems }) => {
                     <TableCell>{problem.acceptance}</TableCell>
                     {!hasInitialProblems && (
                       <TableCell className="space-x-1">
-                        {problem.tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag} variant="secondary">
+                        {problem.tags.slice(0, 3).map((tag, tIdx) => (
+                          <Badge key={`${problem.slug || problem._id || idx}-${tag}-${tIdx}`} variant="secondary">
                             {tag}
                           </Badge>
                         ))}
