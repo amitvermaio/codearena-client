@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Github } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { loginUser } from "@/store/actions/user/userAction";
 import axios from '@/config/axios.config.jsx';
 
 // Google SVG Icon
@@ -26,6 +28,8 @@ const Login = () => {
   const [serverError, setServerError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const dispatch = useDispatch();
+
   // Form handling with react-hook-form
   const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -36,12 +40,9 @@ const Login = () => {
     const { email, password } = data;
     try {
       console.log(email, password);
-      const response = await axios.post('/auth/login', {
-        email,
-        password,
-      });
-
-      if (response.status === 200) {
+      const response = await dispatch(loginUser({ email, password })).unwrap();
+      console.log(response);
+      if (response.statusCode === 200) {
         navigate('/problems');
         toast.success('Successfully signed in!');
       }

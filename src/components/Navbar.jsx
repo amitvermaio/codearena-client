@@ -30,7 +30,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Logo } from "../components/shared/Logo";
 import axios from "../config/axios.config.jsx";
 import { toast } from "sonner";
-import { fetchUserProfile, verifyAuth } from "@/store/actions/user/userAction";
+import { fetchUserProfile, logoutUser, verifyAuth } from "@/store/actions/user/userAction";
 import { useDispatch, useSelector } from "react-redux";
 
 // Dummy data instead of API call
@@ -84,13 +84,16 @@ const Navbar = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   
   const user = useSelector(state => state.user?.user?.data || "");
-  const { username, fullname, avatar } = user;
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+  
 
   const LogoutHandler = async () => {
     try {
-      const res = await axios.post('/auth/logout');
+      const res = await dispatch(logoutUser()).unwrap();
       console.log("Logout response: ", res);
-      if (res.status === 200) {
+      if (res.statusCode === 200) {
         dispatch(verifyAuth());
         toast.success('Logged out successfully');
         navigate('/');
@@ -193,33 +196,33 @@ const Navbar = () => {
             </Link>
           </Button>
           {
-            user.isAuthenticated ? 
+            user  ? 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10 border-2 border-border">
-                    <AvatarImage src={`${avatar}`} alt="User profile" />
-                    <AvatarFallback>{fullname?.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={`${user.avatar}`} alt="User profile" />
+                    <AvatarFallback>{user.fullname?.charAt(0)}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{fullname ? fullname : "User"}</p>
-                    <p className="text-xs leading-none text-muted-foreground">@{username ? username : "user"}</p>
+                    <p className="text-sm font-medium leading-none">{user.fullname ? user.fullname : "User"}</p>
+                    <p className="text-xs leading-none text-muted-foreground">@{user.username ? user.username : "user"}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
-                    <Link to={`/u/${username}`} className="flex items-center w-full">
+                    <Link to={`/u/${user.username}`} className="flex items-center w-full">
                       <UserIcon className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to={`/u/${username}/settings`} className="flex items-center w-full">
+                    <Link to={`/u/${user.username}/settings`} className="flex items-center w-full">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </Link>

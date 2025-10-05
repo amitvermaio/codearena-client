@@ -9,7 +9,6 @@ import {
   Linkedin,
   Twitter,
   Mail,
-  UserPlus,
   Edit,
   Camera,
   ArrowLeft,
@@ -18,10 +17,8 @@ import { Badge } from "../ui/badge";
 import EditProfileDialog from "./EditProfileDialog";
 import ImageUpdateDialog from "./ImageUpdateDialog";
 import { cn } from "../../lib/utils";
-import { useNavigate, Link } from "react-router-dom";
-// import { useDispatch, useSelector } from "react-redux"; // Redux placeholder
+import { useNavigate } from "react-router-dom";
 
-// Background color options for profile header
 const profileBgColors = {
   default: "bg-muted",
   blue: "bg-blue-500",
@@ -37,18 +34,14 @@ const profileBgColors = {
   cyan: "bg-cyan-800",
 };
 
-
-const ProfileHeader = ({ user, onUpdate }) => {
+const ProfileHeader = ({ user, canEdit = false, onUpdate }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isImageUpdateOpen, setIsImageUpdateOpen] = useState(false);
   const navigate = useNavigate();
 
-  // const dispatch = useDispatch(); // Redux placeholder
-
   const handleImageSave = (url) => {
     const updatedUser = { ...user, profilePic: url };
     onUpdate(updatedUser);
-    // dispatch(updateUser(updatedUser)); // Redux placeholder
     setIsImageUpdateOpen(false);
   };
 
@@ -58,55 +51,77 @@ const ProfileHeader = ({ user, onUpdate }) => {
 
   return (
     <>
-      {/* Profile Picture Update Modal */}
-      <ImageUpdateDialog
-        isOpen={isImageUpdateOpen}
-        onOpenChange={setIsImageUpdateOpen}
-        onSave={handleImageSave}
-        aspect={1}
-      />
+      {/* Image update modal */}
+      {canEdit && (
+        <ImageUpdateDialog
+          isOpen={isImageUpdateOpen}
+          onOpenChange={setIsImageUpdateOpen}
+          onSave={handleImageSave}
+          aspect={1}
+        />
+      )}
+
+      {/* Edit profile modal */}
+      {canEdit && (
+        <EditProfileDialog
+          isOpen={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          user={user}
+          onSave={onUpdate}
+        />
+      )}
 
       <Card>
-        {/* Profile Background */}
+        {/* Profile background */}
         <div className={cn("h-24 rounded-t-lg", bgColorClass)} />
 
         <CardContent className="p-4 sm:p-6 -mt-16">
           <div className="flex flex-col sm:flex-row sm:items-end sm:gap-6">
-            {/* Profile Avatar */}
+            {/* Avatar */}
             <div className="relative group">
               <Avatar className="h-28 w-28 border-4 border-card">
-                <AvatarImage src={user.avatar} />
-                <AvatarFallback className="text-3xl font-semibold">{user.fullname?.charAt(0)}</AvatarFallback>
+                <AvatarImage src={user.profilePic || user.avatar} />
+                <AvatarFallback className="text-3xl font-semibold">
+                  {user.fullname?.charAt(0)}
+                </AvatarFallback>
               </Avatar>
-              <button
-                className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full"
-                onClick={() => setIsImageUpdateOpen(true)}
-              >
-                <Camera className="h-6 w-6 text-white" />
-              </button>
+
+              {/* Camera button only if canEdit */}
+              {canEdit && (
+                <button
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full"
+                  onClick={() => setIsImageUpdateOpen(true)}
+                >
+                  <Camera className="h-6 w-6 text-white" />
+                </button>
+              )}
             </div>
 
-            {/* Name & Username */}
+            {/* Name and username */}
             <div className="mt-4 sm:mt-0 flex-grow">
-              <h1 className="text-2xl font-bold font-headline">
-                {user.fullname}
-              </h1>
+              <h1 className="text-2xl font-bold font-headline">{user.fullname}</h1>
               <p className="text-sm text-muted-foreground">@{user.username}</p>
             </div>
 
-            {/* Action Buttons */}
+            {/* Action buttons */}
             <div className="mt-4 sm:mt-0 flex flex-wrap gap-2">
               <Button variant="outline" onClick={() => navigate(-1)}>
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back
               </Button>
-              
+
+              {/* Edit button only for auth user */}
+              {canEdit && (
+                <Button variant="default" onClick={() => setIsEditDialogOpen(true)}>
+                  <Edit className="mr-2 h-4 w-4" /> Edit Profile
+                </Button>
+              )}
             </div>
           </div>
 
           {/* Bio */}
           {user.bio && <p className="mt-4 text-sm">{user.bio}</p>}
 
-          {/* Location, Email, Portfolio */}
+          {/* Location, email, website */}
           <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
             {user.location && (
               <div className="flex items-center gap-1">
@@ -134,37 +149,25 @@ const ProfileHeader = ({ user, onUpdate }) => {
             )}
           </div>
 
-          {/* Social Links */}
+          {/* Social links */}
           <div className="mt-4 flex items-center gap-2">
             {user.socialLinks?.github && (
               <Button variant="ghost" size="icon" asChild>
-                <a
-                  href={`${user.socialLinks.github}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={user.socialLinks.github} target="_blank" rel="noopener noreferrer">
                   <Github className="h-5 w-5" />
                 </a>
               </Button>
             )}
             {user.socialLinks?.linkedin && (
               <Button variant="ghost" size="icon" asChild>
-                <a
-                  href={user.socialLinks.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={user.socialLinks.linkedin} target="_blank" rel="noopener noreferrer">
                   <Linkedin className="h-5 w-5" />
                 </a>
               </Button>
             )}
             {user.socialLinks?.twitter && (
               <Button variant="ghost" size="icon" asChild>
-                <a
-                  href={`${user.socialLinks.twitter}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer">
                   <Twitter className="h-5 w-5" />
                 </a>
               </Button>
@@ -188,6 +191,6 @@ const ProfileHeader = ({ user, onUpdate }) => {
       </Card>
     </>
   );
-}
+};
 
 export default ProfileHeader;

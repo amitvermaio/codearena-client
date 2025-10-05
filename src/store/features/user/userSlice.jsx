@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   verifyAuth,
   fetchUserProfile,
+  fetchCurrentUser,
   updateUserProfile,
   loginUser,
   registerUser,
@@ -9,24 +10,12 @@ import {
 } from "../../actions/user/userAction";
 
 const initialState = {
-  user: {
-    data: {
-      skills: [],       
-      profileColor: "",
-      fullname: "",
-      bio: "",
-      location: "",
-      portfolio: "",
-      socials: {
-        github: "",
-        twitter: "",
-        linkedin: "",
-      },
-    }
-  },
+  user: null,
+  token: localStorage.getItem('accessToken') || null,
   loading: false,
   error: null,
   isAuthenticated: false,
+  initialized: false,
 };
 
 
@@ -84,9 +73,10 @@ const userSlice = createSlice({
       state.loading = true;
     });
     builder.addCase(loginUser.fulfilled, (state, action) => {
+      console.log(action.payload);
       state.loading = false;
       state.user = action.payload.user;
-      state.token = action.payload.token;
+      state.token = action.payload.accessToken;
       state.isAuthenticated = true;
       state.error = null;
     });
@@ -123,6 +113,24 @@ const userSlice = createSlice({
       state.error = action.payload;
     });
 
+    builder.addCase(fetchCurrentUser.pending, (state) => { state.loading = true; })
+      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.accessToken;
+        state.isAuthenticated = true;
+        state.error = null;
+        state.initialized = true;
+      })
+      .addCase(fetchCurrentUser.rejected, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        state.error = action.payload || null;
+        state.initialized = true;
+      });
+
     builder.addCase(updateUserProfile.pending, (state) => {
       state.loading = true;
     });
@@ -142,6 +150,7 @@ const userSlice = createSlice({
       state.isAuthenticated = false;
       state.error = null;
     });
+    
   },
 });
 

@@ -2,12 +2,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import problemsReducer from "./features/problems/problemSlice";
 import userReducer from "./features/user/userSlice"; // <- common users
 import adminUserReducer from "./features/admin/userSlice"; // <- admin panel users
+import profileReducer from "./features/profile/profileSlice"; // <- profile
 
 export const store = configureStore({
   reducer: {
     user: userReducer,          // for common user
     adminUsers: adminUserReducer, // for admin panel
     problems: problemsReducer,
+    profile: profileReducer, // for profile
     // contests: contestsReducer,
   },
 });
