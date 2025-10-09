@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -27,10 +27,17 @@ const ProblemManagement = () => {
   const [problems, setProblems] = useState([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedProblem, setSelectedProblem] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProblems().then(setProblems);
+    getProblems()
+      .then((res) => {
+        setProblems(Array.isArray(res) ? res : []);
+      })
+      .finally(() => setLoading(false));
   }, []);
+
+  const visibleProblems = useMemo(() => (Array.isArray(problems) ? problems : []), [problems]);
 
   const handleEdit = (problem) => {
     setSelectedProblem(problem);
@@ -48,10 +55,8 @@ const ProblemManagement = () => {
 
   const handleSaveProblem = (problem) => {
     if (selectedProblem) {
-      // Update existing problem
       setProblems((prev) => prev.map((p) => (p.id === problem.id ? problem : p)));
     } else {
-      // Add new problem
       const newProblem = { ...problem, id: `problem-${Date.now()}` };
       setProblems((prev) => [newProblem, ...prev]);
     }
@@ -63,13 +68,13 @@ const ProblemManagement = () => {
         <h1 className="text-3xl font-bold font-headline">Manage Problems</h1>
         <Button onClick={handleAddProblem}>Add New Problem</Button>
       </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Problem Set</CardTitle>
-          <CardDescription>
-            Manage the coding problems available on the platform.
-          </CardDescription>
+          <CardDescription>Manage the coding problems available on the platform.</CardDescription>
         </CardHeader>
+
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
@@ -81,55 +86,87 @@ const ProblemManagement = () => {
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
-                {problems.map((problem) => (
-                  <TableRow key={problem.id} >
-                    <TableCell className="font-medium">{problem.title}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={difficultyColors[problem.difficulty]}>
-                        {problem.difficulty}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="space-x-1 max-w-sm truncate whitespace-nowrap">
-                      {problem.tags.slice(0, 3).map((tag) => (
-                        <Badge key={tag} variant="secondary">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </TableCell>
-                    <TableCell className="text-right space-x-2 whitespace-nowrap">
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(problem)}>
-                        Edit
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="destructive" size="sm">
-                            Delete
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete the problem.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteProblem(problem.id)}>
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-8 text-center">
+                      Loading...
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : visibleProblems.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-12 text-center">
+                      <p className="text-lg text-muted-foreground">No problems found</p>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  visibleProblems.map((problem) => {
+                    const id = problem.id ?? problem._id ?? `p-${String(problem.title).slice(0, 8)}-${Date.now()}`;
+                    const difficulty = problem.difficulty ?? "Medium";
+                    const tags = Array.isArray(problem.tags) ? problem.tags : [];
+
+                    return (
+                      <TableRow key={id}>
+                        <TableCell className="font-medium">{problem.title}</TableCell>
+
+                        <TableCell>
+                          <Badge variant="outline" className={difficultyColors[difficulty] ?? ""}>
+                            {difficulty}
+                          </Badge>
+                        </TableCell>
+
+                        <TableCell className="space-x-1 max-w-sm truncate whitespace-nowrap">
+                          {tags.length > 0 ? (
+                            tags.slice(0, 3).map((tag) => (
+                              <Badge key={tag} variant="secondary">
+                                {tag}
+                              </Badge>
+                            ))
+                          ) : (
+                            <span className="text-sm text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+
+                        <TableCell className="text-right space-x-2 whitespace-nowrap">
+                          <Button variant="outline" size="sm" onClick={() => handleEdit(problem)}>
+                            Edit
+                          </Button>
+
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="destructive" size="sm">
+                                Delete
+                              </Button>
+                            </AlertDialogTrigger>
+
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete the problem.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteProblem(problem.id)}>
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
               </TableBody>
             </Table>
           </div>
         </CardContent>
       </Card>
+
       <ProblemEditDialog
         isOpen={isEditDialogOpen}
         setIsOpen={setIsEditDialogOpen}
@@ -138,6 +175,6 @@ const ProblemManagement = () => {
       />
     </div>
   );
-}
+};
 
 export default ProblemManagement;
