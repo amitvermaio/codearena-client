@@ -1,45 +1,67 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Button } from "../ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "../ui/card";
 import { Calendar, Clock, Users, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "../ui/badge";
 
-// Redux imports (uncomment jab Redux setup ho jaye)
-// import { useSelector, useDispatch } from "react-redux";
-
 const ContestCard = ({ contest }) => {
-  const isUpcoming = new Date(contest.startTime) > new Date();
+  const startTime = contest?.startTime ? new Date(contest.startTime) : null;
 
-  const renderButton = () => {
-    return (
-      // Agar tum React Router use kar rahe ho to <Link> ko wahan se import karo
-      <Button className="w-full">
-        {isUpcoming ? "View Details" : "Go to Contest"}
-        <ArrowRight className="ml-2 h-4 w-4" />
-      </Button>
-    );
-  };
+  const isUpcoming = useMemo(() => {
+    return startTime ? startTime > new Date() : false;
+  }, [startTime]);
+
+  const imageUrl = contest?.imageUrl || "/placeholder-contest.jpg";
+  const registeredCount = contest?.registeredCount ?? 0;
+  const durationText = contest?.duration || "—";
+
+  const formattedDate = useMemo(() => {
+    if (!startTime) return "TBA";
+    try {
+      return format(startTime, "MMM d, yyyy, h:mm a");
+    } catch {
+      return "Invalid date";
+    }
+  }, [startTime]);
+
+  const renderButton = () => (
+    <Button className="w-full">
+      {isUpcoming ? "View Details" : "Go to Contest"}
+      <ArrowRight className="ml-2 h-4 w-4" />
+    </Button>
+  );
 
   return (
     <Card className="flex flex-col h-full transition-all hover:shadow-lg hover:-translate-y-1 group">
       <CardHeader className="p-0">
-        {/* Image replace (Next.js Image → normal img tag) */}
         <div className="relative h-40 w-full">
           <img
-            src={contest.imageUrl}
-            alt={contest.title}
+            src={imageUrl}
+            alt={contest?.title || "Contest"}
             className="object-cover rounded-t-lg w-full h-full"
           />
+
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
           <div className="absolute bottom-4 left-4">
-            <CardTitle className="font-headline text-xl text-white">{contest.title}</CardTitle>
+            <CardTitle className="font-headline text-xl text-white">
+              {contest?.title || "Untitled Contest"}
+            </CardTitle>
             <CardDescription className="text-white/80">
               {isUpcoming ? "Starts soon" : "In progress"}
             </CardDescription>
           </div>
+
           <div className="absolute top-4 right-4">
-            <Badge>Platform</Badge>
+            <Badge>{contest?.type || "Platform"}</Badge>
           </div>
         </div>
       </CardHeader>
@@ -47,15 +69,17 @@ const ContestCard = ({ contest }) => {
       <CardContent className="p-4 flex-grow space-y-3">
         <div className="flex items-center text-sm text-muted-foreground">
           <Calendar className="mr-2 h-4 w-4" />
-          <span>{format(new Date(contest.startTime), "MMM d, yyyy, h:mm a")}</span>
+          <span>{formattedDate}</span>
         </div>
+
         <div className="flex items-center text-sm text-muted-foreground">
           <Clock className="mr-2 h-4 w-4" />
-          <span>Duration: {contest.duration}</span>
+          <span>Duration: {durationText}</span>
         </div>
+
         <div className="flex items-center text-sm text-muted-foreground">
           <Users className="mr-2 h-4 w-4" />
-          <span>{contest.registeredCount || "0"} registered</span>
+          <span>{registeredCount} registered</span>
         </div>
       </CardContent>
 
