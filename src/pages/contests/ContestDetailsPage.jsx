@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Clock, Users, Calendar, ArrowRight, CheckCircle, Award } from "lucide-react";
@@ -6,65 +6,44 @@ import { format } from "date-fns";
 import ProblemList from "@/components/problems/ProblemList";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// ----------------------
-// HARD CODED DATA
-// ----------------------
-
-const getContestById = async (id) => {
-  // Hardcoded contest data for now
+const fetchContestMock = async (id) => {
   return {
     id: "3",
     slug: "algorithm-royale",
     title: "Algorithm Royale",
     type: "platform",
-    startTime: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), 
+    startTime: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
     duration: "24 hours",
     registered: false,
     imageUrl:
       "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop",
+    participants: 2458,
   };
 };
 
-const getProblems = async () => {
-  // Hardcoded problems for now
+const fetchProblemsMock = async () => {
   return [
-    {
-      id: 1,
-      title: "Two Sum",
-      difficulty: "Easy",
-      acceptance: "45%",
-    },
-    {
-      id: 2,
-      title: "Longest Substring Without Repeating",
-      difficulty: "Medium",
-      acceptance: "33%",
-    },
-    {
-      id: 3,
-      title: "Median of Two Sorted Arrays",
-      difficulty: "Hard",
-      acceptance: "29%",
-    },
+    { id: 1, title: "Two Sum", difficulty: "Easy", acceptance: "45%" },
+    { id: 2, title: "Longest Substring Without Repeating", difficulty: "Medium", acceptance: "33%" },
+    { id: 3, title: "Median of Two Sorted Arrays", difficulty: "Hard", acceptance: "29%" },
   ];
 };
 
-// ---------------------
-// Problems List Wrapper
-// ---------------------
 function ContestProblemList() {
   const [problems, setProblems] = useState([]);
-
   useEffect(() => {
-    getProblems().then((p) => setProblems(p.slice(0, 3)));
+    let mounted = true;
+    fetchProblemsMock().then((p) => {
+      if (!mounted) return;
+      setProblems(Array.isArray(p) ? p.slice(0, 3) : []);
+    });
+    return () => {
+      mounted = false;
+    };
   }, []);
-
   return <ProblemList problems={problems} />;
 }
 
-// ---------------------
-// Skeleton Loader
-// ---------------------
 function ContestDetailsPageSkeleton() {
   return (
     <div className="container mx-auto py-8 px-4 md:px-6">
@@ -83,6 +62,7 @@ function ContestDetailsPageSkeleton() {
             </CardContent>
           </Card>
         </div>
+
         <div>
           <Card>
             <CardHeader>
@@ -92,7 +72,7 @@ function ContestDetailsPageSkeleton() {
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <Skeleton className="h-8 w-8 rounded-full" />
-                  <div className="space-y-2">
+                  <div className="space-y-2 w-full">
                     <Skeleton className="h-4 w-20" />
                     <Skeleton className="h-4 w-28" />
                   </div>
@@ -106,26 +86,72 @@ function ContestDetailsPageSkeleton() {
   );
 }
 
-// ---------------------
-// MAIN PAGE
-// ---------------------
 export default function ContestDetailsPage({ params }) {
   const [contest, setContest] = useState(null);
   const [isRegistered, setIsRegistered] = useState(false);
   const [isLive, setIsLive] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getContestById(params?.id).then((data) => {
-      if (data) {
-        setContest(data);
-        setIsRegistered(data.registered);
-        setIsLive(new Date() >= data.startTime);
-      }
-    });
+    document.title = "CodeArena Contests — " + (params?.id ? params.id : "Contest");
   }, [params?.id]);
 
-  if (!contest) {
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    fetchContestMock(params?.id)
+      .then((data) => {
+        if (!mounted) return;
+        if (data) {
+          setContest(data);
+          setIsRegistered(Boolean(data.registered));
+          setIsLive(Boolean(new Date() >= new Date(data.startTime)));
+        }
+      })
+      .catch((err) => {
+        // keep silent — UI shows no contest
+        console.error("Failed to load contest:", err);
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [params?.id]);
+
+  const formattedStart = useMemo(() => {
+    if (!contest?.startTime) return "TBA";
+    try {
+      return format(new Date(contest.startTime), "MMM d, yyyy, h:mm a");
+    } catch {
+      return "TBA";
+    }
+  }, [contest?.startTime]);
+
+  const imageUrl = contest?.imageUrl || "/contest-placeholder.jpg";
+  const participants = contest?.participants ?? "—";
+  const duration = contest?.duration ?? "—";
+
+  if (loading) {
     return <ContestDetailsPageSkeleton />;
+  }
+
+  if (!contest) {
+    return (
+      <div className="container mx-auto py-8 px-4 md:px-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Contest not found</CardTitle>
+            <CardDescription>The requested contest could not be loaded.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">Try again later.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   const handleRegister = () => {
@@ -134,23 +160,13 @@ export default function ContestDetailsPage({ params }) {
 
   return (
     <div className="container mx-auto py-8 px-4 md:px-6">
-
-      {/* Banner */}
       <div className="relative h-64 rounded-lg overflow-hidden mb-8">
-        <img
-          src={contest.imageUrl}
-          alt={contest.title}
-          className="object-cover w-full h-full"
-        />
-
+        <img src={imageUrl} alt={contest.title} className="object-cover w-full h-full" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-
         <div className="absolute bottom-6 left-6 text-white">
           <h1 className="text-4xl font-bold font-headline">{contest.title}</h1>
           <p className="text-lg text-white/90">
-            {isLive
-              ? "The arena is open. Good luck!"
-              : "Welcome, challenger. The arena awaits."}
+            {isLive ? "The arena is open. Good luck!" : "Welcome, challenger. The arena awaits."}
           </p>
         </div>
 
@@ -168,18 +184,13 @@ export default function ContestDetailsPage({ params }) {
         </div>
       </div>
 
-      {/* Main Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        {/* Left Section */}
         <div className="lg:col-span-2">
           {isLive ? (
             <Card>
               <CardHeader>
                 <CardTitle>Contest Problems</CardTitle>
-                <CardDescription>
-                  Solve these problems before the time runs out.
-                </CardDescription>
+                <CardDescription>Solve these problems before the time runs out.</CardDescription>
               </CardHeader>
               <CardContent>
                 <ContestProblemList />
@@ -191,10 +202,8 @@ export default function ContestDetailsPage({ params }) {
                 <CardTitle>Contest Details</CardTitle>
               </CardHeader>
               <CardContent className="prose dark:prose-invert max-w-none">
-                <p>
-                  Prepare for a series of challenges designed to test your
-                  skills.
-                </p>
+                <p>Prepare for a series of challenges designed to test your skills.</p>
+
                 <h3 className="font-semibold">Rules</h3>
                 <ul>
                   <li>Timed contest.</li>
@@ -207,7 +216,6 @@ export default function ContestDetailsPage({ params }) {
           )}
         </div>
 
-        {/* Right Info Card */}
         <div>
           <Card>
             <CardHeader>
@@ -227,7 +235,7 @@ export default function ContestDetailsPage({ params }) {
                 <Calendar className="mr-3 h-5 w-5" />
                 <div>
                   <p className="font-semibold">Start Time</p>
-                  <p>{format(contest.startTime, "MMM d, yyyy, h:mm a")}</p>
+                  <p>{formattedStart}</p>
                 </div>
               </div>
 
@@ -235,7 +243,7 @@ export default function ContestDetailsPage({ params }) {
                 <Clock className="mr-3 h-5 w-5" />
                 <div>
                   <p className="font-semibold">Duration</p>
-                  <p>{contest.duration}</p>
+                  <p>{duration}</p>
                 </div>
               </div>
 
@@ -243,14 +251,12 @@ export default function ContestDetailsPage({ params }) {
                 <Users className="mr-3 h-5 w-5" />
                 <div>
                   <p className="font-semibold">Participants</p>
-                  <p>2,458 registered</p>
+                  <p>{participants.toLocaleString ? participants.toLocaleString() : participants} registered</p>
                 </div>
               </div>
-
             </CardContent>
           </Card>
         </div>
-
       </div>
     </div>
   );
