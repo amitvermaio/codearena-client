@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ instead of next/router
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardHeader,
@@ -38,12 +38,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input as FileInput } from "@/components/ui/input"; // ✅ normal input with type="file"
 import ContestProblemSelectDialog from "@/components/admin/ContestProblemSelectDialog";
 
-// =============================
-// Zod Schema
-// =============================
 const contestFormSchema = z.object({
   title: z.string().min(5, "Contest name must be at least 5 characters."),
   startTime: z.date(),
@@ -55,6 +51,8 @@ const ContestCreate = () => {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedProblems, setSelectedProblems] = useState([]);
+  const [fileName, setFileName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(contestFormSchema),
@@ -62,22 +60,49 @@ const ContestCreate = () => {
       title: "",
       startTime: new Date(),
       duration: "1h",
+      imageUrl: null,
     },
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (selectedProblems.length === 0) {
       toast.error("Please select at least one problem for the contest.");
       return;
     }
 
-    console.log("Creating contest:", { ...data, problems: selectedProblems });
+    setSubmitting(true);
+    try {
+      // Simulate API call
+      await new Promise((res) => setTimeout(res, 600));
 
-    toast.success("Contest Created", {
-      description: `Contest "${data.title}" has been successfully created.`,
-    });
+      const payload = {
+        ...data,
+        problems: selectedProblems,
+        imageName: data.imageUrl?.name ?? null,
+      };
 
-    navigate("/admin/contests");
+      console.log("Creating contest:", payload);
+
+      toast.success("Contest Created", {
+        description: `Contest "${data.title}" has been successfully created.`,
+      });
+
+      // reset form and selection to show a clean state
+      form.reset({
+        title: "",
+        startTime: new Date(),
+        duration: "1h",
+        imageUrl: null,
+      });
+      setSelectedProblems([]);
+      setFileName("");
+      navigate("/admin/contests");
+    } catch (err) {
+      console.error("Failed to create contest:", err);
+      toast.error("Failed to create contest. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -87,20 +112,23 @@ const ContestCreate = () => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 max-w-4xl mx-auto"
         >
-          {/* Header */}
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold font-headline">
-              Create New Contest
-            </h1>
+            <h1 className="text-3xl font-bold font-headline">Create New Contest</h1>
             <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate(-1)}
+                disabled={submitting}
+              >
                 Cancel
               </Button>
-              <Button type="submit">Save Contest</Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? "Saving…" : "Save Contest"}
+              </Button>
             </div>
           </div>
 
-          {/* Card */}
           <Card>
             <CardHeader>
               <CardTitle>Contest Details</CardTitle>
@@ -110,7 +138,6 @@ const ContestCreate = () => {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              {/* Contest Title */}
               <FormField
                 control={form.control}
                 name="title"
@@ -118,19 +145,14 @@ const ContestCreate = () => {
                   <FormItem>
                     <FormLabel>Contest Title</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="e.g., Weekly Sprint #25"
-                        {...field}
-                      />
+                      <Input placeholder="e.g., Weekly Sprint #25" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Start Time + Duration */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-                {/* Start Time */}
                 <FormField
                   control={form.control}
                   name="startTime"
@@ -147,32 +169,26 @@ const ContestCreate = () => {
                                   "flex-grow justify-start text-left font-normal",
                                   !field.value && "text-muted-foreground"
                                 )}
+                                type="button"
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
+                                {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                               </Button>
                             </FormControl>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                            />
+                            <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
                           </PopoverContent>
                         </Popover>
+
                         <Input
                           type="time"
                           className="w-[120px]"
-                          value={format(field.value, "HH:mm")}
+                          value={format(field.value ?? new Date(), "HH:mm")}
                           onChange={(e) => {
                             const [hours, minutes] = e.target.value.split(":");
-                            const newDate = new Date(field.value);
-                            newDate.setHours(parseInt(hours), parseInt(minutes));
+                            const newDate = new Date(field.value ?? new Date());
+                            newDate.setHours(parseInt(hours, 10), parseInt(minutes, 10));
                             field.onChange(newDate);
                           }}
                         />
@@ -182,17 +198,13 @@ const ContestCreate = () => {
                   )}
                 />
 
-                {/* Duration */}
                 <FormField
                   control={form.control}
                   name="duration"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Duration</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select duration" />
@@ -211,47 +223,42 @@ const ContestCreate = () => {
                 />
               </div>
 
-              {/* Contest Photo */}
               <FormField
-  control={form.control}
-  name="imageUrl"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Contest Photo</FormLabel>
-      <FormControl>
-        <div className="relative">
-          {/* Styled box acting as file input */}
-          <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer text-sm text-muted-foreground hover:bg-accent">
-            <Upload className="h-4 w-4 text-muted-foreground" />
-            <span>{field.value ? field.value.name : "Choose a file..."}</span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => field.onChange(e.target.files?.[0])}
-            />
-          </label>
-        </div>
-      </FormControl>
-      <FormMessage />
-    </FormItem>
-  )}
-/>
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contest Photo</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer text-sm text-muted-foreground hover:bg-accent">
+                          <Upload className="h-4 w-4 text-muted-foreground" />
+                          <span>{fileName || "Choose a file..."}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const f = e.target.files?.[0] ?? null;
+                              field.onChange(f);
+                              setFileName(f?.name ?? "");
+                            }}
+                          />
+                        </label>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              {/* Contest Problems */}
               <div className="space-y-2">
                 <Label>Contest Problems</Label>
                 <div className="flex items-center gap-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsDialogOpen(true)}
-                  >
+                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(true)} disabled={submitting}>
                     Select Problems
                   </Button>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedProblems.length} problem(s) selected.
-                  </p>
+                  <p className="text-sm text-muted-foreground">{selectedProblems.length} problem(s) selected.</p>
                 </div>
               </div>
             </CardContent>
@@ -259,7 +266,6 @@ const ContestCreate = () => {
         </form>
       </Form>
 
-      {/* Problem Select Modal */}
       <ContestProblemSelectDialog
         isOpen={isDialogOpen}
         setIsOpen={setIsDialogOpen}
@@ -268,72 +274,6 @@ const ContestCreate = () => {
       />
     </>
   );
-}
-
-export default ContestCreate;
-
-/* =========================================================
-   🚀 REDUX IMPLEMENTATION (COMMENTED)
-   =========================================================
-
-// contestSlice.js
-import { createSlice } from "@reduxjs/toolkit";
-
-const contestSlice = createSlice({
-  name: "contest",
-  initialState: {
-    title: "",
-    startTime: new Date(),
-    duration: "1h",
-    imageUrl: null,
-    selectedProblems: [],
-  },
-  reducers: {
-    setContestField: (state, action) => {
-      const { field, value } = action.payload;
-      state[field] = value;
-    },
-    setProblems: (state, action) => {
-      state.selectedProblems = action.payload;
-    },
-    resetContest: (state) => {
-      state.title = "";
-      state.startTime = new Date();
-      state.duration = "1h";
-      state.imageUrl = null;
-      state.selectedProblems = [];
-    },
-  },
-});
-
-export const { setContestField, setProblems, resetContest } = contestSlice.actions;
-export default contestSlice.reducer;
-
-
-// In CreateContestPage.jsx
-import { useSelector, useDispatch } from "react-redux";
-import { setContestField, setProblems, resetContest } from "@/redux/contestSlice";
-
-const dispatch = useDispatch();
-const contest = useSelector((state) => state.contest);
-
-const handleSubmit = () => {
-  if (contest.selectedProblems.length === 0) {
-    toast.error("Please select at least one problem for the contest.");
-    return;
-  }
-  console.log("Creating contest:", contest);
-  toast.success("Contest Created", {
-    description: `Contest "${contest.title}" has been successfully created.`,
-  });
-  dispatch(resetContest());
-  navigate("/admin/contests");
 };
 
-// Example usage inside form
-<Input
-  value={contest.title}
-  onChange={(e) => dispatch(setContestField({ field: "title", value: e.target.value }))}
-/>
-
-========================================================= */
+export default ContestCreate;
