@@ -1,29 +1,29 @@
-import React, { useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; 
-import { ArrowRight, Wand2, CodeXmlIcon } from "lucide-react";
-import { href, Link } from "react-router-dom"; // React Router link use karenge
+import React, { useEffect, useMemo } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowRight, Wand2, CodeXml } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const tools = [
+const toolsConfig = [
   {
     title: "AI Code Summarizer",
     description: "Get a concise summary of your code's functionality, highlighting key algorithms and data structures.",
     href: "/tools/summarizer",
-    icon: <Wand2 className="h-8 w-8 text-primary" />,
+    icon: Wand2,
   },
   {
     title: "Code Converter",
-    description: "Change your code to another Language, See how it can be in another Programming Language. Learn Grow.",
+    description: "Change your code to another language. Learn and grow by seeing your code in multiple languages.",
     href: "/tools/code-converter",
-    icon: <CodeXmlIcon className="h-8 w-8 text-primary" />
-  }
-  // Add more tools here
+    icon: CodeXml,
+  },
 ];
 
 const Tools = () => {
-
   useEffect(() => {
     document.title = "Your Coding Toolkit | CodeArena Tools";
   }, []);
+
+  const tools = useMemo(() => toolsConfig || [], []);
 
   return (
     <div className="container mx-auto py-8 px-4 md:px-6">
@@ -32,33 +32,44 @@ const Tools = () => {
           Developer Tools
         </h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-          A suite of AI-powered tools to enhance your productivity and understanding.
+          A suite of AI-powered utilities to enhance your productivity and understanding.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        {tools.map((tool) => (
-          <Link to={tool.href} key={tool.title} className="block group">
-            <Card className="h-full transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="font-headline text-2xl leading-[1]">{tool.title}</CardTitle>
-                  {tool.icon}
-                </div>
-                <CardDescription>{tool.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center text-sm text-primary font-medium">
-                  Use Tool
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
+        {tools.map((tool) => {
+          const Icon = tool.icon;
+          return (
+            <Link
+              to={tool.href}
+              key={tool.title}
+              className="block group"
+              aria-label={`Open ${tool.title}`}
+            >
+              <Card className="h-full transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="font-headline text-2xl leading-[1]">
+                      {tool.title}
+                    </CardTitle>
+                    <Icon className="h-8 w-8 text-primary" />
+                  </div>
+                  <CardDescription>{tool.description}</CardDescription>
+                </CardHeader>
+
+                <CardContent>
+                  <div className="flex items-center text-sm text-primary font-medium">
+                    Use Tool
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
-}
+};
 
 export default Tools;
