@@ -1,16 +1,10 @@
-// PairProgrammingClient.jsx
-
 import React, { useState, useEffect, useRef } from "react";
 import { Editor } from "@monaco-editor/react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // navigation
+import { useNavigate } from "react-router-dom";
 import Draggable from "react-draggable";
 import { toast } from "sonner";
-
-// ---------------- Redux Version Imports (Comment if not using) ----------------
-// import { useDispatch, useSelector } from "react-redux";
-// import { runCode, submitCode } from "../redux/codeSlice";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,13 +14,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+
 import {
   Video,
   VideoOff,
@@ -35,25 +30,24 @@ import {
   PhoneOff,
   Play,
   Loader2,
-  SquareTerminal,
-  AlertCircle,
-  CheckCircle,
   Send,
   GripVertical,
-  Info,
   FileInput,
+  SquareTerminal,
 } from "lucide-react";
+
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../ui/tooltip";
+} from "@/components/ui/tooltip";
 
 // -------------------------------- Languages --------------------------------
 const languages = [
@@ -63,7 +57,7 @@ const languages = [
   { id: 62, name: "Java (OpenJDK 13.0.1)", value: "java" },
 ];
 
-// ----------------------------- Action Buttons -----------------------------
+// -------------------------------- Buttons --------------------------------
 function ActionButtons({ handleRun, handleSubmit, loading }) {
   return (
     <div className="flex gap-2">
@@ -85,6 +79,7 @@ function ActionButtons({ handleRun, handleSubmit, loading }) {
           </>
         )}
       </Button>
+
       <Button
         type="button"
         disabled={loading}
@@ -106,45 +101,44 @@ function ActionButtons({ handleRun, handleSubmit, loading }) {
   );
 }
 
-// ----------------------------- Main Component -----------------------------
+// -------------------------------- Component --------------------------------
 export default function PairProgrammingClient({ problem }) {
-  const { register, handleSubmit, watch } = useForm();
   const navigate = useNavigate();
+  const { register } = useForm();
 
-  // ------------------- Redux Version (Commented) -------------------
-  // const dispatch = useDispatch();
-  // const { runResult, submitResult, loading } = useSelector((state) => state.code);
-
-  // ------------------- Local States -------------------
   const [lang, setLang] = useState("javascript");
   const [langId, setLangId] = useState(93);
-  const [code, setCode] = useState("// Start coding here...");
+  const [code, setCode] = useState("// Start coding here…");
   const [stdin, setStdin] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ------------------- Video/Call States -------------------
+  // Video states
   const [isCallActive, setIsCallActive] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isMicOn, setIsMicOn] = useState(true);
+
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const localStreamRef = useRef(null);
   const nodeRef = useRef(null);
 
-  // ------------------- Call Handlers -------------------
+  // ---------------------- Handle Call ----------------------
   const handleJoinCall = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
+
       localStreamRef.current = stream;
+
       if (localVideoRef.current) localVideoRef.current.srcObject = stream;
       if (remoteVideoRef.current) remoteVideoRef.current.srcObject = stream;
+
       setIsCallActive(true);
-    } catch (err) {
+    } catch {
       toast.error("Camera Access Denied", {
-        description: "Enable camera permissions in your browser.",
+        description: "Please enable camera permissions in your browser settings.",
       });
     }
   };
@@ -155,24 +149,42 @@ export default function PairProgrammingClient({ problem }) {
       localStreamRef.current.getTracks().forEach((t) => t.stop());
       localStreamRef.current = null;
     }
-    toast("Call Ended", {
-      description: "You have left the session.",
+    toast("Call Ended");
+  };
+
+  const toggleMic = () => {
+    setIsMicOn((prev) => {
+      if (localStreamRef.current) {
+        localStreamRef.current.getAudioTracks().forEach((track) => {
+          track.enabled = !prev;
+        });
+      }
+      return !prev;
     });
   };
 
-  // ------------------- API Handlers -------------------
+  const toggleVideo = () => {
+    setIsVideoOn((prev) => {
+      if (localStreamRef.current) {
+        localStreamRef.current.getVideoTracks().forEach((track) => {
+          track.enabled = !prev;
+        });
+      }
+      return !prev;
+    });
+  };
+
+  // ---------------------- API ----------------------
   const runCodeAPI = async () => {
     setLoading(true);
     try {
       const res = await axios.post("/api/run", {
         code,
         languageId: langId,
-        problemId: problem._id,
+        problemId: problem?._id,
         stdin,
       });
       console.log("Run Result:", res.data);
-      // Redux version
-      // dispatch(runCode({ code, langId, problemId: problem.id, stdin }));
     } catch (err) {
       toast.error("Run Failed", { description: err.message });
     } finally {
@@ -186,11 +198,9 @@ export default function PairProgrammingClient({ problem }) {
       const res = await axios.post("/api/submit", {
         code,
         languageId: langId,
-        problemId: problem.id,
+        problemId: problem?._id,
       });
       console.log("Submit Result:", res.data);
-      // Redux version
-      // dispatch(submitCode({ code, langId, problemId: problem.id }));
     } catch (err) {
       toast.error("Submission Failed", { description: err.message });
     } finally {
@@ -206,24 +216,25 @@ export default function PairProgrammingClient({ problem }) {
     }
   };
 
-  // ------------------- JSX -------------------
+  // ---------------------- UI ----------------------
   return (
     <form className="flex flex-col h-full bg-card">
       <input type="hidden" value={code} {...register("code")} />
       <input type="hidden" value={langId} {...register("languageId")} />
-      <input type="hidden" value={problem?._id} {...register("problemId")} />
+      <input type="hidden" value={problem?._id || ""} {...register("problemId")} />
 
-      {/* Video Call Floating Window */}
+      {/* Floating video window */}
       {isCallActive && (
         <Draggable nodeRef={nodeRef} handle=".handle">
           <div
             ref={nodeRef}
             className="absolute top-4 left-4 z-20 w-64 cursor-move"
           >
-            <div className="bg-card rounded-lg shadow-2xl border-2 border-primary/50 overflow-hidden">
+            <div className="bg-card rounded-lg shadow-xl border overflow-hidden">
               <div className="handle p-1 bg-muted/50 flex justify-center">
                 <GripVertical className="h-4 w-4" />
               </div>
+
               <div className="relative aspect-square">
                 <video ref={remoteVideoRef} autoPlay muted playsInline />
                 <video
@@ -240,11 +251,12 @@ export default function PairProgrammingClient({ problem }) {
       )}
 
       <ResizablePanelGroup direction="vertical">
-        {/* Editor Section */}
+        {/* Editor */}
         <ResizablePanel defaultSize={65} minSize={20}>
           <div className="flex flex-col h-full">
-            {/* Editor Top Bar */}
-            <div className="flex-shrink-0 flex items-center justify-between p-2 border-b">
+
+            {/* Editor Header */}
+            <div className="flex items-center justify-between p-2 border-b">
               <Select value={lang} onValueChange={handleLanguageChange}>
                 <SelectTrigger className="w-auto h-8 gap-2 border-0">
                   <SelectValue placeholder="Language" />
@@ -257,6 +269,7 @@ export default function PairProgrammingClient({ problem }) {
                   ))}
                 </SelectContent>
               </Select>
+
               <ActionButtons
                 handleRun={runCodeAPI}
                 handleSubmit={submitCodeAPI}
@@ -264,8 +277,8 @@ export default function PairProgrammingClient({ problem }) {
               />
             </div>
 
-            {/* Code Editor */}
-            <div className="flex-grow font-code text-sm overflow-hidden relative">
+            {/* Monaco Editor */}
+            <div className="flex-grow overflow-hidden relative">
               <Editor
                 height="100%"
                 language={lang}
@@ -280,7 +293,7 @@ export default function PairProgrammingClient({ problem }) {
                 }}
               />
 
-              {/* Call Buttons */}
+              {/* Call Controls */}
               <div className="absolute top-1/2 -translate-y-1/2 right-2 z-10 flex flex-col gap-2 bg-card/50 p-1.5 rounded-full border">
                 <TooltipProvider>
                   {!isCallActive ? (
@@ -297,7 +310,7 @@ export default function PairProgrammingClient({ problem }) {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent side="left">
-                        <p>Join Video Call</p>
+                        <p>Join Call</p>
                       </TooltipContent>
                     </Tooltip>
                   ) : (
@@ -309,7 +322,7 @@ export default function PairProgrammingClient({ problem }) {
                             variant={isMicOn ? "secondary" : "destructive"}
                             size="icon"
                             className="h-9 w-9 rounded-full"
-                            onClick={() => setIsMicOn(!isMicOn)}
+                            onClick={toggleMic}
                           >
                             {isMicOn ? <Mic /> : <MicOff />}
                           </Button>
@@ -325,14 +338,14 @@ export default function PairProgrammingClient({ problem }) {
                             type="button"
                             variant={isVideoOn ? "secondary" : "destructive"}
                             size="icon"
-                            className="h-9 w-9 rounded-full"
-                            onClick={() => setIsVideoOn(!isVideoOn)}
+                            className="h-9 w-9 rounded-focused"
+                            onClick={toggleVideo}
                           >
                             {isVideoOn ? <Video /> : <VideoOff />}
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent side="left">
-                          <p>{isVideoOn ? "Turn off" : "Turn on"}</p>
+                          <p>{isVideoOn ? "Turn Off" : "Turn On"}</p>
                         </TooltipContent>
                       </Tooltip>
 
@@ -362,34 +375,35 @@ export default function PairProgrammingClient({ problem }) {
 
         <ResizableHandle withHandle />
 
-        {/* Bottom Panel (Results + Input) */}
+        {/* Bottom Output Panel */}
         <ResizablePanel defaultSize={35} minSize={15}>
           <div className="flex flex-col h-full">
             <Tabs defaultValue="run" className="flex-grow flex flex-col">
               <TabsList className="grid grid-cols-3 w-full border-b h-10">
                 <TabsTrigger value="run">
-                  <SquareTerminal className="mr-2 h-4 w-4" /> Run Result
+                  <SquareTerminal className="mr-2 h-4 w-4" />
+                  Run Result
                 </TabsTrigger>
                 <TabsTrigger value="submit">
-                  <Send className="mr-2 h-4 w-4" /> Submission Result
+                  <Send className="mr-2 h-4 w-4" />
+                  Submission
                 </TabsTrigger>
                 <TabsTrigger value="input">
-                  <FileInput className="mr-2 h-4 w-4" /> Custom Input
+                  <FileInput className="mr-2 h-4 w-4" />
+                  Custom Input
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="run" className="flex-grow p-4">
-                {/* Run Results will come here */}
-              </TabsContent>
-              <TabsContent value="submit" className="flex-grow p-4">
-                {/* Submit Results will come here */}
-              </TabsContent>
+              <TabsContent value="run" className="flex-grow p-4" />
+
+              <TabsContent value="submit" className="flex-grow p-4" />
+
               <TabsContent value="input" className="flex-grow p-2">
                 <textarea
                   value={stdin}
                   onChange={(e) => setStdin(e.target.value)}
                   className="w-full h-full bg-transparent outline-none resize-none font-code text-sm p-2"
-                  placeholder="Enter custom input here"
+                  placeholder="Enter custom input here…"
                 />
               </TabsContent>
             </Tabs>
