@@ -22,8 +22,12 @@ import { getProblemOfTheDay } from '@/lib/api';
 import { LandingNavbar } from '@/components/layout/LandingNavbar';
 import { Badge } from '@/components/ui/badge';
 import { useSelector, useDispatch } from "react-redux";
-import { verifyAuth } from "@/store/actions/user/userAction";
+import { gsap } from "gsap";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+
 // import { loginUser, registerUser, logoutUser, fetchUserProfile } from "../store/actions/user/userAction";
+
+gsap.registerPlugin(ScrollToPlugin);
 
 const features = [
   {
@@ -80,8 +84,17 @@ const Home = () => {
   // console.log(user)
   
   // useEffect(() => {
-  //   dispatch(verifyAuth());
+  //   dispatch(fetchCurrentUser());
   // }, [dispatch]);
+
+  const handleScroll = (e) => {
+    e.preventDefault();
+    gsap.to(window, {
+      duration: 0.8,
+      scrollTo: { y: "#features", offsetY: 70 }, 
+      ease: "power2.inOut",
+    });
+  };
 
   useEffect(() => {
     getProblemOfTheDay().then(setProblemOfTheDay);
@@ -141,12 +154,12 @@ const Home = () => {
               className="mt-8 flex flex-col sm:flex-row justify-center gap-4"
             >
               <Button asChild size="lg" className="shadow-lg hover:shadow-primary/50 transition-shadow">
-                <Link to={isAuthenticated ? "problems" : "signin"}>
+                <Link to='/problems'>
                   Get Started <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <a href="#features">View Features </a>
+                <a href="#features" onClick={handleScroll}>View Features </a>
               </Button>
             </motion.div>
           </div>

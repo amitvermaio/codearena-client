@@ -23,13 +23,7 @@ import { fetchProblems } from "@/store/actions/problems/problemAction";
 const  ProblemsPage = () => {
   // Data states
   const [problemOfTheDay, setProblemOfTheDay] = useState(null);
-  const [allProblems, setAllProblems] = useState([{
-      id: 101,
-      title: "Two Sum",
-      difficulty: "Easy",
-      status: "Todo",
-      tags: ["Array", "Hash Table"],
-    }]);
+  const [allProblems, setAllProblems] = useState([]);
   // UI states
   const [isPairingDialogOpen, setIsPairingDialogOpen] = useState(false);
   // Filter states
@@ -39,14 +33,13 @@ const  ProblemsPage = () => {
   const [selectedTags, setSelectedTags] = useState([]);
   
   const dispatch = useDispatch();
-  const problems = useSelector((state) => state.problems.problems.data);
+  const problems = useSelector((state) => state.problems.problems);
   
   /**
    * Load dummy data instead of API calls
    */
   useEffect(() => {
     dispatch(fetchProblems());
-
     setProblemOfTheDay({
       id: 101,
       title: "Two Sum",
@@ -57,7 +50,7 @@ const  ProblemsPage = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (problems && Array.isArray(problems)) {
+    if (Array.isArray(problems)) {
       setAllProblems(problems);
     }
   }, [problems]);
@@ -93,7 +86,7 @@ const  ProblemsPage = () => {
 
       const matchesTags =
         selectedTags.length === 0 ||
-        selectedTags.every((tag) => problem.tags.includes(tag));
+        selectedTags.every((tag) => Array.isArray(problem.tags) && problem.tags.includes(tag));
 
       return matchesSearch && matchesDifficulty && matchesStatus && matchesTags;
     });

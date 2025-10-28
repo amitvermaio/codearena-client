@@ -111,7 +111,7 @@ const ProfileHeader = ({ user, canEdit = false, onUpdate }) => {
 
               {/* Edit button only for auth user */}
               {canEdit && (
-                <Button variant="default" onClick={() => setIsEditDialogOpen(true)}>
+                <Button variant="default" onClick={() => navigate(`/settings`)}>
                   <Edit className="mr-2 h-4 w-4" /> Edit Profile
                 </Button>
               )}

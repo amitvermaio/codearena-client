@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProfileHeader from "../../components/profile/ProfileHeader";
 import { Card, CardContent } from "../../components/ui/card";
@@ -6,29 +6,41 @@ import { Star, Target, Zap, Award } from "lucide-react";
 import SolvedStats from "../../components/profile/SolvedStats";
 import SubmissionHistory from "../../components/profile/SubmissionHistory";
 import ProfilePageSkeleton from "../../components/profile/ProfilePageSkeleton";
-import { fetchUserProfile } from "@/store/actions/user/userAction";
+import { getUserByUsername } from "@/store/actions/user/userAction";
 import { useDispatch, useSelector } from "react-redux";
+import NoUserFound from "./NoUserFound";
 
 const UserProfile = () => {
   const { username } = useParams();
   const dispatch = useDispatch();
 
-  const authUser = useSelector((state) => state.user?.user?.data);
+  const authUser = useSelector((state) => state.user?.user);
   const user = useSelector((state) => state.profile?.user);
   const loading = useSelector((state) => state.profile?.loading);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
 
   useEffect(() => {
     if (username) {
-      dispatch(fetchUserProfile(username));
+      dispatch(getUserByUsername(username));
     }
   }, [username, dispatch]);
 
-  if (loading || !user) {
+  useEffect(() => {
+    if (!authUser || !user) {
+      setIsOwnProfile(false);
+      return;
+    }
+
+    setIsOwnProfile(authUser?._id === user?._id || authUser?.username === user?.username);
+  }, [authUser, user]);
+
+  if (loading && !user) {
     return <ProfilePageSkeleton />;
   }
 
-  // ✅ Check if this profile belongs to logged-in user
-  const isOwnProfile = authUser?._id === user?._id;
+  if (!user && !loading) {
+    return <NoUserFound />;
+  }
 
   const stats = [
     { label: "Rank", value: `#1432`, icon: <Star className="h-5 w-5" /> },

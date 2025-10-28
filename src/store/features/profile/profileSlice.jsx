@@ -14,6 +14,8 @@ const profileSlice = createSlice({
     extraReducers: (builder) => {
         builder.addCase(getUserByUsername.pending, (state) => {
             state.loading = true;
+            state.error = null;
+            state.user = null;
         });
         builder.addCase(getUserByUsername.fulfilled, (state, action) => {
             state.loading = false;
@@ -22,6 +24,7 @@ const profileSlice = createSlice({
         });
         builder.addCase(getUserByUsername.rejected, (state, action) => {
             state.loading = false;
+            state.user = null;
             state.error = action.payload;
         });
     },

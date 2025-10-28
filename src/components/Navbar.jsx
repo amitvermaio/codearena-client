@@ -30,7 +30,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Logo } from "../components/shared/Logo";
 import axios from "../config/axios.config.jsx";
 import { toast } from "sonner";
-import { fetchUserProfile, logoutUser, verifyAuth } from "@/store/actions/user/userAction";
+import { fetchUserProfile, logoutUser } from "@/store/actions/user/userAction";
 import { useDispatch, useSelector } from "react-redux";
 
 // Dummy data instead of API call
@@ -83,18 +83,26 @@ const Navbar = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   
-  const user = useSelector(state => state.user?.user?.data || "");
+  const { user, isAuthenticated, loading } = useSelector(state => ({
+    user: state.user.user,
+    isAuthenticated: state.user.isAuthenticated,
+    loading: state.user.loading
+  }));
+
+  // Fetch user profile on component mount
   useEffect(() => {
-    console.log(user);
-  }, [user]);
-  
+    const token = localStorage.getItem("accessToken");
+    if (token && !user && !loading) {
+      dispatch(fetchUserProfile());
+    }
+  }, [dispatch, user, loading]);
 
   const LogoutHandler = async () => {
     try {
       const res = await dispatch(logoutUser()).unwrap();
       console.log("Logout response: ", res);
       if (res.statusCode === 200) {
-        dispatch(verifyAuth());
+        dispatch(fetchUserProfile());
         toast.success('Logged out successfully');
         navigate('/');
       }
@@ -196,7 +204,7 @@ const Navbar = () => {
             </Link>
           </Button>
           {
-            user  ? 
+            user != null  ? 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -222,7 +230,7 @@ const Navbar = () => {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to={`/u/${user.username}/settings`} className="flex items-center w-full">
+                    <Link to={`/settings`} className="flex items-center w-full">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </Link>

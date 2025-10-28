@@ -7,9 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Github } from 'lucide-react';
-import { useDispatch } from 'react-redux';
-import { loginUser } from "@/store/actions/user/userAction";
-import axios from '@/config/axios.config.jsx';
+import axios from '@/config/axios.config';
 
 // Google SVG Icon
 function GoogleIcon() {
@@ -28,8 +26,6 @@ const Login = () => {
   const [serverError, setServerError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const dispatch = useDispatch();
-
   // Form handling with react-hook-form
   const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -40,15 +36,17 @@ const Login = () => {
     const { email, password } = data;
     try {
       console.log(email, password);
-      const response = await dispatch(loginUser({ email, password })).unwrap();
+      const response = await axios.post('/auth/login', { email, password });
       console.log(response);
-      if (response.statusCode === 200) {
-        navigate('/problems');
+      if (response.status === 200) {
+        localStorage.setItem('CodeArena_Token', response.data.token);
         toast.success('Successfully signed in!');
+        navigate('/problems');
       }
     } catch (err) {
       const msg = err.response?.data?.message || 'Invalid email or password.';
       setServerError(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }

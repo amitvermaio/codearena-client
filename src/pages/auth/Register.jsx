@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Github } from 'lucide-react';
 import axios from '@/config/axios.config.jsx';
+import { toast } from 'sonner';
 
 function GoogleIcon() {
   return (
@@ -39,11 +40,14 @@ const CreateAccount = () => {
       });
 
       if (response.status === 201) {
-        navigate('/signin');
+        localStorage.setItem('CodeArena_Token', response.data.token);
+        toast.success('User registered successfully');
+        navigate('/problems');
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || 'An unexpected error occurred.';
       setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

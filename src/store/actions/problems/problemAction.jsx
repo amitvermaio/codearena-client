@@ -16,9 +16,15 @@ import {
 export const fetchProblems = createAsyncThunk('problems/fetchProblems', async (_, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
-      const { data } = await axios.get('/problems');
-      dispatch(setProblems(data));
-      return data;
+      const response = await axios.get('/problems', {
+        headers: {
+          'x-secret-key': import.meta.env.VITE_SECRET_KEY,
+        }
+      });
+      const { data } = response;
+      const problems = data?.data ?? [];
+      dispatch(setProblems(problems));
+      return problems;
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch problems';
       dispatch(setError(errorMessage));
@@ -31,9 +37,15 @@ export const fetchProblems = createAsyncThunk('problems/fetchProblems', async (_
 export const fetchProblemBySlug = createAsyncThunk('problems/fetchProblemBySlug', async (slug, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
-      const { data } = await axios.get(`/problems/${slug}`);
-      dispatch(setCurrentProblem(data));
-      return data;
+      const response = await axios.get(`/problems/${slug}`, {
+        headers: {
+          'x-secret-key': import.meta.env.VITE_SECRET_KEY,
+        }
+      });
+      const { data } = response;
+      const problem = data?.data ?? null;
+      dispatch(setCurrentProblem(problem));
+      return problem;
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch problem';
       dispatch(setError(errorMessage));
@@ -46,7 +58,11 @@ export const fetchProblemBySlug = createAsyncThunk('problems/fetchProblemBySlug'
 export const createProblem = createAsyncThunk('problems/createProblem', async (problemData, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
-      const { data } = await axios.post('/problems', problemData);
+      const { data } = await axios.post('/problems', problemData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('CodeArena_Token')}`
+        }
+      });
       dispatch(addProblem(data));
       dispatch(setLoading(false));
       return data;
@@ -62,7 +78,11 @@ export const createProblem = createAsyncThunk('problems/createProblem', async (p
 export const updateProblemBySlug = createAsyncThunk('problems/updateProblemBySlug', async ({ slug, updates }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
-      const { data } = await axios.put(`/problems/${slug}`, updates);
+      const { data } = await axios.put(`/problems/${slug}`, updates, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('CodeArena_Token')}`
+        }
+      });
       dispatch(updateProblem({ slug, updates: data }));
       dispatch(setLoading(false));
       return data;
@@ -78,7 +98,11 @@ export const updateProblemBySlug = createAsyncThunk('problems/updateProblemBySlu
 export const deleteProblemBySlug = createAsyncThunk('problems/deleteProblemBySlug', async (slug, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
-      await axios.delete(`/problems/${slug}`);
+      await axios.delete(`/problems/${slug}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('CodeArena_Token')}`
+        }
+      });
       dispatch(deleteProblem(slug));
       dispatch(setLoading(false));
       return slug;
@@ -94,7 +118,11 @@ export const deleteProblemBySlug = createAsyncThunk('problems/deleteProblemBySlu
 export const submitSolution = createAsyncThunk('problems/submitSolution', async ({ slug, solution, language }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
-      const { data } = await axios.post(`/problems/${slug}/submit`, { solution, language });
+      const { data } = await axios.post(`/problems/${slug}/submit`, { solution, language }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('CodeArena_Token')}`
+        }
+      });
 
       // Update problem status
       if (data.passed) {
@@ -123,7 +151,11 @@ export const submitSolution = createAsyncThunk('problems/submitSolution', async 
 export const searchProblems = createAsyncThunk('problems/searchProblems', async (searchParams, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
-      const { data } = await axios.get(`/problems/search`, { params: searchParams });
+      const { data } = await axios.get(`/problems/search`, { params: searchParams }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('CodeArena_Token')}`
+        }
+      });
       dispatch(setProblems(data));
       return data;
     } catch (error) {

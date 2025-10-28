@@ -1,23 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  verifyAuth,
-  fetchUserProfile,
   fetchCurrentUser,
-  updateUserProfile,
   loginUser,
   registerUser,
+  updateUserProfile,
   logoutUser,
+  fetchUserProfile,
 } from "../../actions/user/userAction";
 
 const initialState = {
   user: null,
-  token: localStorage.getItem('accessToken') || null,
+  token: localStorage.getItem("accessToken") || null,
   loading: false,
   error: null,
   isAuthenticated: false,
-  initialized: false,
+  initialized: false, 
 };
-
 
 const userSlice = createSlice({
   name: "user",
@@ -28,93 +26,46 @@ const userSlice = createSlice({
     },
     updateUserField: (state, action) => {
       const { name, value } = action.payload;
-      if (state.user) {
-        console.log(name, value)
-        state.user[name] = value;
-      }
+      if (state.user) state.user[name] = value;
     },
     addUserSkill: (state, action) => {
-      if (!state.user) return;
-      if (!state.user.data) state.user.data = {};
-      if (!state.user.data.skills) state.user.data.skills = [];
-      
-      if (!state.user.data.skills.includes(action.payload)) {
-        state.user.data.skills.push(action.payload);
-      }
+      if (state.user) state.user.skills.push(action.payload);
     },
     removeUserSkill: (state, action) => {
-      if (!state.user?.data?.skills) return;
-      
-      state.user.data.skills = state.user.data.skills.filter(
-        (skill) => skill !== action.payload
-      );
+      if (state.user) state.user.skills = state.user.skills.filter((skill) => skill !== action.payload);
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(verifyAuth.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(verifyAuth.fulfilled, (state, action) => {
-      state.loading = false;
-      if (action.payload) {
-        state.user = action.payload.user;
-        state.isAuthenticated = true;
-      } else {
-        state.user = null;
-        state.isAuthenticated = false;
-      }
-    });
-    builder.addCase(verifyAuth.rejected, (state) => {
-      state.loading = false;
-      state.user = null;
-      state.isAuthenticated = false;
-    }),
-    builder.addCase(loginUser.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(loginUser.fulfilled, (state, action) => {
-      console.log(action.payload);
-      state.loading = false;
-      state.user = action.payload.user;
-      state.token = action.payload.accessToken;
-      state.isAuthenticated = true;
-      state.error = null;
-    });
-    builder.addCase(loginUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
-
-    builder.addCase(registerUser.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(registerUser.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.isAuthenticated = true;
-      state.error = null;
-    });
-    builder.addCase(registerUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
-
-    builder.addCase(fetchUserProfile.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(fetchUserProfile.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload;
-      state.error = null;
-    });
-    builder.addCase(fetchUserProfile.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
-
-    builder.addCase(fetchCurrentUser.pending, (state) => { state.loading = true; })
+    // ✅ Fetch current user on app load
+    builder
+      .addCase(fetchCurrentUser.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+        console.log(action.payload);
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.accessToken;
+        state.isAuthenticated = true;
+        state.initialized = true; // ✅ auth check done
+        state.error = null;
+      })
+      .addCase(fetchCurrentUser.rejected, (state, action) => {
+        console.log("Slice me chala!!!")
+        state.loading = false;
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        state.error = action.payload || null;
+        state.initialized = true; // ✅ still mark as checked
+      });
+
+    // ✅ Login
+    builder
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.accessToken;
@@ -122,35 +73,74 @@ const userSlice = createSlice({
         state.error = null;
         state.initialized = true;
       })
-      .addCase(fetchCurrentUser.rejected, (state, action) => {
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // ✅ Register
+    builder
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.accessToken;
+        state.isAuthenticated = true;
+        state.error = null;
+        state.initialized = true;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // ✅ Fetch User Profile
+    builder
+      .addCase(fetchUserProfile.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.accessToken;
+        state.isAuthenticated = true;
+        state.initialized = true;
+        state.error = null;
+      })
+      .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
-        state.error = action.payload || null;
         state.initialized = true;
+        state.error = action.payload;
       });
 
-    builder.addCase(updateUserProfile.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(updateUserProfile.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = { ...state.user, ...action.payload };
-      state.error = null;
-    });
-    builder.addCase(updateUserProfile.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
+    // ✅ Update profile
+    builder
+      .addCase(updateUserProfile.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = { ...state.user, ...action.payload };
+        state.error = null;
+      })
+      .addCase(updateUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
 
+    // ✅ Logout
     builder.addCase(logoutUser.fulfilled, (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
       state.error = null;
+      state.initialized = true;
     });
-    
   },
 });
 

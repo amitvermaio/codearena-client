@@ -1,18 +1,20 @@
-// src/components/AuthWrapper.jsx
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchCurrentUser } from '@/store/features/user/userSlice';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCurrentUser } from "@/store/actions/user/userAction";
+import Loader from "../Loader";
 
 const AuthWrapper = ({ children }) => {
   const dispatch = useDispatch();
-  const initialized = useSelector((s) => s.user.initialized);
+  const { initialized, user } = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(fetchCurrentUser());
-  }, [dispatch]);
+    console.log(initialized);
+  }, []); // run only once on mount
 
-  if (!initialized) return <div>Checking authentication...</div>;
-  return <>{children}</>;
+  if (!initialized) return <Loader />;
+  
+  return <> { children } </>;
 };
 
 export default AuthWrapper;

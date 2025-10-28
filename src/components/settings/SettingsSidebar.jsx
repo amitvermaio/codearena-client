@@ -42,7 +42,7 @@ const SettingsSidebar = ({ children }) => {
                   asChild
                   className="justify-start"
                 >
-                  <Link to={`/u/${params.username}/settings/${item.href}`}>
+                  <Link to={`/settings/${item.href}`}>
                     <item.icon className="mr-2 h-4 w-4" />
                     {item.label}
                   </Link>

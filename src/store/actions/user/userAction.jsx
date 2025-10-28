@@ -1,114 +1,124 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { checkAuth } from "@/services/auth";
 import axios from "@/config/axios.config";
 
-export const verifyAuth = createAsyncThunk("user/verifyAuth", async () => {
-  const userData = await checkAuth();
-  return userData; 
-});
-
-
-export const loginUser = createAsyncThunk("user/login", async ({ email, password }, { rejectWithValue }) => {
+// ✅ Login
+export const loginUser = createAsyncThunk(
+  "user/login",
+  async ({ email, password }, { rejectWithValue }) => {
     try {
       const { data } = await axios.post("/auth/login", { email, password });
-      // Persist access token locally for route protection and API requests
+      const token = data?.data?.accessToken;
+      if (token) localStorage.setItem("accessToken", token);
       console.log(data);
-      console.log(data.data.accessToken);
-      if (data?.data?.accessToken) {
-        localStorage.setItem("access_token", data.data.accessToken);
-      }
-      return data; 
+      return data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Login failed");
     }
   }
 );
 
-export const registerUser = createAsyncThunk("user/register", async (userDetails, { rejectWithValue }) => {
+// ✅ Register
+export const registerUser = createAsyncThunk(
+  "user/register",
+  async (userDetails, { rejectWithValue }) => {
     try {
-      const { fullname, username, email, password } = userDetails;
-      const { data } = await axios.post("/auth/register", { fullname, username, email, password });
-      // Persist access token after registration
-      if (data?.token) {
-        localStorage.setItem("access_token", data.token);
-      }
-      return data; 
+      const { data } = await axios.post("/auth/register", userDetails);
+      const token = data?.data?.accessToken;
+      if (token) localStorage.setItem("accessToken", token);
+      return data.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Registration failed");
     }
   }
 );
 
-/* fetchCurrentUser — called on app start, backend reads refresh cookie & returns user + new access token */
-export const fetchCurrentUser = createAsyncThunk('user/fetchCurrentUser', async (_, { rejectWithValue }) => {
+// ✅ Refresh current user
+export const fetchCurrentUser = createAsyncThunk(
+  "user/fetchCurrentUser",
+  async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get('/auth/refresh-token'); // withCredentials true via api instance
-      const user = data.user || data.data?.user;
-      const accessToken = data.accessToken;
-      if (accessToken) localStorage.setItem('access_token', accessToken);
-      return { user, accessToken };
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Not authenticated');
-    }
-  }
-);
-
-export const fetchUserProfile = createAsyncThunk("user/fetchProfile", async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.get('/auth/me', {
+      const res = await axios.get('/auth/login/success', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
-      })
-      return data; 
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Failed to fetch profile");
+      });
+      return res;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Not authenticated");
     }
   }
 );
 
-export const updateUserProfile = createAsyncThunk("user/updateProfile", async (updates, { rejectWithValue }) => {
+export const fetchUserProfile = createAsyncThunk(
+  "user/fetchUserProfile",
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      // First check if we have a token
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        return rejectWithValue("No authentication token found");
+      }
+
+      // Fetch user profile
+      const res = await axios.get("/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      // Return the user data in the expected format
+      return { 
+        user: res.data.data,
+        accessToken: token
+      };
+    } catch (err) {
+      console.error("Error fetching user profile:", err);
+      // If unauthorized, clear the invalid token
+      if (err.response?.status === 401) {
+        localStorage.removeItem("accessToken");
+        dispatch(logoutUser());
+      }
+      return rejectWithValue(err.response?.data?.message || "Failed to fetch user profile");
+    }
+  }
+);
+
+// ✅ Update profile
+export const updateUserProfile = createAsyncThunk(
+  "user/updateProfile",
+  async (updates, { rejectWithValue }) => {
     try {
       const { data } = await axios.patch("/users/me", updates);
-      return data; 
+      return data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Update failed");
     }
   }
 );
 
-export const uploadPhoto = createAsyncThunk("upload/uploadPhoto", async (file, { rejectWithValue }) => {
-    try {
-      const formData = new FormData();
-      formData.append("photo", file);
-
-      const res = await axios.post("/users/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      return res.data.url; 
-    } catch (err) {
-      return rejectWithValue(err.response?.data || "Upload failed");
-    }
-  }
-);
-
+// ✅ Logout
 export const logoutUser = createAsyncThunk("user/logout", async () => {
-  const { data } = await axios.post("/auth/logout");
-  // Remove token from localStorage on logout
-  localStorage.removeItem("access_token");
+  const token = localStorage.getItem("accessToken");
+  const { data } = await axios.post("/auth/logout", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  localStorage.removeItem("accessToken");
   return data;
-}); 
+});
 
-
-export const getUserByUsername = createAsyncThunk("user/getUserByUsername", async (username, { rejectWithValue }) => {
+// Get User Profile
+export const getUserByUsername = createAsyncThunk(
+  "user/getUserByUsername",
+  async (username, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get(`/profile/${username}`);
-      console.log(data);
-      
-      return data; 
+      const { data } = await axios.get(`/users/profile/${username}`);
+      return data?.data ?? data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Failed to fetch user");
+      const status = err.response?.status;
+      const message = err.response?.data?.message || "Failed to fetch user profile";
+      return rejectWithValue({ status, message });
     }
   }
 );

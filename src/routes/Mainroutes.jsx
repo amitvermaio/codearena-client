@@ -1,97 +1,120 @@
+import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
-import Home from "../pages/Home";
-import Login from "../pages/auth/Login";
-import Register from "../pages/auth/Register";
-import Dashboard from "../pages/dashboard/Dashboard";
-import AdminPanel from "../pages/admin/AdminPanel";
-import ProblemList from "../pages/problems/ProblemPage";
-import ProblemDetails from "../pages/problems/ProblemDetails";
-import UserProfile from "../pages/profile/UserProfile";
-import ContestList from "../pages/contests/ContestList";
-import ContestProblems from "../pages/contests/ContestProblems";
-import ProblemOfTheDay from "../pages/potd/ProblemOfTheDay";
-import IDE from "../pages/tools/IDE";
-import CodeConverter from "../pages/tools/CodeConverter";
-import NotFound from "../pages/NotFound";
-import VerifyEmail from "../pages/auth/VerifyEmail";
-import Summarizer from "../pages/tools/Summarizer";
-import Tools from "../pages/tools/Tools";
-import UserSettings from "../pages/problems/UserAccount";
-import ProfileSettings from "../pages/settings/ProfileSettings";
-import SecuritySettings from "../pages/settings/SecuritySettings";
-import ForgotPassword from "../pages/auth/ForgotPassword";
 
+// Layouts & Wrappers
 import MainLayout from "@/components/layout/MainLayout";
-import AdminRoute from "../components/AdminRoute";
-import ProtectedRoute from "../components/ProtectedRoute";
 import SettingsLayout from "@/components/layout/SettingsLayout";
 import AdminLayout from "@/components/layout/AdminLayout";
-import UserManagement from "@/pages/admin/UserManagement";
-import ProblemManagement from "@/pages/admin/ProblemManagement";
-import ContestManagement from "@/pages/admin/ContestManagement";
-import ContestCreate from "@/pages/admin/ContestCreate";
-import { useEffect } from "react";
+import AdminRoute from "../components/AdminRoute";
+import ProtectedRoute from "../components/ProtectedRoute";
+import AuthWrapper from "@/components/auth/AuthWrapper";
+
+// Fallback Loader (you can replace with a spinner)
+const Loader = () => <div className="flex items-center justify-center h-screen text-lg">Loading...</div>;
+
+// Lazy imports
+const Home = lazy(() => import("../pages/Home"));
+const Login = lazy(() => import("../pages/auth/Login"));
+const Register = lazy(() => import("../pages/auth/Register"));
+const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
+const AdminPanel = lazy(() => import("../pages/admin/AdminPanel"));
+const ProblemList = lazy(() => import("../pages/problems/ProblemPage"));
+const ProblemDetails = lazy(() => import("../pages/problems/ProblemDetails"));
+const UserProfile = lazy(() => import("../pages/profile/UserProfile"));
+const ContestList = lazy(() => import("../pages/contests/ContestList"));
+const ContestProblems = lazy(() => import("../pages/contests/ContestProblems"));
+const ProblemOfTheDay = lazy(() => import("../pages/potd/ProblemOfTheDay"));
+const IDE = lazy(() => import("../pages/tools/IDE"));
+const CodeConverter = lazy(() => import("../pages/tools/CodeConverter"));
+const NotFound = lazy(() => import("../pages/NotFound"));
+const VerifyEmail = lazy(() => import("../pages/auth/VerifyEmail"));
+const Summarizer = lazy(() => import("../pages/tools/Summarizer"));
+const Tools = lazy(() => import("../pages/tools/Tools"));
+const UserSettings = lazy(() => import("../pages/problems/UserAccount"));
+const ProfileSettings = lazy(() => import("../pages/settings/ProfileSettings"));
+const SecuritySettings = lazy(() => import("../pages/settings/SecuritySettings"));
+const ForgotPassword = lazy(() => import("../pages/auth/ForgotPassword"));
+const UserManagement = lazy(() => import("@/pages/admin/UserManagement"));
+const ProblemManagement = lazy(() => import("@/pages/admin/ProblemManagement"));
+const ContestManagement = lazy(() => import("@/pages/admin/ContestManagement"));
+const ContestCreate = lazy(() => import("@/pages/admin/ContestCreate"));
 
 const Mainroutes = () => {
-
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<Home />} />
-      <Route path="/signin" element={<Login />} />
-      <Route path="/create-account" element={<Register />} />
-      <Route path="/verify-account" element={<VerifyEmail />} />
-      <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-      {/* <Route path="/auth/reset-password/:token" element={<ResetPassword />} /> */}
+    <Suspense fallback={<Loader />}>
+      <Routes>
 
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/signin" element={<Login />} />
+        <Route path="/create-account" element={<Register />} />
+        <Route path="/verify-account" element={<VerifyEmail />} />
+        <Route path="/auth/forgot-password" element={<ForgotPassword />} />
 
-      {/* Problems */}
-      <Route path="/problems/:problemId" element={<ProblemDetails />} />
+        {/* Problems */}
+        <Route path="/problems/:problemId" element={<ProblemDetails />} />
 
-      {/* Contests */}
-      <Route path="/contests/:contestId" element={<ContestProblems />} />
+        {/* Contests */}
+        <Route path="/contests/:contestId" element={<ContestProblems />} />
 
-      {/* Problem of the Day */}
-      <Route path="/potd" element={<ProblemOfTheDay />} />
+        {/* Problem of the Day */}
+        <Route path="/potd" element={<ProblemOfTheDay />} />
 
-      {/* Protected Routes */}
-      <Route path="/dashboard" element={
-        <ProtectedRoute><Dashboard /></ProtectedRoute>
-      } />
+        {/* Protected Dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
 
-{/* <ProtectedRoute><AdminRoute><AdminPanel /></AdminRoute></ProtectedRoute> */}
-      <Route path="/administration" element={<AdminLayout />}>
-        <Route index element={<AdminPanel />} />
-        <Route path="users-management" element={<UserManagement />} />
-        <Route path="problems-management" element={<ProblemManagement />} />
-        <Route path="contests-management" element={<ContestManagement />} />
-        <Route path="contests-management/create-contest" element={<ContestCreate />} />
-      </Route>
-
-      <Route element={<MainLayout />}>
-        <Route path="/problems" element={<ProblemList />} />
-        <Route path="/contests" element={<ContestList />} />
-        <Route path="/tools" element={<Tools />} />
-        {/* Tools */}
-        <Route path="/tools/ide" element={<IDE />} />
-        <Route path="/tools/code-converter" element={<CodeConverter />} />
-        <Route path="/tools/summarizer" element={<Summarizer/>} />
-        
-        {/* profile */}
-        <Route path="/u/:username" element={<UserProfile />} />
-
-        {/* settings */}
-        <Route path="/u/:username/settings" element={<SettingsLayout />}>
-          <Route index element={<ProfileSettings />} />
-          <Route path="account" element={<UserSettings />} />
-          <Route path="security" element={<SecuritySettings />} />
+        {/* Admin Routes */}
+        <Route
+          path="/administration"
+          element={
+            <ProtectedRoute>
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<AdminPanel />} />
+          <Route path="users-management" element={<UserManagement />} />
+          <Route path="problems-management" element={<ProblemManagement />} />
+          <Route path="contests-management" element={<ContestManagement />} />
+          <Route path="contests-management/create-contest" element={<ContestCreate />} />
         </Route>
 
-      </Route>
+        {/* Main Layout Routes */}
+        <Route element={<MainLayout />}>
+          <Route path="/problems" element={<ProblemList />} />
+          <Route path="/contests" element={<ContestList />} />
+          <Route path="/tools" element={<Tools />} />
 
-      {/* 404 Page */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+          {/* Tools */}
+          <Route path="/tools/ide" element={<IDE />} />
+          <Route path="/tools/code-converter" element={<CodeConverter />} />
+          <Route path="/tools/summarizer" element={<Summarizer />} />
+
+          {/* Profile */}
+          <Route path="/u/:username" element={<UserProfile />} />
+
+          {/* Settings */}
+          <Route path="/settings" element={<SettingsLayout />}>
+            <Route index element={<ProfileSettings />} />
+            <Route path="account" element={<UserSettings />} />
+            <Route path="security" element={<SecuritySettings />} />
+          </Route>
+        </Route>
+
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
+
+      </Routes>
+    </Suspense>
   );
 };
 
