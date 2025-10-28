@@ -1,22 +1,30 @@
 import axios from "axios";
 
-// Creating a new axios instance with base config
-const config = {
-  baseURL: import.meta.env.VITE_API_BASE_URL, // Base URL from environment
-  withCredentials: true, // Include credentials in requests
-  timeout: 5000, // Added a timeout (won't break anything if your requests are fast)
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000",
+  withCredentials: true,
+  timeout: 5000,
   headers: {
-    "Content-Type": "application/json", // Explicitly set Content-Type
+    "Content-Type": "application/json",
   },
-};
-
-// Initialize axios instance
-const instance = axios.create(config);
-
-// Optional: intercept requests (currently does nothing)
-instance.interceptors.request.use((request) => {
-  // Could modify request here, but currently returning as-is
-  return request;
 });
 
-export default instance;
+// Request Interceptor
+api.interceptors.request.use(
+  (req) => {
+    // Useful placeholder for adding auth headers later
+    return req;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response Interceptor (light, safe, realistic)
+api.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    console.error("API Error:", error?.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
+
+export default api;
