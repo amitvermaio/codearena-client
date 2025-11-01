@@ -9,11 +9,11 @@ import AdminRoute from "../components/AdminRoute";
 import ProtectedRoute from "../components/ProtectedRoute";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 
-// Fallback Loader (you can replace with a spinner)
+
 const Loader = () => <div className="flex items-center justify-center h-screen text-lg">Loading...</div>;
 
 // Lazy imports
-const Home = lazy(() => import("../pages/Home"));
+import Home from "@/pages/Home";
 const Login = lazy(() => import("../pages/auth/Login"));
 const Register = lazy(() => import("../pages/auth/Register"));
 const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
@@ -42,7 +42,7 @@ const ContestCreate = lazy(() => import("@/pages/admin/ContestCreate"));
 const Mainroutes = () => {
   return (
     <Suspense fallback={<Loader />}>
-      <Routes>
+        <Routes>
 
         {/* Public Routes */}
         <Route path="/" element={<Home />} />

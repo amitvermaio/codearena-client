@@ -35,9 +35,10 @@ const  ProblemsPage = () => {
   const dispatch = useDispatch();
   const problems = useSelector((state) => state.problems.problems);
   
-  /**
-   * Load dummy data instead of API calls
-   */
+  useEffect(() => {
+    document.title = "CodeArena Problems — Level Up Your Logic"
+  }, []);
+  
   useEffect(() => {
     dispatch(fetchProblems());
     setProblemOfTheDay({

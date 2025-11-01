@@ -8,6 +8,9 @@ import ContestCard from "../../components/contests/ContestCard";
 
 const ContestList = () => {
   const [platformContests, setPlatformContests] = useState([]);
+  useEffect(() => {
+    document.title = "CodeArena Contests — Compete with the Best"
+  }, []);
 
   // ------------------ Redux Version (use when Redux is ready) ------------------
   // const dispatch = useDispatch();

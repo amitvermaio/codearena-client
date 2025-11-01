@@ -91,20 +91,24 @@ const Navbar = () => {
 
   // Fetch user profile on component mount
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token && !user && !loading) {
+    const token = localStorage.getItem('CodeArena_Token');
+
+    console.log(token)
+    if (token && !user) {
+      console.log("first")
       dispatch(fetchUserProfile());
     }
-  }, [dispatch, user, loading]);
+  }, [dispatch, user]);
 
   const LogoutHandler = async () => {
     try {
-      const res = await dispatch(logoutUser()).unwrap();
+      const token = localStorage.getItem('CodeArena_Token');
+      console.log("token: ", token);
+      const res = await axios.post('/auth/logout', {}, { headers: { Authorization: `Bearer ${token}` } });
       console.log("Logout response: ", res);
-      if (res.statusCode === 200) {
+      if (res.status === 200) {
         dispatch(fetchUserProfile());
         toast.success('Logged out successfully');
-        navigate('/');
       }
     } catch (error) {
       toast.error('Something went wrong');
@@ -113,10 +117,6 @@ const Navbar = () => {
 
   useEffect(() => {
     getNotifications().then(setNotifications);
-  }, []);
-
-  useEffect(() => {
-    dispatch(fetchUserProfile());
   }, []);
 
   useEffect(() => {

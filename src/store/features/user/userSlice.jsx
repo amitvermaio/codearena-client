@@ -1,8 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchCurrentUser,
-  loginUser,
-  registerUser,
   updateUserProfile,
   logoutUser,
   fetchUserProfile,
@@ -10,7 +8,7 @@ import {
 
 const initialState = {
   user: null,
-  token: localStorage.getItem("accessToken") || null,
+  token: localStorage.getItem(import.meta.env.VITE_TOKEN_NAME) || null,
   loading: false,
   error: null,
   isAuthenticated: false,
@@ -58,42 +56,6 @@ const userSlice = createSlice({
         state.isAuthenticated = false;
         state.error = action.payload || null;
         state.initialized = true; // ✅ still mark as checked
-      });
-
-    // ✅ Login
-    builder
-      .addCase(loginUser.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.accessToken;
-        state.isAuthenticated = true;
-        state.error = null;
-        state.initialized = true;
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
-
-    // ✅ Register
-    builder
-      .addCase(registerUser.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.accessToken;
-        state.isAuthenticated = true;
-        state.error = null;
-        state.initialized = true;
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
       });
 
     // ✅ Fetch User Profile

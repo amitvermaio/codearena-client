@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; 
 import { ArrowRight, Wand2, CodeXmlIcon } from "lucide-react";
 import { href, Link } from "react-router-dom"; // React Router link use karenge
@@ -20,6 +20,11 @@ const tools = [
 ];
 
 const Tools = () => {
+
+  useEffect(() => {
+    document.title = "Your Coding Toolkit | CodeArena Tools";
+  }, []);
+
   return (
     <div className="container mx-auto py-8 px-4 md:px-6">
       <div className="mb-8 text-center">
