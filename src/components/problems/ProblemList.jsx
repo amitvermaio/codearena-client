@@ -26,7 +26,6 @@ const statusIcons = {
 };
 
 const ProblemList = ({ problems }) => {
-
   const navigate = useNavigate();
   const user = useSelector((state) => state.user?.user?.data);
   const solvedProblems = user?.solvedProblems || [];

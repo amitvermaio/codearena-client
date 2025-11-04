@@ -18,7 +18,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 
 import { Search, Flame, Video } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProblems } from "@/store/actions/problems/problemAction";
+import { asyncloadcurrentproblem, fetchProblems } from "@/store/actions/problems/problemAction";
 
 const  ProblemsPage = () => {
   // Data states

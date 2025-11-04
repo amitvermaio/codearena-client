@@ -67,11 +67,12 @@ const problemSlice = createSlice({
     },
 
     // Current problem
-    setCurrentProblem: (state, action) => {
+    loadCurrentProblem: (state, action) => {
       state.currentProblem = action.payload;
+      state.loading = false;
     },
 
-    clearCurrentProblem: (state) => {
+    removeCurrentProblem: (state) => {
       state.currentProblem = null;
     },
 
@@ -177,8 +178,8 @@ export const {
   addProblem,
   updateProblem,
   deleteProblem,
-  setCurrentProblem,
-  clearCurrentProblem,
+  loadCurrentProblem,
+  removeCurrentProblem,
   setFilter,
   setSearchQuery,
   applyFilters,

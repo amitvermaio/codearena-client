@@ -103,7 +103,6 @@ const Navbar = () => {
   const LogoutHandler = async () => {
     try {
       const token = localStorage.getItem('CodeArena_Token');
-      console.log("token: ", token);
       const res = await axios.post('/auth/logout', {}, { headers: { Authorization: `Bearer ${token}` } });
       console.log("Logout response: ", res);
       if (res.status === 200) {
