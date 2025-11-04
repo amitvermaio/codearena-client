@@ -22,15 +22,21 @@ const useTheme = () => {
   });
 
   useEffect(() => {
+    // Ensure DOM is available (SSR-safe)
+    if (typeof window === 'undefined') return;
+
+    // Debug helper (commented out by default)
+    // console.log(`DEBUG: Attempting to set theme to: ${theme}`);
+
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  const setTheme = (newTheme) => {
-    setThemeState(newTheme);
-  };
+  function setTheme(newTheme) {
+      setThemeState(newTheme);
+    }
 
   return { theme, setTheme };
 };
