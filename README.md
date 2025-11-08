@@ -1,151 +1,130 @@
-# CodeArena
+<div align="center">
+  <h1>CodeArena</h1>
+  <p>🚀 A collaborative coding platform for real-time pair programming and competitive coding challenges</p>
+  
+  <!-- Badges -->
+  <div align="center">
+    <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React">
+    <img src="https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
+    <img src="https://img.shields.io/badge/Express.js-404D59?style=for-the-badge" alt="Express">
+    <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB">
+    <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
+    <img src="https://img.shields.io/badge/JavaScript-171717?style=for-the-badge&logo=javascript&logoColor=F7DF1E" alt="JavaScript">
+    <img src="https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E" alt="Vite">
+  </div>
+  
+  <br/>
+  
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+  
+</div>
 
-CodeArena is a collaborative coding platform built using the **MERN stack** with modern frontend tools like TailwindCSS and ShadCN.  
-This document will help contributors and collaborators quickly set up the project locally.
+## ✨ Features
 
----
+- **Real-time Code Collaboration** - Pair program with others in real-time
+- **Code Execution** - Run code in multiple programming languages
+- **Problem Solving** - Solve coding challenges with test cases
+- **Interactive UI** - Modern and responsive interface built with TailwindCSS
+- **Type Safety** - Built with TypeScript for better developer experience
 
-## ⚡ Quick Setup
+## 🚀 Tech Stack
 
-### 1️⃣ Clone the Repository
-```bash
-git clone https://github.com/amitvermaio/codearena.git
-cd codearena
+### Frontend
+- **Framework**: React 18 with TypeScript
+- **Styling**: TailwindCSS with ShadCN components
+- **State Management**: React Context API
+- **Code Editor**: Monaco Editor (VS Code's editor)
+- **Build Tool**: Vite
+- **UI Components**: Radix UI Primitives + ShadCN
+- **Form Handling**: React Hook Form
+- **Real-time**: Socket.IO
+
+### Backend
+- **Runtime**: Node.js with Express
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: JWT
+- **Real-time**: Socket.IO
+
+## 📁 Project Structure
+
+```
+frontend/
+├── public/            # Static files
+├── src/
+│   ├── assets/        # Images, fonts, etc.
+│   ├── components/    # Reusable UI components
+│   ├── contexts/      # React contexts
+│   ├── hooks/         # Custom React hooks
+│   ├── lib/           # Utility functions
+│   ├── pages/         # Page components
+│   ├── styles/        # Global styles
+│   ├── types/         # TypeScript type definitions
+│   ├── App.tsx        # Main App component
+│   └── main.tsx       # Entry point
 ```
 
-### 2️⃣ INSTALL DEPENDENCIES
-- Backend
-``` bash
-cd backend
-npm install
-```
+## 🛠️ Getting Started
 
-- Frontend
-```bash
-cd ../frontend
-npm install
-```
+### Prerequisites
 
-### 3️⃣ Environment Variables
+- Node.js 16+ and npm/yarn
+- MongoDB 6.0+
+- Git
 
-Create a `.env` file in both backend/ and frontend/ .
-Backend (`backend/.env`)
+### Installation
 
-```bash
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-ACCESS_TOKEN_SECRET=your_secret
-ACCESS_TOKEN_EXPIRY=1d
-REFRESH_TOKEN_SECRET=your_secret
-REFRESH_TOKEN_EXPIRY=7d
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/amitvermaio/codearena.git
+   cd codearena
+   ```
 
-### Frontend (`frontend/.env`)
-``` bash
-VITE_BACKEND_URL=http://localhost:5000
-```
+2. **Install dependencies**
+   ```bash
+   # Install frontend dependencies
+   cd frontend
+   npm install
+   
+   # Install backend dependencies
+   cd ../backend
+   npm install
+   ```
 
-### 4️⃣ Run the Project
+3. **Environment Setup**
+   Create a `.env` file in both frontend and backend directories. Refer to `.env.example` for required variables.
 
-- Backend (Express + MongoDB)
-```bash
-cd backend
-npm run dev
-```
+4. **Start Development Servers**
+   ```bash
+   # Start backend server
+   cd backend
+   npm run dev
+   
+   # In a new terminal, start frontend
+   cd ../frontend
+   npm run dev
+   ```
 
-- Frontend (React + Vite)
-``` bash
-cd ../frontend
-npm run dev
-```
+5. **Open in Browser**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5000
 
-The app should now be running at:
+## 🤝 Contributing
 
-- Frontend → http://localhost:5173/
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) to get started.
 
-- Backend → http://localhost:5000/
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
----
+## 📄 License
 
-## 📂 Project Structure
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-``` bash
-codearena/
-├── backend/       # Node.js + Express + MongoDB
-│   ├── src/
-│   ├── .env
-│   └── package.json
-│
-├── frontend/      # React + TailwindCSS + ShadCN
-│   ├── src/
-│   ├── .env
-│   └── package.json
-│
-├── README.md
-└── .gitignore
-```
+## 🙏 Acknowledgments
 
----
-
-# 🔧 Development Workflow
-
-1. Create a new branch for your feature/bugfix:
-``` bash
-git checkout -b feat/feature-name
-```
-
-2. Make your changes and commit them using Conventional Commits:
-
-``` bash
-git commit -m "feat(auth): add forgot password API integration"
-```
-
-3. Push your branch:
-``` bash 
-git push origin feat/feature-name
-```
-
-4. Open a Pull Request 🚀
-
----
-
-# 📌 Tech Stack (Quick Overview)
-
-- Frontend: React, Vite, Redux, TailwindCSS, ShadCN
-
-- Backend: Node.js, Express.js, MongoDB, JWT, bcrypt
-
-- Tools: Axios, ESLint, Prettier
-
---- 
-
-# 🤝 Contributing
-
-- Fork the repo
-
-- Create your feature branch (git checkout -b feat/your-feature)
-
-- Commit your changes (git commit -m 'feat: add some feature')
-
-- Push to the branch (git push origin feat/your-feature)
-
-- Open a Pull Request
-
-----
-
-# 📜 License
-
-This project is licensed under the MIT License.
-
-``` yaml
----
-
-## ✅ Commit message for this README  
-```
-
----
-
-# 📝 Commit Message for this README
-``` bash
-docs(readme): add professional README with setup guide and contribution workflow
-```
+- [ShadCN](https://ui.shadcn.com/) for the amazing component library
+- [Radix UI](https://www.radix-ui.com/) for accessible primitives
+- All the open-source libraries that made this project possible
