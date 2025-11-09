@@ -26,14 +26,14 @@
 - **Code Execution** - Run code in multiple programming languages
 - **Problem Solving** - Solve coding challenges with test cases
 - **Interactive UI** - Modern and responsive interface built with TailwindCSS
-- **Type Safety** - Built with TypeScript for better developer experience
+- **Redux** - Predictable global state management (JS version)
 
 ## 🚀 Tech Stack
 
 ### Frontend
 - **Framework**: React 18 with TypeScript
 - **Styling**: TailwindCSS with ShadCN components
-- **State Management**: React Context API
+- **State Management**: Redux Toolkit
 - **Code Editor**: Monaco Editor (VS Code's editor)
 - **Build Tool**: Vite
 - **UI Components**: Radix UI Primitives + ShadCN
@@ -54,14 +54,13 @@ frontend/
 ├── src/
 │   ├── assets/        # Images, fonts, etc.
 │   ├── components/    # Reusable UI components
-│   ├── contexts/      # React contexts
-│   ├── hooks/         # Custom React hooks
+│   ├── hooks/         # Custom React hooks & Shadcn hooks
 │   ├── lib/           # Utility functions
 │   ├── pages/         # Page components
-│   ├── styles/        # Global styles
-│   ├── types/         # TypeScript type definitions
-│   ├── App.tsx        # Main App component
-│   └── main.tsx       # Entry point
+│   ├── store/         # Redux store
+│   ├── routes/        # App routes
+│   ├── Mainroutes.jsx # Main App routes
+│   └── main.jsx       # Entry point
 ```
 
 ## 🛠️ Getting Started
