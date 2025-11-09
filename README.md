@@ -31,7 +31,7 @@
 ## 🚀 Tech Stack
 
 ### Frontend
-- **Framework**: React 18 with TypeScript
+- **Framework**: React 18 with JavaScript
 - **Styling**: TailwindCSS with ShadCN components
 - **State Management**: Redux Toolkit
 - **Code Editor**: Monaco Editor (VS Code's editor)
