@@ -1,41 +1,31 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from "@/config/axios.config"
-import {
-  setLoading,
-  setError,
-  setProblems,
-  addProblem,
-  updateProblem,
-  deleteProblem,
-  loadCurrentProblem,
-  applyFilters
-} from '../../features/problems/problemSlice';
+import { setLoading, setError, setProblems, setCurrentProblem } from "@/store/features/problems/problemSlice";
 
-// ------------------- Async Thunks ------------------- //
+export const asyncloadproblems = () => async (dispatch, getState) => {
+  try {
+    dispatch(setLoading(true));
+    const { data } = await axios.get(`/problems`, {
+      headers: {
+        "x-secret-key": import.meta.env.VITE_SECRET_KEY
+      }
+    });
 
-export const fetchProblems = createAsyncThunk('problems/fetchProblems', async (_, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setLoading(true));
-      const response = await axios.get('/problems', {
-        headers: {
-          'x-secret-key': import.meta.env.VITE_SECRET_KEY,
-        }
-      });
-      const { data } = response;
-      const problems = data?.data ?? [];
-      dispatch(setProblems(problems));
-      return problems;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch problems';
-      dispatch(setError(errorMessage));
-      return rejectWithValue(errorMessage);
+    if (data.statusCode === 200) {
+      console.log(data.data)
+      dispatch(setProblems(data.data));
+    } else {
+      dispatch(setError(data.message));
+      dispatch(setLoading(false));
     }
+  } catch (error) {
+    console.log(error)
+    dispatch(setError(error.message));
+    dispatch(setLoading(false));
   }
-);
+}
 
 export const asyncloadcurrentproblem = (problemId) => async (dispatch, getState) => {
   try {
-    console.log(problemId)
     dispatch(setLoading(true));
     const { data } = await axios.get(`/problems/${problemId}`, {
       headers: {
@@ -43,9 +33,15 @@ export const asyncloadcurrentproblem = (problemId) => async (dispatch, getState)
       }
     });
     if (data.statusCode === 200) {
-      dispatch(loadCurrentProblem());
+      console.log(data.data)
+      dispatch(setCurrentProblem(data.data));
+    } else {
+      dispatch(setError(data.message));
+      dispatch(setLoading(false));
     }
   } catch (error) {
     console.log(error)
+    dispatch(setError(error.message));
+    dispatch(setLoading(false));
   }
 }

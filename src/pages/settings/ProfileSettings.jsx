@@ -18,30 +18,30 @@ import { cn } from "../../lib/utils";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-import { updateUserProfile } from "@/store/actions/user/userAction";
+import { asyncupdateuserprofile } from "@/store/actions/user/userAction";
 import ProfileSettingsSkeleton from "@/components/settings/ProfileSettingsSkeleton";
-import { updateUserField, addUserSkill, removeUserSkill } from "@/store/features/user/userSlice"; 
+import { updateuserfield, adduserskill, removeuserskill } from "@/store/features/user/userSlice"; 
 
 const profileColors = [
-  { name: "default", class: "bg-muted" },
-  { name: "blue", class: "bg-blue-500" },
-  { name: "green", class: "bg-green-500" },
-  { name: "purple", class: "bg-purple-500" },
-  { name: "red", class: "bg-red-500" },
-  { name: "orange", class: "bg-orange-500" },
-  { name: "yellow", class: "bg-yellow-500" },
-  { name: "pink", class: "bg-pink-500" },
-  { name: "slate", class: "bg-slate-800" },
-  { name: "stone", class: "bg-stone-800" },
-  { name: "indigo", class: "bg-indigo-800" },
-  { name: "cyan", class: "bg-cyan-800" }
+  { name: "default", className: "bg-muted" },
+  { name: "blue", className: "bg-blue-500" },
+  { name: "green", className: "bg-green-500" },
+  { name: "purple", className: "bg-purple-500" },
+  { name: "red", className: "bg-red-500" },
+  { name: "orange", className: "bg-orange-500" },
+  { name: "yellow", className: "bg-yellow-500" },
+  { name: "pink", className: "bg-pink-500" },
+  { name: "slate", className: "bg-slate-800" },
+  { name: "stone", className: "bg-stone-800" },
+  { name: "indigo", className: "bg-indigo-800" },
+  { name: "cyan", className: "bg-cyan-800" }
 ];
 
 const ProfileSettings = () => {
-  const user = useSelector((state) => state.user?.user?.data);
+  const user = useSelector((state) => state.user?.user);
   const dispatch = useDispatch();
   const [skillInput, setSkillInput] = useState("");
-  const [bgColor, setBgColor] = useState(user?.profileColor);
+  const [bgColor, setBgColor] = useState(user?.profileColor || "default");
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: user
@@ -50,6 +50,7 @@ const ProfileSettings = () => {
   useEffect(() => {
     if (user) {
       reset(user);
+      setBgColor(user.profileColor || "default");
     }
   }, [user, reset]);
 
@@ -62,31 +63,48 @@ const ProfileSettings = () => {
     );
   }
 
-  const SubmitHandler = (data) => {
-    const profileColor = bgColor;
-    data.profileColor = profileColor;
-    dispatch(updateUserProfile(data));
-    toast.success("Profile Updated", {
-      description: "Your changes have been saved successfully."
-    });
+  const SubmitHandler = async (formData) => {
+    try {
+      const payload = {
+        ...formData,
+        profileColor: bgColor,
+        skills: user.skills || [],
+      };
+
+      if (payload.fullname && !payload.fullName) {
+        payload.fullName = payload.fullname;
+      }
+
+      await dispatch(asyncupdateuserprofile(payload));
+
+      toast.success("Profile Updated", {
+        description: "Your changes have been saved successfully."
+      });
+    } catch (error) {
+      const message = error?.message || "Failed to update profile. Please try again.";
+      toast.error("Update Failed", {
+        description: message
+      });
+    }
   };
 
   const handleColorSelect = (color) => {
-    dispatch(updateUserField({ name: "profileColor", value: color }));
+    setBgColor(color);
+    dispatch(updateuserfield({ name: "profileColor", value: color }));
   };
 
   const handleSkillKeyDown = (e) => {
     if (e.key === "Enter" && skillInput.trim() !== "") {
       e.preventDefault();
-      if (!user.skills || !user.skills.includes(skillInput.trim())) {
-        dispatch(addUserSkill(skillInput.trim()));
+      if (!user.skills?.includes(skillInput.trim())) {
+        dispatch(adduserskill(skillInput.trim()));
       }
       setSkillInput(""); 
     }
   };
 
   const handleRemoveSkill = (skill) => {
-    dispatch(removeUserSkill(skill));
+    dispatch(removeuserskill(skill));
   };
 
   return (
@@ -115,18 +133,6 @@ const ProfileSettings = () => {
               />
             </div>
 
-            {/* Username */}
-            {/* <div className="grid md:grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="md:text-right">
-                Username
-              </Label>
-              <Input
-                id="username"
-                {...register("username")}
-                className="md:col-span-3"
-              />
-            </div> */}
-
             {/* Bio */}
             <div className="grid md:grid-cols-4 items-start gap-4">
               <Label htmlFor="bio" className="md:text-right pt-2">
@@ -150,15 +156,12 @@ const ProfileSettings = () => {
                     key={color.name}
                     className={cn(
                       "h-8 w-8 rounded-full border-2 flex items-center justify-center",
-                      color.class,
+                      color.className,
                       bgColor === color.name
                         ? "border-ring"
                         : "border-transparent"
                     )}
-                    onClick={() => { 
-                      setBgColor(color.name); 
-                      handleColorSelect(color.name); 
-                    }}
+                    onClick={() => handleColorSelect(color.name)}
                   >
                     {bgColor === color.name && (
                       <Check className="h-5 w-5 text-white" />
@@ -252,7 +255,9 @@ const ProfileSettings = () => {
           </CardContent>
 
           <CardFooter className="border-t pt-6">
-            <Button type="submit">Save Changes</Button>
+            <Button type="submit" className="mt-4">
+              Save Changes
+            </Button>
           </CardFooter>
         </Card>
       </form>

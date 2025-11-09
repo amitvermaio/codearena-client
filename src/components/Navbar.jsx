@@ -30,7 +30,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Logo } from "../components/shared/Logo";
 import axios from "../config/axios.config.jsx";
 import { toast } from "sonner";
-import { fetchUserProfile, logoutUser } from "@/store/actions/user/userAction";
+
+import { asyncfetchuserprofile, asynclogoutuser } from "../store/actions/user/userAction";
 import { useDispatch, useSelector } from "react-redux";
 
 // Dummy data instead of API call
@@ -82,31 +83,21 @@ const Navbar = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  
-  const { user, isAuthenticated, loading } = useSelector(state => ({
-    user: state.user.user,
-    isAuthenticated: state.user.isAuthenticated,
-    loading: state.user.loading
-  }));
+
+  const { user } = useSelector((state) => state.user);
 
   // Fetch user profile on component mount
   useEffect(() => {
-    const token = localStorage.getItem('CodeArena_Token');
-
-    console.log(token)
-    if (token && !user) {
-      console.log("first")
-      dispatch(fetchUserProfile());
-    }
-  }, [dispatch, user]);
+    dispatch(asyncfetchuserprofile());
+  }, [dispatch]);
 
   const LogoutHandler = async () => {
     try {
-      const token = localStorage.getItem('CodeArena_Token');
+      const token = localStorage.getItem(import.meta.env.VITE_TOKEN_NAME);
       const res = await axios.post('/auth/logout', {}, { headers: { Authorization: `Bearer ${token}` } });
       console.log("Logout response: ", res);
       if (res.status === 200) {
-        dispatch(fetchUserProfile());
+        dispatch(asynclogoutuser());
         toast.success('Logged out successfully');
       }
     } catch (error) {
@@ -210,7 +201,7 @@ const Navbar = () => {
                   <Avatar className="h-10 w-10 border-2 border-border">
                     <AvatarImage src={`${user.avatar}`} alt="User profile" />
                     <AvatarFallback>{user.fullname?.charAt(0)}</AvatarFallback>
-                  </Avatar>
+                  </Avatar> 
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>

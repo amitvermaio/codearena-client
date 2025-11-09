@@ -39,7 +39,7 @@ const Login = () => {
       const response = await axios.post('/auth/login', { email, password });
       console.log(response);
       if (response.status === 200) {
-        localStorage.setItem('CodeArena_Token', response.data?.data?.token);
+        localStorage.setItem(import.meta.env.VITE_TOKEN_NAME, response.data?.data?.token);
         toast.success('Successfully signed in!');
         navigate('/problems');
       }

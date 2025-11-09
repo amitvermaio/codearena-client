@@ -37,12 +37,7 @@ const ProblemPage = () => {
   }, [problemId]);
 
   if (loading) return <ProblemPageSkeleton />;
-  setTimeout(() => {
-    if (!currentProblem) return <ProblemNotFound />;
-  }, 10000);
-  if (!loading) {
-    console.log(currentProblem)
-  }
+  if (!currentProblem && !loading) return <ProblemNotFound />;
 
   if (isMobile) {
     return (

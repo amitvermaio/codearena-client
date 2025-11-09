@@ -1,93 +1,96 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "@/config/axios.config";
+import { loaduser, logoutuser, setloading } from "@/store/features/user/userSlice";
+import { loadprofile } from "@/store/features/profile/profileSlice";
 
-// ✅ Refresh current user
-export const fetchCurrentUser = createAsyncThunk(
-  "user/fetchCurrentUser",
-  async (_, { rejectWithValue }) => {
-    try {
-      const res = await axios.get('/auth/me', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("CodeArena_Token")}`,
-        },
-      });
-      return res;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Not authenticated");
+export const asyncfetchuserprofile = () => async (dispatch, getState) => {
+  try {
+    const token = localStorage.getItem(import.meta.env.VITE_TOKEN_NAME);
+    if (!token) {
+      dispatch(logoutuser());
+      return;
     }
-  }
-);
 
-export const fetchUserProfile = createAsyncThunk(
-  "user/fetchUserProfile",
-  async (_, { rejectWithValue, dispatch }) => {
-    try {
-      // First check if we have a token
-      const token = localStorage.getItem("CodeArena_Token");
-      if (!token) {
-        return rejectWithValue("No authentication token found");
-      }
-
-      // Fetch user profile
-      const res = await axios.get("/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
-      // Return the user data in the expected format
-      return { 
-        user: res.data.data,
-        token: token
-      };
-    } catch (err) {
-      console.error("Error fetching user profile:", err);
-      // If unauthorized, clear the invalid token
-      if (err.response?.status === 401) {
-        localStorage.removeItem("CodeArena_Token");
-        dispatch(logoutUser());
-      }
-      return rejectWithValue(err.response?.data?.message || "Failed to fetch user profile");
+    dispatch(setloading(true));
+    const { data } = await axios.get("/auth/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (data.statusCode === 200) {
+      dispatch(loaduser(data?.data));
     }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    dispatch(setloading(false));
   }
-);
+}
 
-// ✅ Update profile
-export const updateUserProfile = createAsyncThunk(
-  "user/updateProfile",
-  async (updates, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.patch("/users/me", updates);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Update failed");
+export const asyncupdateuserprofile = (updates) => async (dispatch) => {
+  try {
+    const token = localStorage.getItem(import.meta.env.VITE_TOKEN_NAME);
+    if (!token) {
+      dispatch(logoutuser());
+      throw new Error("Authentication token is missing");
     }
-  }
-);
 
-// ✅ Logout
-export const logoutUser = createAsyncThunk("user/logout", async () => {
-  const token = localStorage.getItem("CodeArena_Token");
-  const { data } = await axios.post("/auth/logout", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  localStorage.removeItem("CodeArena_Token");
-  return data;
-});
+    dispatch(setloading(true));
 
-// Get User Profile
-export const getUserByUsername = createAsyncThunk(
-  "user/getUserByUsername",
-  async (username, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.get(`/users/profile/${username}`);
-      return data?.data ?? data;
-    } catch (err) {
-      const status = err.response?.status;
-      const message = err.response?.data?.message || "Failed to fetch user profile";
-      return rejectWithValue({ status, message });
+    const { data } = await axios.patch("/users/me", updates, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (data.statusCode !== 200) {
+      const message = data.message || "Failed to update profile";
+      throw new Error(message);
     }
+
+    dispatch(loaduser(data.data));
+    return data.data;
+  } catch (error) {
+    console.error("Profile update failed:", error);
+    const message = error.response?.data?.message || error.message || "Failed to update profile";
+    throw new Error(message);
+  } finally {
+    dispatch(setloading(false));
   }
-);
+};
+
+export const asynclogoutuser = () => async (dispatch, getState) => {
+  try {
+    const token = localStorage.getItem(import.meta.env.VITE_TOKEN_NAME);
+    if (!token) {
+      dispatch(logoutuser());
+      return;
+    }
+    dispatch(setloading(true));
+    const { data } = await axios.post("/auth/logout", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (data.statusCode === 200) {
+      dispatch(logoutuser());
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    dispatch(setloading(false));
+  }
+}
+
+export const asyncgetprofilefromusername = (username) => async (dispatch, getState) => {
+  try {
+    dispatch(setloading(true));
+    const { data } = await axios.get(`/users/profile/${username}`);
+    if (data.statusCode === 200) {
+      dispatch(loadprofile(data?.data));
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    dispatch(setloading(false));
+  }
+}

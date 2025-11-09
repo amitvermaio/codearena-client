@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
-import Select from "react-select"; // Replacement for missing shadcn MultiSelect
+import React, { useEffect, useMemo, useState } from "react";
+import Select from "react-select";
 
 import ProblemList from "@/components/problems/ProblemList";
 import { ProblemOfTheDay } from "@/components/ProblemOfTheDay";
@@ -17,30 +17,31 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 import { Search, Flame, Video } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-import { asyncloadcurrentproblem, fetchProblems } from "@/store/actions/problems/problemAction";
 
-const  ProblemsPage = () => {
-  // Data states
-  const [problemOfTheDay, setProblemOfTheDay] = useState(null);
-  const [allProblems, setAllProblems] = useState([]);
-  // UI states
-  const [isPairingDialogOpen, setIsPairingDialogOpen] = useState(false);
-  // Filter states
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedDifficulty, setSelectedDifficulty] = useState("all");
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [selectedTags, setSelectedTags] = useState([]);
-  
+import { useDispatch, useSelector } from "react-redux";
+import { asyncloadproblems } from "@/store/actions/problems/problemAction";
+
+import { setFilter, applyFilters } from "@/store/features/problems/problemSlice";
+
+const ProblemsPage = () => {
   const dispatch = useDispatch();
+
+  // Redux states
   const problems = useSelector((state) => state.problems.problems);
-  
+  const filteredProblems = useSelector((state) => state.problems.filteredProblems);
+  const filters = useSelector((state) => state.problems.filters);
+
+  // Local UI states only
+  const [problemOfTheDay, setProblemOfTheDay] = useState(null);
+  const [isPairingDialogOpen, setIsPairingDialogOpen] = useState(false);
+
   useEffect(() => {
-    document.title = "CodeArena Problems — Level Up Your Logic"
+    document.title = "CodeArena Problems — Level Up Your Logic";
   }, []);
-  
+
   useEffect(() => {
-    dispatch(fetchProblems());
+    dispatch(asyncloadproblems());
+
     setProblemOfTheDay({
       id: 101,
       title: "Two Sum",
@@ -50,56 +51,24 @@ const  ProblemsPage = () => {
     });
   }, [dispatch]);
 
-  useEffect(() => {
-    if (Array.isArray(problems)) {
-      setAllProblems(problems);
-    }
+  const allTags = useMemo(() => {
+    const setTags = new Set();
+    problems?.forEach((p) => p.tags?.forEach((t) => setTags.add(t)));
+    return [...setTags].sort();
   }, [problems]);
 
-  /**
-   * Extract unique tags from problems list
-   */
-  const allTags = useMemo(() => {
-    if (!Array.isArray(allProblems)) return [];
-    const tags = new Set();
-    allProblems.forEach((problem) => {
-      if (Array.isArray(problem.tags)) {
-        problem.tags.forEach((tag) => tags.add(tag));
-      }
-    });
-    return Array.from(tags).sort();
-  }, [allProblems]);
-
-  /**
-   * Apply all filters: search, difficulty, status, tags
-   */
-  const filteredProblems = useMemo(() => {
-    return allProblems.filter((problem) => {
-      const matchesSearch = problem.title
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-
-      const matchesDifficulty =
-        selectedDifficulty === "all" || problem.difficulty === selectedDifficulty;
-
-      const matchesStatus =
-        selectedStatus === "all" || problem.status === selectedStatus;
-
-      const matchesTags =
-        selectedTags.length === 0 ||
-        selectedTags.every((tag) => Array.isArray(problem.tags) && problem.tags.includes(tag));
-
-      return matchesSearch && matchesDifficulty && matchesStatus && matchesTags;
-    });
-  }, [allProblems, searchQuery, selectedDifficulty, selectedStatus, selectedTags]);
+  const handleFilter = (type, value) => {
+    dispatch(setFilter({ filterType: type, value }));
+    dispatch(applyFilters());
+  };
 
   return (
     <>
-      {/* Pair programming modal */}
       <PairingDialog open={isPairingDialogOpen} onOpenChange={setIsPairingDialogOpen} />
 
       <div className="container mx-auto py-8 px-4 md:px-6">
-        {/* Header */}
+
+        {/* ----------- HEADER START ----------- */}
         <div className="mb-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight">
             <span className="text-primary">Problem Library</span>
@@ -108,8 +77,9 @@ const  ProblemsPage = () => {
             Sharpen your skills, solve challenges, and climb the leaderboard. Your coding journey starts now.
           </p>
         </div>
+        {/* ----------- HEADER END ----------- */}
 
-        {/* Problem of the Day */}
+        {/* ----------- PROBLEM OF THE DAY ----------- */}
         {problemOfTheDay && (
           <section className="mb-12">
             <div className="text-center mb-6">
@@ -122,7 +92,7 @@ const  ProblemsPage = () => {
           </section>
         )}
 
-        {/* Pairing feature */}
+        {/* ----------- PAIRING CARD ----------- */}
         <Card className="mb-8 bg-gradient-to-r from-primary/10 to-transparent">
           <CardHeader>
             <CardTitle className="font-headline text-2xl flex items-center gap-3">
@@ -139,21 +109,25 @@ const  ProblemsPage = () => {
           </CardContent>
         </Card>
 
-        {/* Filters */}
+        {/* ----------- FILTERS SECTION ----------- */}
         <div className="mb-6 flex flex-col md:flex-row items-center gap-4">
-          {/* Search */}
+
+          {/* SEARCH BAR */}
           <div className="relative flex-grow w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               placeholder="Search problems..."
               className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={filters.searchQuery}
+              onChange={(e) => handleFilter("searchQuery", e.target.value)}
             />
           </div>
 
-          {/* Difficulty filter */}
-          <ShadcnSelect value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+          {/* DIFFICULTY */}
+          <ShadcnSelect
+            value={filters.difficulty}
+            onValueChange={(v) => handleFilter("difficulty", v)}
+          >
             <SelectTrigger className="w-full sm:w-[150px]">
               <SelectValue placeholder="Difficulty" />
             </SelectTrigger>
@@ -165,8 +139,11 @@ const  ProblemsPage = () => {
             </SelectContent>
           </ShadcnSelect>
 
-          {/* Status filter */}
-          <ShadcnSelect value={selectedStatus} onValueChange={setSelectedStatus}>
+          {/* STATUS */}
+          <ShadcnSelect
+            value={filters.status}
+            onValueChange={(v) => handleFilter("status", v)}
+          >
             <SelectTrigger className="w-full sm:w-[150px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -179,90 +156,104 @@ const  ProblemsPage = () => {
             </SelectContent>
           </ShadcnSelect>
 
-          {/* Tags filter */}
+          {/* TAGS */}
           <Select
-          isMulti
-          placeholder="Tags"
-          options={allTags.map((tag) => ({ value: tag, label: tag }))}
-          value={selectedTags.map((tag) => ({ value: tag, label: tag }))}
-          onChange={(selected) => setSelectedTags(selected.map((opt) => opt.value))}
-          className="w-full sm:w-[200px]"
-          styles={{
-            control: (base, state) => ({
-              ...base,
-              backgroundColor: "hsl(240 10% 3.9%)",
-              borderColor: state.isFocused
-                ? "hsl(240 3.7% 15.9%)"
-                : "hsl(240 3.7% 15.9%)",
-              boxShadow: "none",
-              "&:hover": {
+            isMulti
+            placeholder="Tags"
+            className="w-full sm:w-[200px]"
+            options={allTags.map((tag) => ({ value: tag, label: tag }))}
+            value={filters.tags.map((t) => ({ value: t, label: t }))}
+            onChange={(selected) =>
+              handleFilter(
+                "tags",
+                selected ? selected.map((opt) => opt.value) : []
+              )
+            }
+            styles={{
+              control: (base, state) => ({
+                ...base,
+                backgroundColor: "hsl(240 10% 3.9%)",
                 borderColor: "hsl(240 3.7% 15.9%)",
-              },
-              minHeight: "38px",
-              color: "hsl(0 0% 98%)",
-              fontSize: "0.875rem",
-              lineHeight: "1.25rem",
-            }),
-            valueContainer: (base) => ({
-              ...base,
-              color: "hsl(0 0% 98%)",
-              fontSize: "0.875rem",
-              lineHeight: "1.25rem",
-            }),
-            input: (base) => ({
-              ...base,
-              color: "hsl(0 0% 98%)",
-              fontSize: "0.875rem",
-              lineHeight: "1.25rem",
-            }),
-            menu: (base) => ({
-              ...base,
-              backgroundColor: "hsl(240 10% 3.9%)",
-              color: "hsl(0 0% 98%)",
-              fontSize: "0.875rem",
-              lineHeight: "1.25rem",
-            }),
-            option: (base, state) => ({
-              ...base,
-              backgroundColor: state.isFocused
-                ? "hsl(240 3.7% 15.9%)"
-                : "hsl(240 10% 3.9%)",
-              color: "hsl(0 0% 98%)",
-              cursor: "pointer",
-              fontSize: "0.875rem",
-              lineHeight: "1.25rem",
-            }),
-            multiValue: (base) => ({
-              ...base,
-              backgroundColor: "hsl(240 3.7% 15.9%)",
-              color: "hsl(0 0% 98%)",
-              fontSize: "0.875rem",
-              lineHeight: "1.25rem",
-            }),
-            multiValueLabel: (base) => ({
-              ...base,
-              color: "hsl(0 0% 98%)",
-              fontSize: "0.875rem",
-              lineHeight: "1.25rem",
-            }),
-            placeholder: (base) => ({
-              ...base,
-              color: "hsl(0 0% 98%)", // pure white
-              fontSize: "0.82rem",
-              lineHeight: "1.25rem",
-            }),
+                boxShadow: "none",
+                "&:hover": { borderColor: "hsl(240 3.7% 15.9%)" },
+                color: "white",
+                minHeight: "38px",
+                fontSize: "0.875rem",
+                lineHeight: "1.25rem",
+              }),
 
-          }}
-        />
+              menu: (base) => ({
+                ...base,
+                backgroundColor: "hsl(240 10% 3.9%)",
+                color: "white",
+                fontSize: "0.875rem",
+                lineHeight: "1.25rem",
+              }),
+
+              option: (base, state) => ({
+                ...base,
+                backgroundColor: state.isFocused
+                  ? "hsl(240 3.7% 15.9%)"
+                  : "hsl(240 10% 3.9%)",
+                color: "white",
+                cursor: "pointer",
+                fontSize: "0.875rem",
+                lineHeight: "1.25rem",
+              }),
+
+              multiValue: (base) => ({
+                ...base,
+                backgroundColor: "hsl(240 3.7% 15.9%)",   // Same chip color as before
+                fontSize: "0.875rem",
+                lineHeight: "1.25rem",
+              }),
+
+              multiValueLabel: (base) => ({
+                ...base,
+                color: "white",   // Text color fixed
+                fontSize: "0.875rem",
+                lineHeight: "1.25rem",
+              }),
+
+              multiValueRemove: (base) => ({
+                ...base,
+                color: "white",
+                fontSize: "0.875rem",
+                lineHeight: "1.25rem",
+                backgroundColor: "hsl(240 3.7% 20%)",
+                color: "white",
+              }),
+
+              placeholder: (base) => ({
+                ...base,
+                color: "hsl(0 0% 98%)",
+                fontSize: "0.875rem",
+                lineHeight: "1.25rem",
+              }),
+
+              singleValue: (base) => ({
+                ...base,
+                color: "white",
+                fontSize: "0.875rem",
+                lineHeight: "1.25rem",
+              }),
+
+              input: (base) => ({
+                ...base,
+                color: "white",
+                fontSize: "0.875rem",
+                lineHeight: "1.25rem",
+              }),
+            }}
+          />
 
         </div>
 
-        {/* Problems list */}
+        {/* ----------- PROBLEMS LIST ----------- */}
         <ProblemList problems={filteredProblems} />
       </div>
     </>
   );
-}
+};
 
 export default ProblemsPage;
-
