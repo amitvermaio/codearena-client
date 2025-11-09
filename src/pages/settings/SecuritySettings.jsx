@@ -5,12 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import axios from "@/config/axios.config";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logoutuser } from "@/store/features/user/userSlice";
 
 // ---------------- Redux Version Imports (Comment if not using) ----------------
 // import { useSelector, useDispatch } from "react-redux";
 // import { updatePassword, deleteAccount } from "@/redux/securitySlice";
 
 const SecuritySettings = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   // ---------------- React Hook Form ----------------
   const {
     register,
@@ -25,9 +32,29 @@ const SecuritySettings = () => {
     reset();
   };
 
-  const handleDeleteAccount = () => {
-    console.log("Account deleted");
-    toast.error("Your account has been deleted!");
+  const handleDeleteAccount = async () => {
+    try {
+      const token = localStorage.getItem(import.meta.env.VITE_TOKEN_NAME);
+      if (!token) {
+        toast.error("You are not logged in!");
+        return;
+      }
+
+      const { data } = await axios.post("/auth/delete-account", {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (data.statusCode === 200) {
+        toast.success("Account deleted successfully!");
+        localStorage.removeItem(import.meta.env.VITE_TOKEN_NAME);
+        dispatch(logoutuser());
+        navigate("/problems");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete account");
+    }
   };
 
   // ---------------- Redux Version (using react-hook-form values) ----------------

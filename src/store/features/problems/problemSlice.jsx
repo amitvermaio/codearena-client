@@ -1,212 +1,160 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 
+// ------------------------------------------------------------------
+// State shape: problems list, filtered list, currentProblem, filters,
+// userProgress (from user slice) to enable status-based filtering.
+// ------------------------------------------------------------------
 const initialState = {
   problems: [],
   filteredProblems: [],
   currentProblem: null,
   loading: false,
   error: null,
-  filters: {
-    difficulty: 'all', // 'all', 'easy', 'medium', 'hard'
-    category: 'all',
-    status: 'all', // 'all', 'solved', 'unsolved', 'attempted'
-    searchQuery: ''
+
+  // user progress copied from user slice (ids as strings)
+  userProgress: {
+    solvedIds: [],     // string[]
+    attemptedIds: [],  // string[]
   },
-  pagination: {
-    currentPage: 1,
-    itemsPerPage: 20,
-    totalItems: 0
-  }
+
+  filters: {
+    searchQuery: "",
+    difficulty: "all", // "Easy" | "Medium" | "Hard" | "all"
+    status: "all",     // "Solved" | "Attempted" | "Todo" | "all"
+    tags: [],          // string[]
+  },
 };
 
 const problemSlice = createSlice({
-  name: 'problems',
+  name: "problems",
   initialState,
   reducers: {
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
-    
+
     setError: (state, action) => {
       state.error = action.payload;
       state.loading = false;
     },
 
-    // Problem mgmt
+    // Set full problems list
     setProblems: (state, action) => {
-      state.problems = action.payload;
-      state.filteredProblems = action.payload;
+      state.problems = Array.isArray(action.payload) ? action.payload : [];
+      state.filteredProblems = state.problems;
       state.loading = false;
       state.error = null;
-      state.pagination.totalItems = action.payload.length;
     },
 
-    addProblem: (state, action) => {
-      state.problems.push(action.payload);
-      state.filteredProblems.push(action.payload);
-      state.pagination.totalItems = state.problems.length;
-    },
-
-    updateProblem: (state, action) => {
-      const { slug, updates } = action.payload;
-      const index = state.problems.findIndex(p => p.slug === slug);
-      if (index !== -1) {
-        state.problems[index] = { ...state.problems[index], ...updates };
-        const filteredIndex = state.filteredProblems.findIndex(p => p.slug === slug);
-        if (filteredIndex !== -1) {
-          state.filteredProblems[filteredIndex] = { ...state.filteredProblems[filteredIndex], ...updates };
-        }
-      }
-    },
-
-    deleteProblem: (state, action) => {
-      const slug = action.payload;
-      state.problems = state.problems.filter(p => p.slug !== slug);
-      state.filteredProblems = state.filteredProblems.filter(p => p.slug !== slug);
-      state.pagination.totalItems = state.problems.length;
-    },
-
-    // Current problem
-    loadCurrentProblem: (state, action) => {
-      state.currentProblem = action.payload;
+    setCurrentProblem: (state, action) => {
+      state.currentProblem = action.payload || null;
       state.loading = false;
     },
 
-    removeCurrentProblem: (state) => {
+    clearCurrentProblem: (state) => {
       state.currentProblem = null;
     },
 
-    // Filtering and search
-    setFilter: (state, action) => {
-      const { filterType, value } = action.payload;
-      state.filters[filterType] = value;
-      state.pagination.currentPage = 1; // Reset to first page when filtering
+    // Bring user progress from user slice: arrays of ids (any -> string)
+    setUserProgress: (state, action) => {
+      const { solvedIds = [], attemptedIds = [] } = action.payload || {};
+      state.userProgress.solvedIds = solvedIds.map(String);
+      state.userProgress.attemptedIds = attemptedIds.map(String);
     },
 
-    setSearchQuery: (state, action) => {
-      state.filters.searchQuery = action.payload;
-      state.pagination.currentPage = 1;
+    setFilter: (state, action) => {
+      const { filterType, value } = action.payload;
+      if (filterType in state.filters) {
+        state.filters[filterType] = value;
+      }
     },
 
     applyFilters: (state) => {
+      const { searchQuery, difficulty, status, tags } = state.filters;
+      const { solvedIds, attemptedIds } = state.userProgress;
+
       let filtered = [...state.problems];
 
-      // Apply difficulty filter
-      if (state.filters.difficulty !== 'all') {
-        filtered = filtered.filter(p => p.difficulty === state.filters.difficulty);
+      // difficulty
+      if (difficulty !== "all") {
+        filtered = filtered.filter((p) => p.difficulty === difficulty);
       }
 
-      // Apply category filter
-      if (state.filters.category !== 'all') {
-        filtered = filtered.filter(p => p.category === state.filters.category);
+      // status — derived from user progress
+      if (status !== "all") {
+        filtered = filtered.filter((p) => {
+          const id = String(p._id ?? p.id ?? "");
+          const isSolved = solvedIds.includes(id);
+          const isAttempted = attemptedIds.includes(id);
+          if (status === "Solved") return isSolved;
+          if (status === "Attempted") return !isSolved && isAttempted;
+          if (status === "Todo") return !isSolved && !isAttempted;
+          return true;
+        });
       }
 
-      // Apply status filter
-      if (state.filters.status !== 'all') {
-        filtered = filtered.filter(p => p.status === state.filters.status);
+      // search by title
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        filtered = filtered.filter((p) => (p.title || "").toLowerCase().includes(q));
       }
 
-      // Apply search query
-      if (state.filters.searchQuery) {
-        const query = state.filters.searchQuery.toLowerCase();
-        filtered = filtered.filter(p => 
-          p.title.toLowerCase().includes(query) ||
-          p.description.toLowerCase().includes(query) ||
-          (p.tags && p.tags.some(tag => tag.toLowerCase().includes(query)))
-        );
+      // tags (AND filter)
+      if (Array.isArray(tags) && tags.length > 0) {
+        filtered = filtered.filter((p) => {
+          const ptags = Array.isArray(p.tags) ? p.tags : [];
+          return tags.every((t) => ptags.includes(t));
+        });
       }
 
       state.filteredProblems = filtered;
-      state.pagination.totalItems = filtered.length;
     },
 
     clearFilters: (state) => {
-      state.filters = { ...initialState.filters };
+      state.filters = {
+        searchQuery: "",
+        difficulty: "all",
+        status: "all",
+        tags: [],
+      };
       state.filteredProblems = state.problems;
-      state.pagination.currentPage = 1;
-      state.pagination.totalItems = state.problems.length;
     },
 
-    // Pagination
-    setCurrentPage: (state, action) => {
-      state.pagination.currentPage = action.payload;
-    },
-
-    setItemsPerPage: (state, action) => {
-      state.pagination.itemsPerPage = action.payload;
-      state.pagination.currentPage = 1;
-    },
-
-    // Problem status updates
-    markProblemSolved: (state, action) => {
-      const slug = action.payload;
-      const problem = state.problems.find(p => p.slug === slug);
-      if (problem) {
-        problem.status = 'solved';
-        problem.solvedAt = new Date().toISOString();
-      }
-      const filteredProblem = state.filteredProblems.find(p => p.slug === slug);
-      if (filteredProblem) {
-        filteredProblem.status = 'solved';
-        filteredProblem.solvedAt = new Date().toISOString();
-      }
-    },
-
-    markProblemAttempted: (state, action) => {
-      const slug = action.payload;
-      const problem = state.problems.find(p => p.slug === slug);
-      if (problem && problem.status === 'unsolved') {
-        problem.status = 'attempted';
-        problem.attemptedAt = new Date().toISOString();
-      }
-      const filteredProblem = state.filteredProblems.find(p => p.slug === slug);
-      if (filteredProblem && filteredProblem.status === 'unsolved') {
-        filteredProblem.status = 'attempted';
-        filteredProblem.attemptedAt = new Date().toISOString();
-      }
-    },
-
-    // Reset state
-    resetProblemState: () => initialState
-  }
+    resetProblemState: () => initialState,
+  },
 });
 
 export const {
   setLoading,
   setError,
   setProblems,
-  addProblem,
-  updateProblem,
-  deleteProblem,
-  loadCurrentProblem,
-  removeCurrentProblem,
+  setCurrentProblem,
+  clearCurrentProblem,
+  setUserProgress,
   setFilter,
-  setSearchQuery,
   applyFilters,
   clearFilters,
-  setCurrentPage,
-  setItemsPerPage,
-  markProblemSolved,
-  markProblemAttempted,
-  resetProblemState
+  resetProblemState,
 } = problemSlice.actions;
 
-// Selectors
-export const selectProblems = (state) => state.problems.problems;
+// Basic selectors
+export const selectAllProblems = (state) => state.problems.problems;
+export const selectFilters = (state) => state.problems.filters;
 export const selectFilteredProblems = (state) => state.problems.filteredProblems;
-export const selectCurrentProblem = (state) => state.problems.currentProblem;
-export const selectProblemLoading = (state) => state.problems.loading;
-export const selectProblemError = (state) => state.problems.error;
-export const selectProblemFilters = (state) => state.problems.filters;
-export const selectPagination = (state) => state.problems.pagination;
+export const selectUserProgress = (state) => state.problems.userProgress;
 
-// Paginated problems selector
-export const selectPaginatedProblems = (state) => {
-  const { filteredProblems, pagination } = state.problems;
-  const { currentPage, itemsPerPage } = pagination;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  return filteredProblems.slice(startIndex, endIndex);
-};
+// Derived selector: attach a computed `_status` on each problem for UI.
+export const selectProblemsWithStatus = createSelector(
+  [selectFilteredProblems, selectUserProgress],
+  (problems, { solvedIds, attemptedIds }) => {
+    return problems.map((p) => {
+      const id = String(p._id ?? p.id ?? "");
+      const isSolved = solvedIds.includes(id);
+      const isAttempted = attemptedIds.includes(id);
+      const _status = isSolved ? "Solved" : isAttempted ? "Attempted" : "Todo";
+      return { ...p, _status };
+    });
+  }
+);
 
 export default problemSlice.reducer;

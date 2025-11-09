@@ -40,7 +40,7 @@ const CreateAccount = () => {
       });
 
       if (response.status === 201) {
-        localStorage.setItem('CodeArena_Token', response.data.token);
+        localStorage.setItem(import.meta.env.VITE_TOKEN_NAME, response.data.token);
         toast.success('User registered successfully');
         navigate('/problems');
       }
