@@ -29,6 +29,10 @@ const Login = () => {
   // Form handling with react-hook-form
   const { register, handleSubmit, formState: { errors } } = useForm();
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
+  }
+
   // Handle sign in
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -72,7 +76,7 @@ const Login = () => {
             
             {/* Social Sign-In */}
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" type="button"><GoogleIcon /> Google</Button>
+              <Button variant="outline" type="button" onClick={handleGoogleLogin}><GoogleIcon /> Google</Button>
               <Button variant="outline" type="button"><Github /> GitHub</Button>
             </div>
 

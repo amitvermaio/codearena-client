@@ -97,6 +97,7 @@ const Navbar = () => {
       const res = await axios.post('/auth/logout', {}, { headers: { Authorization: `Bearer ${token}` } });
       console.log("Logout response: ", res);
       if (res.status === 200) {
+        localStorage.removeItem(import.meta.env.VITE_TOKEN_NAME);
         dispatch(asynclogoutuser());
         toast.success('Logged out successfully');
       }
@@ -194,7 +195,7 @@ const Navbar = () => {
             </Link>
           </Button>
           {
-            user != null  ? 
+            user?.fullname.length > 0  ? 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
