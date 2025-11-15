@@ -27,6 +27,10 @@ const CreateAccount = () => {
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
+  const handleGoogleRegister = () => {
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
+  }
+
   const onSubmit = async (data) => {
     setIsLoading(true);
     setError(null);
@@ -64,7 +68,7 @@ const CreateAccount = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Social Buttons */}
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" type="button"><GoogleIcon /> Google</Button>
+              <Button variant="outline" type="button" onClick={handleGoogleRegister}><GoogleIcon /> Google</Button>
               <Button variant="outline" type="button"><Github /> GitHub</Button>
             </div>
 
