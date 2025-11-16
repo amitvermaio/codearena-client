@@ -17,15 +17,13 @@ import {
   Layers, 
   Video, 
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { getProblemOfTheDay } from '@/lib/api';
 import { LandingNavbar } from '@/components/layout/LandingNavbar';
 import { Badge } from '@/components/ui/badge';
-import { useSelector, useDispatch } from "react-redux";
 import { gsap } from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import { useSelector } from "react-redux";
 
-// import { loginUser, registerUser, logoutUser, fetchUserProfile } from "../store/actions/user/userAction";
+
 
 gsap.registerPlugin(ScrollToPlugin);
 
@@ -72,20 +70,7 @@ const faqs = [
 ];
 
 const Home = () => {
-  const [problemOfTheDay, setProblemOfTheDay] = useState(null);
-  const dispatch = useDispatch();
-  const { isAuthenticated } = useSelector((state) => state.user);
-  // const dispatch = useDispatch();
-  // const user = useSelector((state) => state.user?.user?.data);
-
-  // useEffect(() => {
-  //   dispatch(fetchUserProfile());
-  // }, [dispatch]);
-  // console.log(user)
-  
-  // useEffect(() => {
-  //   dispatch(fetchCurrentUser());
-  // }, [dispatch]);
+  const { potd } = useSelector((state) => state.potd);
 
   const handleScroll = (e) => {
     e.preventDefault();
@@ -95,10 +80,6 @@ const Home = () => {
       ease: "power2.inOut",
     });
   };
-
-  useEffect(() => {
-    getProblemOfTheDay().then(setProblemOfTheDay);
-  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -225,7 +206,7 @@ const Home = () => {
 
 
         {/* Problem of the Day Section */}
-        {problemOfTheDay && (
+        {potd && (
           <section className="py-20 sm:py-24 bg-background/80 backdrop-blur-sm">
             <div className="container mx-auto px-4">
                <div className="mx-auto max-w-3xl text-center mb-12">
@@ -235,7 +216,7 @@ const Home = () => {
                   </p>
                 </div>
               <div className="max-w-4xl mx-auto">
-                 <ProblemOfTheDay problem={problemOfTheDay} />
+                 <ProblemOfTheDay problem={potd} />
               </div>
             </div>
           </section>

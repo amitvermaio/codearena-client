@@ -1,5 +1,7 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { asyncgetpotd } from "@/store/actions/problems/potdAction";
 
 // Layouts
 import MainLayout from "@/components/layout/MainLayout";
@@ -19,6 +21,7 @@ const Loader = () => (
 
 // Lazy-loaded Pages
 import Home from "@/pages/Home";
+import OAuthSuccess from "@/components/auth/OAuthSuccess";
 const Login = lazy(() => import("@/pages/auth/Login"));
 const Register = lazy(() => import("@/pages/auth/Register"));
 const VerifyEmail = lazy(() => import("@/pages/auth/VerifyEmail"));
@@ -39,7 +42,7 @@ const ContestList = lazy(() => import("@/pages/contests/ContestList"));
 const ContestProblems = lazy(() => import("@/pages/contests/ContestProblems"));
 
 // POTD
-const ProblemOfTheDay = lazy(() => import("@/pages/potd/ProblemOfTheDay"));
+const PotdPage = lazy(() => import("@/pages/potd/PotdPage"));
 
 // Tools
 const Tools = lazy(() => import("@/pages/tools/Tools"));
@@ -65,6 +68,16 @@ const SecuritySettings = lazy(() => import("@/pages/settings/SecuritySettings"))
 // Main Application Routes
 // ------------------------------------------------------
 const Mainroutes = () => {
+
+  const dispatch = useDispatch();
+  const { loaded, potd } = useSelector((state) => state.potd);
+
+  useEffect(() => {
+    if (!loaded) {
+      dispatch(asyncgetpotd());
+    }
+  }, []);
+
   return (
     <Suspense fallback={<Loader />}>
       <Routes>
@@ -77,6 +90,7 @@ const Mainroutes = () => {
         <Route path="/create-account" element={<Register />} />
         <Route path="/verify-account" element={<VerifyEmail />} />
         <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+        <Route path="/oauth-success" element={<OAuthSuccess />} />
 
         {/* Single Problem Page */}
         <Route path="/problems/:problemId" element={<ProblemDetails />} />
@@ -85,7 +99,7 @@ const Mainroutes = () => {
         <Route path="/contests/:contestId" element={<ContestProblems />} />
 
         {/* POTD */}
-        <Route path="/potd" element={<ProblemOfTheDay />} />
+        <Route path="/potd" element={<PotdPage />} />
 
 
 

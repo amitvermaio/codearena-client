@@ -31,6 +31,10 @@ const CreateAccount = () => {
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
   }
 
+  const handleGithubRegister = () => {
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/github`;
+  }
+
   const onSubmit = async (data) => {
     setIsLoading(true);
     setError(null);
@@ -69,7 +73,7 @@ const CreateAccount = () => {
             {/* Social Buttons */}
             <div className="grid grid-cols-2 gap-4">
               <Button variant="outline" type="button" onClick={handleGoogleRegister}><GoogleIcon /> Google</Button>
-              <Button variant="outline" type="button"><Github /> GitHub</Button>
+              <Button variant="outline" type="button" onClick={handleGithubRegister}><Github /> GitHub</Button>
             </div>
 
             {/* Divider */}

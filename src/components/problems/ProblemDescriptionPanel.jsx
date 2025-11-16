@@ -164,8 +164,8 @@ const ProblemDescriptionPanel = ({ problem }) => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-background rounded-lg overflow-hidden border border-border">
-      <Tabs defaultValue="description" className="flex-grow flex flex-col">
+    <div className="w-full h-full min-h-0 flex flex-col bg-background rounded-lg border border-border overflow-hidden">
+      <Tabs defaultValue="description" className="flex-grow flex flex-col min-h-0">
         {/* Tab Navigation */}
         <div className="border-b border-border px-4 bg-muted/20">
           <TabsList className="bg-transparent p-0 w-full justify-start gap-1">
@@ -209,7 +209,7 @@ const ProblemDescriptionPanel = ({ problem }) => {
         </div>
 
         {/* Tab Content */}
-        <ScrollArea className="flex-grow">
+        <ScrollArea className="flex-grow min-h-0">
           <div className="p-6">
             {/* Description Tab */}
             <TabsContent value="description" className="mt-0 space-y-6">

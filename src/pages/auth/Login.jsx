@@ -33,6 +33,10 @@ const Login = () => {
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
   }
 
+  const handleGithubLogin = () => {
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/github`;
+  }
+
   // Handle sign in
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -77,7 +81,7 @@ const Login = () => {
             {/* Social Sign-In */}
             <div className="grid grid-cols-2 gap-4">
               <Button variant="outline" type="button" onClick={handleGoogleLogin}><GoogleIcon /> Google</Button>
-              <Button variant="outline" type="button"><Github /> GitHub</Button>
+              <Button variant="outline" type="button" onClick={handleGithubLogin}><Github /> GitHub</Button>
             </div>
 
             {/* Divider */}
