@@ -3,6 +3,7 @@ import problemsReducer from "./features/problems/problemSlice";
 import userReducer from "./features/user/userSlice"; // <- common users
 import adminUserReducer from "./features/admin/userSlice"; // <- admin panel users
 import profileReducer from "./features/profile/profileSlice"; // <- profile
+import potdReducer from "./features/problems/potdSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     adminUsers: adminUserReducer, // for admin panel
     problems: problemsReducer,
     profile: profileReducer, // for profile
+    potd: potdReducer,
     // contests: contestsReducer,
   },
 });

@@ -53,15 +53,17 @@ const ProblemPage = () => {
   }
 
   return (
-    <ResizablePanelGroup direction="horizontal" className="w-full h-[calc(100vh-4rem)] scroll-smooth">
-      <ResizablePanel defaultSize={50} minSize={30}>
-        <ProblemDescriptionPanel problem={currentProblem} />
-      </ResizablePanel>
-      <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={50} minSize={30}>
-        <PairProgrammingClient problem={currentProblem} />
-      </ResizablePanel>
-    </ResizablePanelGroup>
+    <div className="h-[calc(100vh-4rem)] overflow-hidden">
+      <ResizablePanelGroup direction="horizontal" className="w-full h-full">
+        <ResizablePanel defaultSize={50} minSize={30}>
+          <ProblemDescriptionPanel problem={currentProblem} />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={50} minSize={30}>
+          <PairProgrammingClient problem={currentProblem} />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
   );
 }
 

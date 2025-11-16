@@ -13,18 +13,12 @@ import { CheckCircle, Circle, AlertCircle, Play } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { difficultyColors } from "@/utils/constants";
 
 import {
   selectProblemsWithStatus,
   setUserProgress,
 } from "@/store/features/problems/problemSlice";
-
-
-const difficultyColors = {
-  Easy: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700",
-  Medium: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-700",
-  Hard: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700",
-};
 
 const statusIcons = {
   Solved: <CheckCircle className="h-5 w-5 text-green-500" />,

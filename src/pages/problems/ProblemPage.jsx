@@ -30,6 +30,7 @@ const ProblemsPage = () => {
   const problems = useSelector((state) => state.problems.problems);
   const filteredProblems = useSelector((state) => state.problems.filteredProblems);
   const filters = useSelector((state) => state.problems.filters);
+  const potd = useSelector((state) => state.potd.potd);
 
   // Local UI states only
   const [problemOfTheDay, setProblemOfTheDay] = useState(null);
@@ -88,7 +89,7 @@ const ProblemsPage = () => {
                 Problem of the Day
               </h2>
             </div>
-            <ProblemOfTheDay problem={problemOfTheDay} />
+            <ProblemOfTheDay problem={potd} />
           </section>
         )}
 
