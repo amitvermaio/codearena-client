@@ -39,7 +39,7 @@ const UserProfile = lazy(() => import("@/pages/profile/UserProfile"));
 
 // Contests
 const ContestList = lazy(() => import("@/pages/contests/ContestList"));
-const ContestProblems = lazy(() => import("@/pages/contests/ContestProblems"));
+const ContestDetails = lazy(() => import("@/pages/contests/ContestDetailsPage"));
 
 // POTD
 const PotdPage = lazy(() => import("@/pages/potd/PotdPage"));
@@ -96,7 +96,7 @@ const Mainroutes = () => {
         <Route path="/problems/:problemId" element={<ProblemDetails />} />
 
         {/* Single Contest Problems */}
-        <Route path="/contests/:contestId" element={<ContestProblems />} />
+        <Route path="/contests/:contestId" element={<ContestDetails />} />
 
         {/* POTD */}
         <Route path="/potd" element={<PotdPage />} />
