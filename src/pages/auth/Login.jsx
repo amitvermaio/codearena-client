@@ -30,10 +30,12 @@ const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const handleGoogleLogin = () => {
+    toast.loading('Redirecting to Google...');
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
   }
 
   const handleGithubLogin = () => {
+    toast.loading('Redirecting to Github...');
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/github`;
   }
 

@@ -9,6 +9,7 @@ import axios from "@/config/axios.config";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logoutuser } from "@/store/features/user/userSlice";
+import DeleteAccountPopup from "@/components/settings/DeleteAccountPopup";
 
 // ---------------- Redux Version Imports (Comment if not using) ----------------
 // import { useSelector, useDispatch } from "react-redux";
@@ -17,6 +18,11 @@ import { logoutuser } from "@/store/features/user/userSlice";
 const SecuritySettings = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [openDeleteAccountPopup, setOpenDeleteAccountPopup] = React.useState(false);
+
+  const closeDeleteAccountPopup = () => {
+    setOpenDeleteAccountPopup(false);
+  };
 
   // ---------------- React Hook Form ----------------
   const {
@@ -57,17 +63,9 @@ const SecuritySettings = () => {
     }
   };
 
-  // ---------------- Redux Version (using react-hook-form values) ----------------
-  // const dispatch = useDispatch();
-  // const onSubmit = (data) => {
-  //   dispatch(updatePassword(data));
-  // };
-  // const handleDeleteAccount = () => {
-  //   dispatch(deleteAccount());
-  // };
-
   return (
     <div className="space-y-6">
+      <DeleteAccountPopup open={openDeleteAccountPopup} onClose={closeDeleteAccountPopup} onConfirm={handleDeleteAccount} />
       <h1 className="text-3xl font-bold font-headline">Security</h1>
 
       {/* Change Password Section */}
@@ -143,7 +141,7 @@ const SecuritySettings = () => {
           </CardDescription>
         </CardHeader>
         <CardFooter className="border-t px-6 py-4 flex justify-end">
-          <Button variant="destructive" onClick={handleDeleteAccount}>
+          <Button variant="destructive" onClick={() => setOpenDeleteAccountPopup(true)}>
             Delete My Account
           </Button>
         </CardFooter>

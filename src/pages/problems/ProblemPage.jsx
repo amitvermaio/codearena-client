@@ -84,7 +84,7 @@ const ProblemsPage = () => {
         {problemOfTheDay && (
           <section className="mb-12">
             <div className="text-center mb-6">
-              <h2 className="text-3xl font-bold flex items-center justify-center gap-3">
+              <h2 className="text-3xl sm:text-4xl font-bold font-headline flex items-center justify-center gap-3">
                 <Flame className="h-8 w-8 text-orange-500" />
                 Problem of the Day
               </h2>
