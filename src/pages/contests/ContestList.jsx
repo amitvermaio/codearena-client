@@ -12,15 +12,8 @@ const ContestList = () => {
     document.title = "CodeArena Contests — Compete with the Best"
   }, []);
 
-  // ------------------ Redux Version (use when Redux is ready) ------------------
-  // const dispatch = useDispatch();
-  // const { platformContests, loading, error } = useSelector((state) => state.contests);
 
   useEffect(() => {
-    // ------------------ Redux Version (when Redux ready) ------------------
-    // dispatch(fetchContests());
-
-    // ------------------ Temporary Local State Version ------------------
     const fetchContestsData = async () => {
       try {
         const allContests = await getContests();

@@ -28,10 +28,12 @@ const CreateAccount = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const handleGoogleRegister = () => {
+    toast.loading('Redirecting to Google...');
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
   }
 
   const handleGithubRegister = () => {
+    toast.loading('Redirecting to Github...');
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/github`;
   }
 
