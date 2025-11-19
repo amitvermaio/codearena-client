@@ -27,6 +27,16 @@ const CreateAccount = () => {
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
+  const handleGoogleRegister = () => {
+    toast.loading('Redirecting to Google...');
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
+  }
+
+  const handleGithubRegister = () => {
+    toast.loading('Redirecting to Github...');
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/github`;
+  }
+
   const onSubmit = async (data) => {
     setIsLoading(true);
     setError(null);
@@ -40,7 +50,7 @@ const CreateAccount = () => {
       });
 
       if (response.status === 201) {
-        localStorage.setItem('CodeArena_Token', response.data.token);
+        localStorage.setItem(import.meta.env.VITE_TOKEN_NAME, response.data.token);
         toast.success('User registered successfully');
         navigate('/problems');
       }
@@ -64,8 +74,8 @@ const CreateAccount = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Social Buttons */}
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" type="button"><GoogleIcon /> Google</Button>
-              <Button variant="outline" type="button"><Github /> GitHub</Button>
+              <Button variant="outline" type="button" onClick={handleGoogleRegister}><GoogleIcon /> Google</Button>
+              <Button variant="outline" type="button" onClick={handleGithubRegister}><Github /> GitHub</Button>
             </div>
 
             {/* Divider */}

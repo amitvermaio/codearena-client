@@ -5,12 +5,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import axios from "@/config/axios.config";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logoutuser } from "@/store/features/user/userSlice";
+import DeleteAccountPopup from "@/components/settings/DeleteAccountPopup";
 
 // ---------------- Redux Version Imports (Comment if not using) ----------------
 // import { useSelector, useDispatch } from "react-redux";
 // import { updatePassword, deleteAccount } from "@/redux/securitySlice";
 
 const SecuritySettings = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [openDeleteAccountPopup, setOpenDeleteAccountPopup] = React.useState(false);
+
+  const closeDeleteAccountPopup = () => {
+    setOpenDeleteAccountPopup(false);
+  };
+
   // ---------------- React Hook Form ----------------
   const {
     register,
@@ -25,22 +38,34 @@ const SecuritySettings = () => {
     reset();
   };
 
-  const handleDeleteAccount = () => {
-    console.log("Account deleted");
-    toast.error("Your account has been deleted!");
-  };
+  const handleDeleteAccount = async () => {
+    try {
+      const token = localStorage.getItem(import.meta.env.VITE_TOKEN_NAME);
+      if (!token) {
+        toast.error("You are not logged in!");
+        return;
+      }
 
-  // ---------------- Redux Version (using react-hook-form values) ----------------
-  // const dispatch = useDispatch();
-  // const onSubmit = (data) => {
-  //   dispatch(updatePassword(data));
-  // };
-  // const handleDeleteAccount = () => {
-  //   dispatch(deleteAccount());
-  // };
+      const { data } = await axios.post("/auth/delete-account", {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (data.statusCode === 200) {
+        toast.success("Account deleted successfully!");
+        localStorage.removeItem(import.meta.env.VITE_TOKEN_NAME);
+        dispatch(logoutuser());
+        navigate("/problems");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete account");
+    }
+  };
 
   return (
     <div className="space-y-6">
+      <DeleteAccountPopup open={openDeleteAccountPopup} onClose={closeDeleteAccountPopup} onConfirm={handleDeleteAccount} />
       <h1 className="text-3xl font-bold font-headline">Security</h1>
 
       {/* Change Password Section */}
@@ -116,7 +141,7 @@ const SecuritySettings = () => {
           </CardDescription>
         </CardHeader>
         <CardFooter className="border-t px-6 py-4 flex justify-end">
-          <Button variant="destructive" onClick={handleDeleteAccount}>
+          <Button variant="destructive" onClick={() => setOpenDeleteAccountPopup(true)}>
             Delete My Account
           </Button>
         </CardFooter>

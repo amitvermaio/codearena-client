@@ -167,7 +167,7 @@ export default function PairProgrammingClient({ problem }) {
       const res = await axios.post("/api/run", {
         code,
         languageId: langId,
-        problemId: problem.id,
+        problemId: problem._id,
         stdin,
       });
       console.log("Run Result:", res.data);
@@ -211,7 +211,7 @@ export default function PairProgrammingClient({ problem }) {
     <form className="flex flex-col h-full bg-card">
       <input type="hidden" value={code} {...register("code")} />
       <input type="hidden" value={langId} {...register("languageId")} />
-      <input type="hidden" value={problem.id} {...register("problemId")} />
+      <input type="hidden" value={problem?._id} {...register("problemId")} />
 
       {/* Video Call Floating Window */}
       {isCallActive && (

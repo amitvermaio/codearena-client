@@ -1,7 +1,7 @@
 import { Logo } from "@/components/shared/Logo"
 import React, { useState, useEffect } from 'react';
 import { Moon, Sun, Menu, ArrowRight } from 'lucide-react';
-
+import { Link } from 'react-router-dom';
 
 
 /**
@@ -22,21 +22,15 @@ const useTheme = () => {
   });
 
   useEffect(() => {
-    // Ensure DOM is available (SSR-safe)
-    if (typeof window === 'undefined') return;
-
-    // Debug helper (commented out by default)
-    // console.log(`DEBUG: Attempting to set theme to: ${theme}`);
-
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  function setTheme(newTheme) {
-      setThemeState(newTheme);
-    }
+  const setTheme = (newTheme) => {
+    setThemeState(newTheme);
+  };
 
   return { theme, setTheme };
 };
@@ -121,7 +115,7 @@ export function LandingNavbar() {
           <nav className="flex items-center gap-4">
             <ThemeToggle />
             {/* Replaced Button asChild + Link with a styled <a> tag */}
-            <a href="/signin" className={buttonGhost}>Sign In</a>
+            <Link to="/signin" className={buttonGhost}>Sign In</Link>
           </nav>
         </div>
 
@@ -161,20 +155,20 @@ export function LandingNavbar() {
 
           {/* Links */}
           <div className="flex-1 p-4 space-y-3">
-            <a
-              href="/create-account"
+            <Link
+              to="/create-account"
               className={`${buttonPrimary} w-full justify-start gap-2`}
               onClick={() => setIsSheetOpen(false)}
             >
               <ArrowRight /> Get Started
-            </a>
-            <a
-              href="/signin"
+            </Link>
+            <Link
+              to="/signin"
               className={`${buttonBase} border border-input bg-background hover:bg-accent hover:text-accent-foreground w-full justify-start`}
               onClick={() => setIsSheetOpen(false)}
             >
               Sign In
-            </a>
+            </Link>
           </div>
 
           {/* Footer (Theme toggle) */}

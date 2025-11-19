@@ -1,205 +1,47 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from "@/config/axios.config"
-import {
-  setLoading,
-  setError,
-  setProblems,
-  addProblem,
-  updateProblem,
-  deleteProblem,
-  setCurrentProblem,
-  applyFilters
-} from '../../features/problems/problemSlice';
+import { setLoading, setError, setProblems, setCurrentProblem } from "@/store/features/problems/problemSlice";
 
-// ------------------- Async Thunks ------------------- //
-
-export const fetchProblems = createAsyncThunk('problems/fetchProblems', async (_, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setLoading(true));
-      const response = await axios.get('/problems', {
-        headers: {
-          'x-secret-key': import.meta.env.VITE_SECRET_KEY,
-        }
-      });
-      const { data } = response;
-      const problems = data?.data ?? [];
-      dispatch(setProblems(problems));
-      return problems;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch problems';
-      dispatch(setError(errorMessage));
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-// Fetch single problem by slug
-export const fetchProblemBySlug = createAsyncThunk('problems/fetchProblemBySlug', async (slug, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setLoading(true));
-      const response = await axios.get(`/problems/${slug}`, {
-        headers: {
-          'x-secret-key': import.meta.env.VITE_SECRET_KEY,
-        }
-      });
-      const { data } = response;
-      const problem = data?.data ?? null;
-      dispatch(setCurrentProblem(problem));
-      return problem;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch problem';
-      dispatch(setError(errorMessage));
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-// Create problem
-export const createProblem = createAsyncThunk('problems/createProblem', async (problemData, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setLoading(true));
-      const { data } = await axios.post('/problems', problemData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('CodeArena_Token')}`
-        }
-      });
-      dispatch(addProblem(data));
-      dispatch(setLoading(false));
-      return data;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to create problem';
-      dispatch(setError(errorMessage));
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-// Update problem by slug
-export const updateProblemBySlug = createAsyncThunk('problems/updateProblemBySlug', async ({ slug, updates }, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setLoading(true));
-      const { data } = await axios.put(`/problems/${slug}`, updates, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('CodeArena_Token')}`
-        }
-      });
-      dispatch(updateProblem({ slug, updates: data }));
-      dispatch(setLoading(false));
-      return data;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to update problem';
-      dispatch(setError(errorMessage));
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-// Delete problem by slug
-export const deleteProblemBySlug = createAsyncThunk('problems/deleteProblemBySlug', async (slug, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setLoading(true));
-      await axios.delete(`/problems/${slug}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('CodeArena_Token')}`
-        }
-      });
-      dispatch(deleteProblem(slug));
-      dispatch(setLoading(false));
-      return slug;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to delete problem';
-      dispatch(setError(errorMessage));
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-// Submit solution
-export const submitSolution = createAsyncThunk('problems/submitSolution', async ({ slug, solution, language }, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setLoading(true));
-      const { data } = await axios.post(`/problems/${slug}/submit`, { solution, language }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('CodeArena_Token')}`
-        }
-      });
-
-      // Update problem status
-      if (data.passed) {
-        dispatch(updateProblem({ 
-          slug, 
-          updates: { status: 'solved', solvedAt: new Date().toISOString() }
-        }));
-      } else {
-        dispatch(updateProblem({ 
-          slug, 
-          updates: { status: 'attempted', attemptedAt: new Date().toISOString() }
-        }));
-      }
-
-      dispatch(setLoading(false));
-      return data;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to submit solution';
-      dispatch(setError(errorMessage));
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-// Search problems
-export const searchProblems = createAsyncThunk('problems/searchProblems', async (searchParams, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setLoading(true));
-      const { data } = await axios.get(`/problems/search`, { params: searchParams }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('CodeArena_Token')}`
-        }
-      });
-      dispatch(setProblems(data));
-      return data;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to search problems';
-      dispatch(setError(errorMessage));
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-// ------------------- Helpers ------------------- //
-
-// Sync filter + apply
-export const filterAndSearch = (filters) => (dispatch, getState) => {
-  Object.entries(filters).forEach(([key, value]) => {
-    if (getState().problems.filters.hasOwnProperty(key)) {
-      dispatch({ type: 'problems/setFilter', payload: { filterType: key, value } });
-    }
-  });
-  dispatch(applyFilters());
-};
-
-// Refresh problems
-export const refreshProblems = () => async (dispatch) => {
-  try {
-    dispatch({ type: 'problems/resetProblemState' });
-    await dispatch(fetchProblems());
-  } catch {
-    dispatch(setError('Failed to refresh problems'));
-  }
-};
-
-// Batch update
-export const batchUpdateProblems = (updates) => async (dispatch) => {
+export const asyncloadproblems = () => async (dispatch, getState) => {
   try {
     dispatch(setLoading(true));
-    const promises = updates.map(({ slug, data }) => axios.put(`/problems/${slug}`, data));
-    const responses = await Promise.all(promises);
-    responses.forEach((res, i) => {
-      dispatch(updateProblem({ slug: updates[i].slug, updates: res.data }));
+    const { data } = await axios.get(`/problems`, {
+      headers: {
+        "x-secret-key": import.meta.env.VITE_SECRET_KEY
+      }
     });
-    dispatch(setLoading(false));
+
+    if (data.statusCode === 200) {
+      console.log(data.data)
+      dispatch(setProblems(data.data));
+    } else {
+      dispatch(setError(data.message));
+      dispatch(setLoading(false));
+    }
   } catch (error) {
-    const errorMessage = error.response?.data?.message || error.message || 'Failed to batch update problems';
-    dispatch(setError(errorMessage));
+    console.log(error)
+    dispatch(setError(error.message));
+    dispatch(setLoading(false));
   }
-};
+}
+
+export const asyncloadcurrentproblem = (problemId) => async (dispatch, getState) => {
+  try {
+    dispatch(setLoading(true));
+    const { data } = await axios.get(`/problems/${problemId}`, {
+      headers: {
+        "x-secret-key": import.meta.env.VITE_SECRET_KEY
+      }
+    });
+    if (data.statusCode === 200) {
+      console.log(data.data)
+      dispatch(setCurrentProblem(data.data));
+    } else {
+      dispatch(setError(data.message));
+      dispatch(setLoading(false));
+    }
+  } catch (error) {
+    console.log(error)
+    dispatch(setError(error.message));
+    dispatch(setLoading(false));
+  }
+}

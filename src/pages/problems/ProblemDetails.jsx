@@ -3,94 +3,68 @@ import { useParams } from "react-router-dom";
 import axios from "@/config/axios.config";
 import { useIsMobile } from "../../hooks/use-mobile";
 
-// ---------------- Redux Version Imports (Comment if not using) ----------------
-// import { useDispatch, useSelector } from "react-redux";
-// import {
-//   fetchProblemById, // thunk
-//   selectProblemById,
-//   selectProblemLoading,
-// } from "@/store/problemsSlice";
-
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
-
+import { useDispatch, useSelector } from "react-redux";
 // Optional editor/client panel. Keep if you already have this component.
 import ProblemDescriptionPanel from "@/components/problems/ProblemDescriptionPanel";
 import ProblemPageSkeleton from "@/components/problems/ProblemPageSkeleton";
 import PairProgrammingClient from "@/components/problems/PairProgrammingClient";
 import ProblemNotFound from "./ProblemNotFound";
+import { asyncloadcurrentproblem } from "@/store/actions/problems/problemAction";
 
-export default function ProblemPage() {
-  // Route is defined as /problems/:problemId in routes
-  // Use problemId as the slug to fetch the problem
+const ProblemPage = () => {
   const { problemId } = useParams();
   const isMobile = useIsMobile();
 
   // ---------------- Redux Version (commented) ----------------
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  const { currentProblem, loading } = useSelector((state) => state.problems);
   // const problem = useSelector((state) => selectProblemById(state, id));
   // const loading = useSelector(selectProblemLoading);
   // useEffect(() => {
   //   if (id) dispatch(fetchProblemById(id));
   // }, [dispatch, id]);
 
-  const [problem, setProblem] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    let active = true;
-    async function load() {
-      try {
-        setLoading(true);
-        setError(null);
-        const safeSlug = encodeURIComponent(problemId);
-        const { data } = await axios.get(`/problems/${safeSlug}`);
-        if (!active) return;
-        setProblem(data);
-      } catch (err) {
-        if (!active) return;
-        setProblem(null);
-        setError(err?.response?.data?.message || "Failed to load problem");
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-    if (problemId) load();
-    return () => {
-      active = false;
-    };
+    dispatch(asyncloadcurrentproblem(problemId));
   }, [problemId]);
 
   if (loading) return <ProblemPageSkeleton />;
-  if (!problem) return <ProblemNotFound />;
+  if (!currentProblem && !loading) return <ProblemNotFound />;
 
   if (isMobile) {
     return (
       <div className="h-[calc(100vh-4rem)] flex flex-col scroll-smooth">
         <div className="flex-1 overflow-y-auto">
-          <ProblemDescriptionPanel problem={problem} />
+          <ProblemDescriptionPanel problem={currentProblem} />
         </div>
         <div className="h-[60vh] border-t">
-          <PairProgrammingClient problem={problem} />
+          <PairProgrammingClient problem={currentProblem} />
         </div>
       </div>
     );
   }
 
   return (
-    <ResizablePanelGroup direction="horizontal" className="w-full h-[calc(100vh-4rem)] scroll-smooth">
-      <ResizablePanel defaultSize={50} minSize={30}>
-        <ProblemDescriptionPanel problem={problem} />
-      </ResizablePanel>
-      <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={50} minSize={30}>
-        <PairProgrammingClient problem={problem} />
-      </ResizablePanel>
-    </ResizablePanelGroup>
+    <div className="h-[calc(100vh-4rem)] overflow-hidden">
+      <ResizablePanelGroup direction="horizontal" className="w-full h-full">
+        <ResizablePanel defaultSize={50} minSize={30}>
+          <ProblemDescriptionPanel problem={currentProblem} />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={50} minSize={30}>
+          <PairProgrammingClient problem={currentProblem} />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
   );
 }
+
+export default ProblemPage;

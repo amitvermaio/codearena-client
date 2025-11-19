@@ -29,6 +29,16 @@ const Login = () => {
   // Form handling with react-hook-form
   const { register, handleSubmit, formState: { errors } } = useForm();
 
+  const handleGoogleLogin = () => {
+    toast.loading('Redirecting to Google...');
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
+  }
+
+  const handleGithubLogin = () => {
+    toast.loading('Redirecting to Github...');
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/github`;
+  }
+
   // Handle sign in
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -39,7 +49,7 @@ const Login = () => {
       const response = await axios.post('/auth/login', { email, password });
       console.log(response);
       if (response.status === 200) {
-        localStorage.setItem('CodeArena_Token', response.data?.data?.token);
+        localStorage.setItem(import.meta.env.VITE_TOKEN_NAME, response.data?.data?.token);
         toast.success('Successfully signed in!');
         navigate('/problems');
       }
@@ -72,8 +82,8 @@ const Login = () => {
             
             {/* Social Sign-In */}
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" type="button"><GoogleIcon /> Google</Button>
-              <Button variant="outline" type="button"><Github /> GitHub</Button>
+              <Button variant="outline" type="button" onClick={handleGoogleLogin}><GoogleIcon /> Google</Button>
+              <Button variant="outline" type="button" onClick={handleGithubLogin}><Github /> GitHub</Button>
             </div>
 
             {/* Divider */}
