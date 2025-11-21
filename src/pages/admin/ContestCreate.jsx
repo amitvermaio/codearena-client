@@ -38,9 +38,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input as FileInput } from "@/components/ui/input"; // ✅ normal input with type="file"
 import ContestProblemSelectDialog from "@/components/admin/ContestProblemSelectDialog";
 import { Textarea } from "@/components/ui/textarea";
+import axios from "@/config/axios.config";
 
 // =============================
 // Zod Schema
@@ -50,7 +50,9 @@ const contestFormSchema = z.object({
   startTime: z.date(),
   duration: z.string().min(1, "Please select a duration."),
   imageUrl: z.any().optional(),
+  description: z.string().optional(),
 });
+
 
 const ContestCreate = () => {
   const navigate = useNavigate();
@@ -63,22 +65,43 @@ const ContestCreate = () => {
       title: "",
       startTime: new Date(),
       duration: "1h",
+      description: "",
     },
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (selectedProblems.length === 0) {
       toast.error("Please select at least one problem for the contest.");
       return;
     }
 
-    console.log("Creating contest:", { ...data, problems: selectedProblems });
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("startTime", data.startTime.toISOString());
+    formData.append("duration", data.duration);
+    formData.append("description", data.description || "");
 
-    toast.success("Contest Created", {
-      description: `Contest "${data.title}" has been successfully created.`,
-    });
+    formData.append("problems", JSON.stringify(selectedProblems));
 
-    navigate("/admin/contests");
+    if (data.imageUrl) {
+      formData.append("coverImage", data.imageUrl); 
+    }
+    toast.loading("Wait a moment...", { duration: 2000 });
+    try {
+      const res = await axios.post("/admin/contests", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${localStorage.getItem(import.meta.env.VITE_TOKEN_NAME)}`,
+        },
+      });
+      if (res.status === 201) {
+        toast.success("Contest Created Successfully!");
+        form.reset();
+//        navigate("/admin/contests");
+      }
+    } catch (error) {
+      toast.error("Error creating contest");
+    }
   };
 
   return (
