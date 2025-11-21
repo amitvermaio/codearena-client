@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,89 +22,64 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { difficultyColors } from "@/utils/constants.js";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setFilter,
+  applyFilters,
+  selectAllProblems,
+  selectFilteredProblems,
+  selectFilters,
+  clearFilters,
+} from "@/store/features/problems/problemSlice";
 
-// =============================
-// Difficulty badge colors
-// =============================
-const difficultyColors = {
-  Easy: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700",
-  Medium:
-    "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-700",
-  Hard: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700",
-};
 
-// =============================
-// Main Component
-// =============================
 const ContestProblemSelectDialog = ({ isOpen, setIsOpen, onSave, initialSelected }) => {
-  const [allProblems, setAllProblems] = useState([]);
+  const dispatch = useDispatch();
   const [selectedProblemIds, setSelectedProblemIds] = useState(new Set());
-  const [searchQuery, setSearchQuery] = useState("");
 
-  // ---------------------------
-  // Fetch problems (replace with your API)
-  // ---------------------------
-  const getProblems = async () => {
-    // Example mock API
-    return [
-      {
-        id: "1",
-        title: "Two Sum",
-        difficulty: "Easy",
-        tags: ["Array", "HashMap"],
-      },
-      {
-        id: "2",
-        title: "Binary Tree Paths",
-        difficulty: "Medium",
-        tags: ["Tree", "DFS"],
-      },
-      {
-        id: "3",
-        title: "Word Ladder",
-        difficulty: "Hard",
-        tags: ["Graph", "BFS"],
-      },
-    ];
-  };
+  const problems = useSelector(selectAllProblems);
+  const filteredProblems = useSelector(selectFilteredProblems);
+  const filters = useSelector(selectFilters);
 
-  useEffect(() => {
-    getProblems().then(setAllProblems);
-  }, []);
+  const getProblemId = (problem) => String(problem?._id ?? problem?.id ?? "");
+  const normalizeToId = (item) =>
+    typeof item === "string" || typeof item === "number" ? String(item) : getProblemId(item);
+
 
   useEffect(() => {
     if (isOpen) {
-      setSelectedProblemIds(new Set(initialSelected.map((p) => p.id)));
+      setSelectedProblemIds(new Set((initialSelected || []).map((item) => normalizeToId(item))));
+      dispatch(applyFilters());
+    } else {
+      dispatch(clearFilters());
     }
-  }, [isOpen, initialSelected]);
+  }, [isOpen, initialSelected, dispatch]);
 
-  // ---------------------------
-  // Search filter
-  // ---------------------------
-  const filteredProblems = useMemo(() => {
-    return allProblems.filter((p) =>
-      p.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [allProblems, searchQuery]);
+  useEffect(() => {
+    dispatch(applyFilters());
+  }, [dispatch, problems, filters]);
 
-  // ---------------------------
-  // Selection logic
-  // ---------------------------
+  const handleFilter = (type, value) => {
+    dispatch(setFilter({ filterType: type, value }));
+  };
+
   const handleSelect = (problemId, isSelected) => {
+    const normalizedId = String(problemId);
     const newSet = new Set(selectedProblemIds);
     if (isSelected) {
-      newSet.add(problemId);
+      newSet.add(normalizedId);
     } else {
-      newSet.delete(problemId);
+      newSet.delete(normalizedId);
     }
     setSelectedProblemIds(newSet);
   };
 
   const handleSave = () => {
-    const selected = allProblems.filter((p) => selectedProblemIds.has(p.id));
-    onSave(selected);
+    const selectedIds = Array.from(selectedProblemIds);
+    onSave(selectedIds);
     setIsOpen(false);
-    toast.success(`${selected.length} problems selected for your contest.`);
+    toast.success(`${selectedIds.length} problems selected for your contest.`);
   };
 
   return (
@@ -118,13 +93,13 @@ const ContestProblemSelectDialog = ({ isOpen, setIsOpen, onSave, initialSelected
         </DialogHeader>
 
         {/* Search bar */}
-        <div className="relative">
+        <div className="relative w-full md:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by problem title..."
             className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={filters.searchQuery}
+            onChange={(e) => handleFilter("searchQuery", e.target.value)}
           />
         </div>
 
@@ -140,34 +115,37 @@ const ContestProblemSelectDialog = ({ isOpen, setIsOpen, onSave, initialSelected
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredProblems.map((problem) => (
-                <TableRow key={problem.id}>
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedProblemIds.has(problem.id)}
-                      onCheckedChange={(checked) =>
-                        handleSelect(problem.id, !!checked)
-                      }
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">{problem.title}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={difficultyColors[problem.difficulty]}
-                    >
-                      {problem.difficulty}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="space-x-1 max-w-sm truncate whitespace-nowrap">
-                    {problem.tags.slice(0, 3).map((tag) => (
-                      <Badge key={tag} variant="secondary">
-                        {tag}
+              {filteredProblems.map((problem) => {
+                const problemId = getProblemId(problem);
+                return (
+                  <TableRow key={problemId}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedProblemIds.has(problemId)}
+                        onCheckedChange={(checked) =>
+                          handleSelect(problemId, !!checked)
+                        }
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">{problem.title}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={difficultyColors[problem.difficulty]}
+                      >
+                        {problem.difficulty}
                       </Badge>
-                    ))}
-                  </TableCell>
-                </TableRow>
-              ))}
+                    </TableCell>
+                    <TableCell className="space-x-1 max-w-sm truncate whitespace-nowrap">
+                      {(problem.tags || []).slice(0, 3).map((tag) => (
+                        <Badge key={tag} variant="secondary">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
 
@@ -204,12 +182,12 @@ import { createSlice } from "@reduxjs/toolkit";
 const problemsSlice = createSlice({
   name: "problems",
   initialState: {
-    allProblems: [],
+    problems: [],
     selectedProblemIds: new Set(),
   },
   reducers: {
     setProblems: (state, action) => {
-      state.allProblems = action.payload;
+      state.problems = action.payload;
     },
     toggleProblem: (state, action) => {
       if (state.selectedProblemIds.has(action.payload)) {
@@ -232,7 +210,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setProblems, toggleProblem } from "@/redux/problemsSlice";
 
 const dispatch = useDispatch();
-const allProblems = useSelector((state) => state.problems.allProblems);
+const problems = useSelector((state) => state.problems.problems);
 const selectedProblemIds = useSelector((state) => state.problems.selectedProblemIds);
 
 // Fetch problems
@@ -247,7 +225,7 @@ const handleSelect = (problemId, isSelected) => {
 
 // Handle save (Redux keeps selectedProblems in store)
 const handleSave = () => {
-  const selected = allProblems.filter((p) => selectedProblemIds.has(p.id));
+  const selected = problems.filter((p) => selectedProblemIds.has(p.id));
   onSave(selected);
   setIsOpen(false);
   toast.success(`${selected.length} problems selected for your contest.`);
