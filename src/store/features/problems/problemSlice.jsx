@@ -10,8 +10,8 @@ const initialState = {
   currentProblem: null,
   loading: false,
   error: null,
-
-  // user progress copied from user slice (ids as strings)
+  loaded: null,
+  
   userProgress: {
     solvedIds: [],     // string[]
     attemptedIds: [],  // string[]

@@ -73,10 +73,8 @@ const Mainroutes = () => {
   const { loaded, potd } = useSelector((state) => state.potd);
 
   useEffect(() => {
-    if (!loaded) {
-      dispatch(asyncgetpotd());
-    }
-  }, []);
+    if (!loaded) dispatch(asyncgetpotd());
+  }, [loaded]);
 
   return (
     <Suspense fallback={<Loader />}>
@@ -122,13 +120,7 @@ const Mainroutes = () => {
         {/* ------------------------------ */}
         <Route
           path="/administration"
-          element={
-            <ProtectedRoute>
-              <AdminRoute>
-                <AdminLayout />
-              </AdminRoute>
-            </ProtectedRoute>
-          }
+          element={<AdminLayout />}
         >
           {/* Admin Home */}
           <Route index element={<AdminPanel />} />

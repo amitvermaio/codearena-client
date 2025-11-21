@@ -1,29 +1,24 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getProblemOfTheDay, getProblems } from "@/lib/api";
 import { Star, Edit, Trash2 } from "lucide-react";
 import { ProblemSelectDialog } from "@/components/admin/ProblemSelectDialog";
 import { toast } from "sonner";
 import { Link } from "react-router-dom"; // ✅ Import Link
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { asyncgetpotd, asyncupdatepotd } from "@/store/actions/problems/potdAction";
 
 const AdminPanel = () => {
-  const [potd, setPotd] = useState(null);
-  const [allProblems, setAllProblems] = useState([]);
+  const dispatch = useDispatch();
+  const { potd, createdBy, updatedBy } = useSelector((state) => state.potd);
+  const { problems } = useSelector((state) => state.problems);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  useEffect(() => {
-    getProblemOfTheDay().then(setPotd);
-    getProblems().then(setAllProblems);
-  }, []);
-
   const handleUpdatePotd = (problem) => {
-    setPotd(problem);
-  };
-
-  const handleRemovePotd = () => {
-    setPotd(null);
-    toast.info("Problem of the Day has been removed.");
+    if (!problem) return;
+    dispatch(asyncupdatepotd(problem._id));
+    toast.success("Problem of the Day updated successfully.");
   };
 
   return (
@@ -48,13 +43,16 @@ const AdminPanel = () => {
                 <div>
                   <p className="font-semibold">{potd.title}</p>
                   <p className="text-sm text-muted-foreground">{potd.difficulty}</p>
+                  {createdBy && (
+                    <p className="text-xs text-muted-foreground">Created by: {createdBy}</p>
+                  )}
+                  {updatedBy && (
+                    <p className="text-xs text-muted-foreground">Updated by: {updatedBy}</p>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(true)}>
                     <Edit className="mr-2 h-4 w-4" /> Update
-                  </Button>
-                  <Button variant="destructive" size="sm" onClick={handleRemovePotd}>
-                    <Trash2 className="mr-2 h-4 w-4" /> Remove
                   </Button>
                 </div>
               </>
@@ -72,7 +70,7 @@ const AdminPanel = () => {
         <ProblemSelectDialog
           isOpen={isDialogOpen}
           setIsOpen={setIsDialogOpen}
-          problems={allProblems}
+          problems={problems}
           onSelectProblem={handleUpdatePotd}
         />
 
@@ -161,7 +159,7 @@ export default AdminPanel;
 /* -------------------- Redux Version (commented) --------------------
 
 import { useSelector, useDispatch } from "react-redux";
-import { fetchPotd, fetchProblems, updatePotd, removePotd } from "@/store/adminSlice";
+import { fetchPotd, fetchProblems, updatePotd, asyncgetpotd } from "@/store/adminSlice";
 
 const administrationPanel = () => {
   const dispatch = useDispatch();
@@ -179,7 +177,7 @@ const administrationPanel = () => {
   };
 
   const handleRemovePotd = () => {
-    dispatch(removePotd());
+    dispatch(asyncgetpotd());
     toast.info("Problem of the Day has been removed.");
   };
 

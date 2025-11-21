@@ -32,8 +32,7 @@ const ProblemsPage = () => {
   const filters = useSelector((state) => state.problems.filters);
   const potd = useSelector((state) => state.potd.potd);
 
-  // Local UI states only
-  const [problemOfTheDay, setProblemOfTheDay] = useState(null);
+
   const [isPairingDialogOpen, setIsPairingDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -42,14 +41,6 @@ const ProblemsPage = () => {
 
   useEffect(() => {
     dispatch(asyncloadproblems());
-
-    setProblemOfTheDay({
-      id: 101,
-      title: "Two Sum",
-      difficulty: "Easy",
-      status: "Todo",
-      tags: ["Array", "Hash Table"],
-    });
   }, [dispatch]);
 
   const allTags = useMemo(() => {
@@ -81,7 +72,7 @@ const ProblemsPage = () => {
         {/* ----------- HEADER END ----------- */}
 
         {/* ----------- PROBLEM OF THE DAY ----------- */}
-        {problemOfTheDay && (
+        {potd && (
           <section className="mb-12">
             <div className="text-center mb-6">
               <h2 className="text-3xl sm:text-4xl font-bold font-headline flex items-center justify-center gap-3">
