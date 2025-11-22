@@ -73,10 +73,8 @@ const Mainroutes = () => {
   const { loaded, potd } = useSelector((state) => state.potd);
 
   useEffect(() => {
-    if (!loaded) {
-      dispatch(asyncgetpotd());
-    }
-  }, []);
+    if (!loaded) dispatch(asyncgetpotd());
+  }, [loaded]);
 
   return (
     <Suspense fallback={<Loader />}>

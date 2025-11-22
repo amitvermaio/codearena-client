@@ -2,10 +2,6 @@ import React, { useEffect, useState } from "react";
 import { getContests } from "../../lib/api"; 
 import ContestCard from "../../components/contests/ContestCard";
 
-// Redux imports (uncomment jab Redux setup ho jaye)
-// import { useSelector, useDispatch } from "react-redux";
-// import { fetchContests } from "../redux/contestSlice";
-
 const ContestList = () => {
   const [platformContests, setPlatformContests] = useState([]);
   useEffect(() => {

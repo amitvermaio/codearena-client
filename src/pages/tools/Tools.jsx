@@ -11,8 +11,8 @@ const tools = [
     icon: <Wand2 className="h-8 w-8 text-primary" />,
   },
   {
-    title: "Code Converter",
-    description: "Change your code to another Language, See how it can be in another Programming Language. Learn Grow.",
+    title: "Bug Detector",
+    description: "Find and fix bugs in your code with AI-powered code analysis. Learn and grow. Let's code!",
     href: "/tools/code-converter",
     icon: <CodeXmlIcon className="h-8 w-8 text-primary" />
   }

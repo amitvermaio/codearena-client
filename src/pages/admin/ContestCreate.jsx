@@ -38,8 +38,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input as FileInput } from "@/components/ui/input"; // ✅ normal input with type="file"
 import ContestProblemSelectDialog from "@/components/admin/ContestProblemSelectDialog";
+import { Textarea } from "@/components/ui/textarea";
+import axios from "@/config/axios.config";
 
 // =============================
 // Zod Schema
@@ -49,7 +50,9 @@ const contestFormSchema = z.object({
   startTime: z.date(),
   duration: z.string().min(1, "Please select a duration."),
   imageUrl: z.any().optional(),
+  description: z.string().optional(),
 });
+
 
 const ContestCreate = () => {
   const navigate = useNavigate();
@@ -62,22 +65,43 @@ const ContestCreate = () => {
       title: "",
       startTime: new Date(),
       duration: "1h",
+      description: "",
     },
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (selectedProblems.length === 0) {
       toast.error("Please select at least one problem for the contest.");
       return;
     }
 
-    console.log("Creating contest:", { ...data, problems: selectedProblems });
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("startTime", data.startTime.toISOString());
+    formData.append("duration", data.duration);
+    formData.append("description", data.description || "");
 
-    toast.success("Contest Created", {
-      description: `Contest "${data.title}" has been successfully created.`,
-    });
+    formData.append("problems", JSON.stringify(selectedProblems));
 
-    navigate("/admin/contests");
+    if (data.imageUrl) {
+      formData.append("coverImage", data.imageUrl); 
+    }
+    toast.loading("Wait a moment...", { duration: 2000 });
+    try {
+      const res = await axios.post("/admin/contests", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${localStorage.getItem(import.meta.env.VITE_TOKEN_NAME)}`,
+        },
+      });
+      if (res.status === 201) {
+        toast.success("Contest Created Successfully!");
+        form.reset();
+//        navigate("/admin/contests");
+      }
+    } catch (error) {
+      toast.error("Error creating contest");
+    }
   };
 
   return (
@@ -121,6 +145,27 @@ const ContestCreate = () => {
                       <Input
                         placeholder="e.g., Weekly Sprint #25"
                         {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Contest Description */}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contest Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="e.g., Solve 4 problems in 90 minutes. Difficulty ranges from Easy to Hard."
+                        {...field}
+                        rows={5}
+                        maxLength={200}
+                        className="resize-none"
                       />
                     </FormControl>
                     <FormMessage />
@@ -213,30 +258,30 @@ const ContestCreate = () => {
 
               {/* Contest Photo */}
               <FormField
-  control={form.control}
-  name="imageUrl"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Contest Photo</FormLabel>
-      <FormControl>
-        <div className="relative">
-          {/* Styled box acting as file input */}
-          <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer text-sm text-muted-foreground hover:bg-accent">
-            <Upload className="h-4 w-4 text-muted-foreground" />
-            <span>{field.value ? field.value.name : "Choose a file..."}</span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => field.onChange(e.target.files?.[0])}
-            />
-          </label>
-        </div>
-      </FormControl>
-      <FormMessage />
-    </FormItem>
-  )}
-/>
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contest Photo</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        {/* Styled box acting as file input */}
+                        <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer text-sm text-muted-foreground hover:bg-accent">
+                          <Upload className="h-4 w-4 text-muted-foreground" />
+                          <span>{field.value ? field.value.name : "Choose a file..."}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => field.onChange(e.target.files?.[0])}
+                          />
+                        </label>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* Contest Problems */}
               <div className="space-y-2">
@@ -271,69 +316,3 @@ const ContestCreate = () => {
 }
 
 export default ContestCreate;
-
-/* =========================================================
-   🚀 REDUX IMPLEMENTATION (COMMENTED)
-   =========================================================
-
-// contestSlice.js
-import { createSlice } from "@reduxjs/toolkit";
-
-const contestSlice = createSlice({
-  name: "contest",
-  initialState: {
-    title: "",
-    startTime: new Date(),
-    duration: "1h",
-    imageUrl: null,
-    selectedProblems: [],
-  },
-  reducers: {
-    setContestField: (state, action) => {
-      const { field, value } = action.payload;
-      state[field] = value;
-    },
-    setProblems: (state, action) => {
-      state.selectedProblems = action.payload;
-    },
-    resetContest: (state) => {
-      state.title = "";
-      state.startTime = new Date();
-      state.duration = "1h";
-      state.imageUrl = null;
-      state.selectedProblems = [];
-    },
-  },
-});
-
-export const { setContestField, setProblems, resetContest } = contestSlice.actions;
-export default contestSlice.reducer;
-
-
-// In CreateContestPage.jsx
-import { useSelector, useDispatch } from "react-redux";
-import { setContestField, setProblems, resetContest } from "@/redux/contestSlice";
-
-const dispatch = useDispatch();
-const contest = useSelector((state) => state.contest);
-
-const handleSubmit = () => {
-  if (contest.selectedProblems.length === 0) {
-    toast.error("Please select at least one problem for the contest.");
-    return;
-  }
-  console.log("Creating contest:", contest);
-  toast.success("Contest Created", {
-    description: `Contest "${contest.title}" has been successfully created.`,
-  });
-  dispatch(resetContest());
-  navigate("/admin/contests");
-};
-
-// Example usage inside form
-<Input
-  value={contest.title}
-  onChange={(e) => dispatch(setContestField({ field: "title", value: e.target.value }))}
-/>
-
-========================================================= */
