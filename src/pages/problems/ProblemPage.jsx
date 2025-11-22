@@ -24,24 +24,21 @@ const ProblemsPage = () => {
 
   const dispatch = useDispatch()
 
-<<<<<<< HEAD
+
 
   const [isPairingDialogOpen, setIsPairingDialogOpen] = useState(false);
-=======
+
   const problems = useSelector( (state) => state.problems.problems )
   const filteredProblems = useSelector( (state) => state.problems.filteredProblems )
   const filters = useSelector( (state) => state.problems.filters )
   const potd = useSelector( (state) => state.potd.potd )
->>>>>>> e5c4386870b34850998685287e481c667bf8df4d
 
-  const [potdLocal, setPotdLocal] = useState( null )
   const [pairOpen, setPairOpen] = useState( false )
 
-<<<<<<< HEAD
+
   useEffect(() => {
     dispatch(asyncloadproblems());
   }, [dispatch]);
-=======
 
 
   useEffect( () => {
@@ -52,13 +49,6 @@ const ProblemsPage = () => {
 
   useEffect( () => {
     dispatch( asyncloadproblems() )
-    setPotdLocal({
-      id: 101,
-      title: 'Two Sum',
-      difficulty: 'Easy',
-      status: 'Todo',
-      tags: ['Array', 'Hash Table'],
-    })
   }, [dispatch] )
 
 
@@ -70,7 +60,6 @@ const ProblemsPage = () => {
     } )
     return [ ...s ].sort()
   }, [ problems ] )
->>>>>>> e5c4386870b34850998685287e481c667bf8df4d
 
 
   const handleFilter = (type, value) => {
@@ -101,26 +90,15 @@ const ProblemsPage = () => {
         {/* ----------- HEADER END ----------- */}
 
         {/* ----------- PROBLEM OF THE DAY ----------- */}
-<<<<<<< HEAD
-        {potd && (
           <section className="mb-12">
             <div className="text-center mb-6">
               <h2 className="text-3xl sm:text-4xl font-bold font-headline flex items-center justify-center gap-3">
                 <Flame className="h-8 w-8 text-orange-500" />
-=======
-        {potdLocal && (
-          <section className='mb-12'>
-            <div className='text-center mb-6'>
-              <h2 className='text-3xl sm:text-4xl font-bold font-headline flex items-center justify-center gap-3'>
-                <Flame className='h-8 w-8 text-orange-500' />
->>>>>>> e5c4386870b34850998685287e481c667bf8df4d
                 Problem of the Day
               </h2>
             </div>
             <ProblemOfTheDay problem={potd} />
           </section>
-        )}
-
 
         {/* ----------- PAIRING CARD ----------- */}
         <Card className='mb-8 bg-gradient-to-r from-primary/10 to-transparent'>
