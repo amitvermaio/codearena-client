@@ -122,13 +122,7 @@ const Mainroutes = () => {
         {/* ------------------------------ */}
         <Route
           path="/administration"
-          element={
-            <ProtectedRoute>
-              <AdminRoute>
-                <AdminLayout />
-              </AdminRoute>
-            </ProtectedRoute>
-          }
+          element={<AdminLayout />}
         >
           {/* Admin Home */}
           <Route index element={<AdminPanel />} />
